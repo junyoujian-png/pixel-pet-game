@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pixel Pet</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- Top Nav -->
+    <header class="top-bar">
+      <div class="top-bar__tabs">
+        <button class="tab active" data-tab="pet">寵物</button>
+        <button class="tab" data-tab="bag">背包</button>
+        <button class="tab" data-tab="food">食物</button>
+        <button class="tab" data-tab="equip">裝備</button>
+      </div>
+      <div class="top-bar__coins">
+        <span class="coin-icon">🪙</span>
+        <span id="coin-count">0</span>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content">
+
+      <!-- Pet Tab -->
+      <section class="tab-panel active" id="tab-pet">
+
+        <!-- Info Card -->
+        <div class="card pet-card">
+          <div class="pet-card__left">
+            <div class="pet-avatar">
+              <svg id="pet-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" class="pixel-art">
+                <!-- Fox pixel art -->
+                <!-- Ears -->
+                <rect x="4"  y="2"  width="4" height="6" fill="#E8622A"/>
+                <rect x="5"  y="3"  width="2" height="4" fill="#F4A261"/>
+                <rect x="24" y="2"  width="4" height="6" fill="#E8622A"/>
+                <rect x="25" y="3"  width="2" height="4" fill="#F4A261"/>
+                <!-- Head -->
+                <rect x="6"  y="6"  width="20" height="14" fill="#E8622A"/>
+                <!-- Forehead lighter -->
+                <rect x="8"  y="6"  width="16" height="4"  fill="#F4A261"/>
+                <!-- Eyes -->
+                <rect x="10" y="11" width="3" height="3" fill="#2D1B00"/>
+                <rect x="19" y="11" width="3" height="3" fill="#2D1B00"/>
+                <!-- Eye shine -->
+                <rect x="11" y="11" width="1" height="1" fill="#fff"/>
+                <rect x="20" y="11" width="1" height="1" fill="#fff"/>
+                <!-- Nose -->
+                <rect x="14" y="16" width="4" height="2" fill="#2D1B00"/>
+                <!-- Snout -->
+                <rect x="12" y="14" width="8" height="4" fill="#F4A261"/>
+                <!-- Cheeks -->
+                <rect x="8"  y="14" width="4" height="2" fill="#FFB4A2"/>
+                <rect x="20" y="14" width="4" height="2" fill="#FFB4A2"/>
+                <!-- Body -->
+                <rect x="8"  y="20" width="16" height="10" fill="#E8622A"/>
+                <!-- Belly -->
+                <rect x="11" y="22" width="10" height="7"  fill="#F4A261"/>
+                <!-- Tail -->
+                <rect x="24" y="22" width="4"  height="8"  fill="#E8622A"/>
+                <rect x="25" y="26" width="3"  height="4"  fill="#fff"/>
+                <!-- Paws -->
+                <rect x="8"  y="28" width="4"  height="2"  fill="#C94A1A"/>
+                <rect x="20" y="28" width="4"  height="2"  fill="#C94A1A"/>
+              </svg>
+            </div>
+            <div id="pet-mood-emoji" class="mood-emoji">😊</div>
+          </div>
+          <div class="pet-card__right">
+            <div class="pet-name-row">
+              <span id="pet-name" class="pet-name">小狐</span>
+              <span class="badge badge--r">R</span>
+            </div>
+            <div class="pet-level-row">
+              <span class="label">Lv.</span>
+              <span id="pet-level" class="level-num">1</span>
+            </div>
+            <div class="exp-bar-wrap">
+              <div class="exp-bar">
+                <div id="exp-fill" class="exp-bar__fill" style="width:0%"></div>
+              </div>
+              <span id="exp-text" class="exp-text">0 / 100</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="card stats-card">
+          <div class="stat-row">
+            <span class="stat-label">🎂 年齡</span>
+            <span id="stat-age" class="stat-value">0 天</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">⚖️ 體重</span>
+            <span id="stat-weight" class="stat-value">1.0 kg</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">😄 心情</span>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar"><div id="mood-fill" class="stat-bar__fill mood-fill" style="width:80%"></div></div>
+              <span id="stat-mood" class="stat-value">80</span>
+            </div>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">🍖 飽食</span>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar"><div id="hunger-fill" class="stat-bar__fill hunger-fill" style="width:60%"></div></div>
+              <span id="stat-hunger" class="stat-value">60</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-grid">
+          <button class="action-btn" id="btn-feed">
+            <span class="action-icon">🍖</span>
+            <span>餵食</span>
+          </button>
+          <button class="action-btn" id="btn-focus">
+            <span class="action-icon">⏱️</span>
+            <span>專注計時</span>
+          </button>
+          <button class="action-btn" id="btn-todo">
+            <span class="action-icon">✅</span>
+            <span>待辦清單</span>
+          </button>
+          <button class="action-btn" id="btn-look">
+            <span class="action-icon">👗</span>
+            <span>形象</span>
+          </button>
+        </div>
+
+        <!-- Small Buttons Row -->
+        <div class="small-btn-row">
+          <button class="small-btn" id="btn-info" title="資訊">
+            <span>ℹ️</span>
+          </button>
+          <button class="small-btn has-dot" id="btn-boost" title="加速">
+            <span>⚡</span>
+            <span class="red-dot"></span>
+          </button>
+          <button class="small-btn" id="btn-shop-small" title="商店">
+            <span>🛒</span>
+          </button>
+          <button class="small-btn" id="btn-more" title="更多">
+            <span>⋯</span>
+          </button>
+        </div>
+
+      </section>
+
+      <!-- Bag Tab -->
+      <section class="tab-panel" id="tab-bag">
+        <div class="card">
+          <h3 class="section-title">背包</h3>
+          <div id="bag-grid" class="item-grid">
+            <div class="empty-hint">背包是空的</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Food Tab -->
+      <section class="tab-panel" id="tab-food">
+        <div class="card">
+          <h3 class="section-title">食物</h3>
+          <div class="item-grid">
+            <div class="shop-item" data-item="fish">
+              <span class="item-icon">🐟</span>
+              <span class="item-name">小魚</span>
+              <button class="buy-btn" data-cost="10" data-type="food" data-id="fish">10🪙</button>
+            </div>
+            <div class="shop-item" data-item="meat">
+              <span class="item-icon">🍖</span>
+              <span class="item-name">烤肉</span>
+              <button class="buy-btn" data-cost="25" data-type="food" data-id="meat">25🪙</button>
+            </div>
+            <div class="shop-item" data-item="cake">
+              <span class="item-icon">🎂</span>
+              <span class="item-name">蛋糕</span>
+              <button class="buy-btn" data-cost="50" data-type="food" data-id="cake">50🪙</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Equip Tab -->
+      <section class="tab-panel" id="tab-equip">
+        <div class="card">
+          <h3 class="section-title">裝備</h3>
+          <div class="item-grid">
+            <div class="shop-item">
+              <span class="item-icon">🎩</span>
+              <span class="item-name">紳士帽</span>
+              <button class="buy-btn" data-cost="100" data-type="equip" data-id="hat">100🪙</button>
+            </div>
+            <div class="shop-item">
+              <span class="item-icon">🧣</span>
+              <span class="item-name">圍巾</span>
+              <button class="buy-btn" data-cost="80" data-type="equip" data-id="scarf">80🪙</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-nav="home">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">首頁</span>
+      </button>
+      <button class="nav-btn" data-nav="explore">
+        <span class="nav-icon">🗺️</span>
+        <span class="nav-label">探索</span>
+      </button>
+      <button class="nav-btn" data-nav="shop">
+        <span class="nav-icon">🛍️</span>
+        <span class="nav-label">商店</span>
+      </button>
+      <button class="nav-btn" data-nav="settings">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">設定</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- Modals -->
+  <div id="modal-focus" class="modal hidden">
+    <div class="modal-box">
+      <h2>專注計時器</h2>
+      <div id="focus-display" class="focus-display">25:00</div>
+      <div class="focus-controls">
+        <button id="focus-start">開始</button>
+        <button id="focus-stop">停止</button>
+      </div>
+      <p class="modal-hint">完成後獲得 EXP 和金幣！</p>
+      <button class="modal-close" data-modal="modal-focus">✕</button>
+    </div>
+  </div>
+
+  <div id="modal-todo" class="modal hidden">
+    <div class="modal-box">
+      <h2>待辦清單</h2>
+      <div class="todo-input-row">
+        <input id="todo-input" type="text" placeholder="新增待辦事項..." maxlength="50" />
+        <button id="todo-add">+</button>
+      </div>
+      <ul id="todo-list" class="todo-list"></ul>
+      <p class="modal-hint">完成待辦獲得 EXP！</p>
+      <button class="modal-close" data-modal="modal-todo">✕</button>
+    </div>
+  </div>
+
+  <div id="modal-info" class="modal hidden">
+    <div class="modal-box">
+      <h2>寵物資訊</h2>
+      <div id="info-content" class="info-content"></div>
+      <button class="modal-close" data-modal="modal-info">✕</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="game.js"></script>
+</body>
+</html>
