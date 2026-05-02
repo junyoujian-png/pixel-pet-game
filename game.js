@@ -13,7 +13,7 @@ const DECAY_INTERVAL = 60_000;
 
 const PETS = [
   { id: 'fox',    name: '狐狸',  rarity: 'R',   image: 'assets/pets/fox.png',    expMult: 1.0, weightBase: 0.5 },
-  { id: 'cat',    name: '貓咪',  rarity: 'C',   image: 'assets/pets/cat.png',    expMult: 0.8, weightBase: 0.4 },
+  { id: 'cat',    name: '貓咪',  rarity: 'F',   image: 'assets/pets/cat.png',    expMult: 0.8, weightBase: 0.4 },
   { id: 'wolf',   name: '狼',    rarity: 'SR',  image: 'assets/pets/wolf.png',   expMult: 1.3, weightBase: 1.2 },
   { id: 'dragon', name: '龍',    rarity: 'SSR', image: 'assets/pets/dragon.png', expMult: 2.0, weightBase: 2.0 },
 ];
