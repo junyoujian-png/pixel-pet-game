@@ -18,7 +18,7 @@ const PETS = [
   { id: 'pet4',  name: '柯基',       rarity: 'F',  image: 'assets/pets/柯基' },
   { id: 'pet5',  name: '比格犬',     rarity: 'R',  image: 'assets/pets/比格犬' },
   { id: 'pet6',  name: '米克斯',     rarity: 'R',  image: 'assets/pets/米克斯' },
-  { id: 'pet7',  name: '貴賓狗',     rarity: 'R',  image: 'assets/pets/臘腸狗' },
+  { id: 'pet7',  name: '貴賓狗',     rarity: 'R',  image: 'assets/pets/貴賓狗' },
   { id: 'pet8',  name: '比熊',       rarity: 'R',  image: 'assets/pets/比熊' },
   { id: 'pet9',  name: '德牧',       rarity: 'SR', image: 'assets/pets/德牧' },
   { id: 'pet10', name: '邊牧',       rarity: 'SR', image: 'assets/pets/邊牧' },
