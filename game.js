@@ -9,9 +9,18 @@ const DRINK_COSTS     = { water: 5, juice: 15, milk: 30 };
 const DRINK_WATER     = { water: 25, juice: 40, milk: 60 };
 const DRINK_MOOD      = { water: 0,  juice: 3,  milk: 5  };
 const DRINK_EXP       = { water: 3,  juice: 8,  milk: 15 };
-const TODO_EXP        = 20;
-const TODO_COINS      = 8;
 const DECAY_INTERVAL  = 60_000; // 1 min
+
+const ITEM_DEFS = {
+  potion:  { icon: '🧪', name: '回復藥',  desc: '+30飽食 +30水份 +20心情' },
+  candy:   { icon: '🍬', name: '愛心糖',  desc: '+40心情' },
+  xpboost: { icon: '⭐', name: '成長藥',  desc: '+50 EXP' },
+};
+
+const EQUIP_DEFS = {
+  hat:   { icon: '🎩', name: '紳士帽' },
+  scarf: { icon: '🧣', name: '圍巾' },
+};
 const MOOD_MOODS = [
   [80, '😄'], [60, '😊'], [40, '😐'], [20, '😟'], [0, '😢']
 ];
@@ -25,7 +34,7 @@ const DEFAULT_STATE = {
   hunger: 60,
   mood:   80,
   water:  70,
-  todos:  [],
+  items:  {},
   equips: [],
 };
 
@@ -157,56 +166,80 @@ function giveDrink(type = 'water') {
   showToast(`補水成功！+${waterG} 💧 +${expG} EXP`);
 }
 
-// ─── Todo ─────────────────────────────────────────────────────────────────────
-function renderTodos() {
-  const list = document.getElementById('todo-list');
+// ─── Item Bag ─────────────────────────────────────────────────────────────────
+function useItem(id) {
+  if (!state.items[id] || state.items[id] <= 0) return;
+  state.items[id]--;
+  if (state.items[id] === 0) delete state.items[id];
+
+  if (id === 'potion') {
+    state.hunger = Math.min(100, state.hunger + 30);
+    state.water  = Math.min(100, state.water  + 30);
+    state.mood   = Math.min(100, state.mood   + 20);
+    saveState();
+    renderStats();
+    showToast('使用回復藥！+30飽食 +30水份 +20心情');
+  } else if (id === 'candy') {
+    state.mood = Math.min(100, state.mood + 40);
+    saveState();
+    renderStats();
+    showToast('使用愛心糖！+40心情 😄');
+  } else if (id === 'xpboost') {
+    saveState();
+    addExp(50);
+    showToast('使用成長藥！+50 EXP ⭐');
+  }
+  renderItemBag();
+}
+
+function renderItemBag() {
+  const list = document.getElementById('itembag-list');
+  const owned = Object.entries(state.items).filter(([, cnt]) => cnt > 0);
+  if (owned.length === 0) {
+    list.innerHTML = '<p class="empty-hint" style="padding:16px 0">道具背包是空的</p>';
+    return;
+  }
   list.innerHTML = '';
-  state.todos.forEach((todo, i) => {
-    const li = document.createElement('li');
-    li.className = `todo-item${todo.done ? ' done' : ''}`;
-
-    const cb = document.createElement('input');
-    cb.type    = 'checkbox';
-    cb.checked = todo.done;
-    cb.addEventListener('change', () => completeTodo(i));
-
-    const span = document.createElement('span');
-    span.textContent = todo.text;
-
-    const del = document.createElement('button');
-    del.textContent = '✕';
-    del.title = '刪除';
-    del.addEventListener('click', () => deleteTodo(i));
-
-    li.append(cb, span, del);
-    list.appendChild(li);
+  owned.forEach(([id, cnt]) => {
+    const def = ITEM_DEFS[id];
+    if (!def) return;
+    const row = document.createElement('div');
+    row.className = 'itembag-row';
+    row.innerHTML = `
+      <span class="itembag-icon">${def.icon}</span>
+      <div class="itembag-info">
+        <span class="itembag-name">${def.name}</span>
+        <span class="itembag-desc">${def.desc}</span>
+      </div>
+      <span class="itembag-count">×${cnt}</span>
+      <button class="use-btn" data-id="${id}">使用</button>
+    `;
+    list.appendChild(row);
+  });
+  list.querySelectorAll('.use-btn').forEach(btn => {
+    btn.addEventListener('click', () => useItem(btn.dataset.id));
   });
 }
 
-function addTodo() {
-  const input = document.getElementById('todo-input');
-  const text  = input.value.trim();
-  if (!text) return;
-  state.todos.push({ text, done: false });
-  input.value = '';
-  saveState();
-  renderTodos();
-}
-
-function completeTodo(i) {
-  if (state.todos[i].done) return;
-  state.todos[i].done = true;
-  saveState();
-  renderTodos();
-  addExp(TODO_EXP);
-  addCoins(TODO_COINS);
-  showToast(`完成任務！+${TODO_EXP} EXP, +${TODO_COINS}🪙`);
-}
-
-function deleteTodo(i) {
-  state.todos.splice(i, 1);
-  saveState();
-  renderTodos();
+// ─── Pet Bag ──────────────────────────────────────────────────────────────────
+function renderPetBag() {
+  const grid = document.getElementById('petbag-grid');
+  if (state.equips.length === 0) {
+    grid.innerHTML = '<div class="empty-hint">還沒有任何裝備</div>';
+    return;
+  }
+  grid.innerHTML = '';
+  state.equips.forEach(id => {
+    const def = EQUIP_DEFS[id] ?? { icon: '📦', name: id };
+    const cell = document.createElement('div');
+    cell.className = 'petbag-item';
+    cell.innerHTML = `
+      <span class="item-icon">${def.icon}</span>
+      <span class="item-name">${def.name}</span>
+      <span class="petbag-owned">已擁有</span>
+    `;
+    grid.appendChild(cell);
+  });
 }
 
 // ─── Info Modal ───────────────────────────────────────────────────────────────
@@ -305,10 +338,17 @@ function initShop() {
         saveState();
         addExp(expG);
         showToast(`補水成功！+${waterG} 💧 +${expG} EXP`);
+      } else if (type === 'item') {
+        state.items[id] = (state.items[id] ?? 0) + 1;
+        saveState();
+        const def = ITEM_DEFS[id];
+        showToast(`購買成功：${def?.name ?? id} ×1`);
       } else {
         if (!state.equips.includes(id)) state.equips.push(id);
         saveState();
-        showToast(`購買成功：${id}`);
+        const def = EQUIP_DEFS[id];
+        showToast(`購買成功：${def?.name ?? id}`);
+        renderPetBag();
       }
     });
   });
@@ -328,13 +368,15 @@ function initActions() {
     btn.addEventListener('click', () => giveDrink(btn.dataset.id));
   });
 
-  document.getElementById('btn-todo').addEventListener('click', () => {
-    openModal('modal-todo');
-    renderTodos();
+  document.getElementById('btn-itembag').addEventListener('click', () => {
+    renderItemBag();
+    openModal('modal-itembag');
   });
 
-  document.getElementById('btn-look').addEventListener('click', () => {
-    showToast('形象功能即將開放！');
+  document.getElementById('btn-petbag').addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'bag'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-bag'));
+    renderPetBag();
   });
 
   document.getElementById('btn-info').addEventListener('click', () => {
@@ -358,10 +400,6 @@ function initActions() {
     showToast('更多功能即將開放！');
   });
 
-  document.getElementById('todo-add').addEventListener('click', addTodo);
-  document.getElementById('todo-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') addTodo();
-  });
 }
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────

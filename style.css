@@ -478,62 +478,61 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   flex-shrink: 0;
 }
 
-/* Todo */
-.todo-input-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-.todo-input-row input {
-  flex: 1;
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface2);
-  color: var(--text);
-  font-size: 14px;
-  outline: none;
-}
-.todo-input-row input:focus { border-color: var(--accent); }
-#todo-add {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  border: none;
-  background: var(--accent);
-  color: #fff;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-.todo-list {
-  list-style: none;
+/* Item Bag Modal */
+.itembag-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  max-height: 200px;
+  gap: 8px;
+  max-height: 240px;
   overflow-y: auto;
 }
-.todo-item {
+.itembag-row {
   display: flex;
   align-items: center;
   gap: 10px;
   background: var(--surface2);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 10px;
-  font-size: 13px;
-  color: var(--text);
+  border-radius: 10px;
+  padding: 10px 12px;
 }
-.todo-item input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer; }
-.todo-item.done span { text-decoration: line-through; color: var(--text2); }
-.todo-item button {
-  margin-left: auto;
+.itembag-icon { font-size: 26px; flex-shrink: 0; }
+.itembag-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.itembag-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.itembag-desc { font-size: 11px; color: var(--text2); }
+.itembag-count { font-size: 13px; font-weight: 700; color: var(--accent); min-width: 28px; text-align: center; }
+.use-btn {
+  padding: 5px 12px;
+  border-radius: 8px;
   border: none;
-  background: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
-  font-size: 14px;
-  color: var(--text2);
+  flex-shrink: 0;
+  transition: opacity .2s;
+}
+.use-btn:hover { opacity: .85; }
+
+/* Pet Bag Tab */
+.petbag-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.petbag-owned {
+  font-size: 10px;
+  color: var(--green);
+  font-weight: 700;
+  background: #e8f5e933;
+  border: 1px solid var(--green);
+  border-radius: 6px;
+  padding: 2px 6px;
 }
 
 /* Info Modal */
