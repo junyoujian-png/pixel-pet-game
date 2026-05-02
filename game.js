@@ -243,18 +243,6 @@ function renderPetBag() {
 }
 
 // ─── Info Modal ───────────────────────────────────────────────────────────────
-function renderInfoModal() {
-  document.getElementById('info-content').innerHTML = `
-    <div class="info-row"><span>名稱</span><span>${state.name}</span></div>
-    <div class="info-row"><span>等級</span><span>Lv.${state.level}</span></div>
-    <div class="info-row"><span>EXP</span><span>${state.exp} / ${EXP_PER_LEVEL}</span></div>
-    <div class="info-row"><span>金幣</span><span>${state.coins} 🪙</span></div>
-    <div class="info-row"><span>心情</span><span>${Math.round(state.mood)} / 100</span></div>
-    <div class="info-row"><span>飽食度</span><span>${Math.round(state.hunger)} / 100</span></div>
-    <div class="info-row"><span>水份</span><span>${Math.round(state.water)} / 100</span></div>
-  `;
-}
-
 // ─── Decay (passive stat decrease) ───────────────────────────────────────────
 function decayStats() {
   state.hunger = Math.max(0, state.hunger - 2);
@@ -377,27 +365,6 @@ function initActions() {
     document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'bag'));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-bag'));
     renderPetBag();
-  });
-
-  document.getElementById('btn-info').addEventListener('click', () => {
-    renderInfoModal();
-    openModal('modal-info');
-  });
-
-  document.getElementById('btn-boost').addEventListener('click', () => {
-    if (!spendCoins(20)) { showToast('金幣不足！'); return; }
-    addExp(30);
-    document.querySelector('#btn-boost .red-dot')?.remove();
-    showToast('加速成功！+30 EXP');
-  });
-
-  document.getElementById('btn-shop-small').addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'food'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-food'));
-  });
-
-  document.getElementById('btn-more').addEventListener('click', () => {
-    showToast('更多功能即將開放！');
   });
 
 }
