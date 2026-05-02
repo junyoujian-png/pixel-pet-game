@@ -5,9 +5,10 @@ const EXP_PER_LEVEL   = 100;
 const FEED_COSTS      = { fish: 10, meat: 25, cake: 50 };
 const FEED_HUNGER     = { fish: 20, meat: 35, cake: 50 };
 const FEED_EXP        = { fish: 5,  meat: 10, cake: 20 };
-const FOCUS_MINUTES   = 25;
-const FOCUS_EXP       = 40;
-const FOCUS_COINS     = 15;
+const DRINK_COSTS     = { water: 5, juice: 15, milk: 30 };
+const DRINK_WATER     = { water: 25, juice: 40, milk: 60 };
+const DRINK_MOOD      = { water: 0,  juice: 3,  milk: 5  };
+const DRINK_EXP       = { water: 3,  juice: 8,  milk: 15 };
 const TODO_EXP        = 20;
 const TODO_COINS      = 8;
 const DECAY_INTERVAL  = 60_000; // 1 min
@@ -17,22 +18,18 @@ const MOOD_MOODS = [
 
 // ─── State ───────────────────────────────────────────────────────────────────
 const DEFAULT_STATE = {
-  name:      '小狐',
-  level:     1,
-  exp:       0,
-  coins:     50,
-  hunger:    60,
-  mood:      80,
-  weight:    1.0,
-  createdAt: Date.now(),
-  todos:     [],
-  equips:    [],
+  name:   '小狐',
+  level:  1,
+  exp:    0,
+  coins:  50,
+  hunger: 60,
+  mood:   80,
+  water:  70,
+  todos:  [],
+  equips: [],
 };
 
 let state = loadState();
-let focusTimer = null;
-let focusRemaining = FOCUS_MINUTES * 60;
-let focusRunning = false;
 
 // ─── Persistence ─────────────────────────────────────────────────────────────
 function loadState() {
@@ -95,14 +92,13 @@ function renderPetCard() {
 }
 
 function renderStats() {
-  const age = Math.floor((Date.now() - state.createdAt) / 86_400_000);
-  document.getElementById('stat-age').textContent    = `${age} 天`;
-  document.getElementById('stat-weight').textContent = `${state.weight.toFixed(1)} kg`;
   document.getElementById('stat-mood').textContent   = Math.round(state.mood);
   document.getElementById('stat-hunger').textContent = Math.round(state.hunger);
+  document.getElementById('stat-water').textContent  = Math.round(state.water);
 
   document.getElementById('mood-fill').style.width   = `${state.mood}%`;
   document.getElementById('hunger-fill').style.width = `${state.hunger}%`;
+  document.getElementById('water-fill').style.width  = `${state.water}%`;
 
   const moodEntry = MOOD_MOODS.find(([min]) => state.mood >= min) || MOOD_MOODS.at(-1);
   document.getElementById('pet-mood-emoji').textContent = moodEntry[1];
@@ -139,43 +135,26 @@ function feedPet(type = 'fish') {
 
   state.hunger = Math.min(100, state.hunger + hungerG);
   state.mood   = Math.min(100, state.mood + 5);
-  state.weight = +(state.weight + 0.05).toFixed(2);
   saveState();
   addExp(expG);
   showToast(`餵食成功！+${expG} EXP`);
 }
 
-// ─── Focus Timer ─────────────────────────────────────────────────────────────
-function startFocus() {
-  if (focusRunning) return;
-  focusRunning   = true;
-  focusRemaining = FOCUS_MINUTES * 60;
-  focusTimer = setInterval(() => {
-    focusRemaining--;
-    renderFocusDisplay();
-    if (focusRemaining <= 0) {
-      clearInterval(focusTimer);
-      focusRunning = false;
-      addExp(FOCUS_EXP);
-      addCoins(FOCUS_COINS);
-      state.mood = Math.min(100, state.mood + 10);
-      saveState();
-      showToast(`專注完成！+${FOCUS_EXP} EXP, +${FOCUS_COINS}🪙`);
-    }
-  }, 1000);
-}
+// ─── Drink ────────────────────────────────────────────────────────────────────
+function giveDrink(type = 'water') {
+  const cost   = DRINK_COSTS[type] ?? 5;
+  const waterG = DRINK_WATER[type] ?? 25;
+  const moodG  = DRINK_MOOD[type]  ?? 0;
+  const expG   = DRINK_EXP[type]   ?? 3;
 
-function stopFocus() {
-  clearInterval(focusTimer);
-  focusRunning   = false;
-  focusRemaining = FOCUS_MINUTES * 60;
-  renderFocusDisplay();
-}
+  if (!spendCoins(cost)) { showToast('金幣不足！'); return; }
 
-function renderFocusDisplay() {
-  const m = String(Math.floor(focusRemaining / 60)).padStart(2, '0');
-  const s = String(focusRemaining % 60).padStart(2, '0');
-  document.getElementById('focus-display').textContent = `${m}:${s}`;
+  state.water = Math.min(100, state.water + waterG);
+  if (moodG > 0) state.mood = Math.min(100, state.mood + moodG);
+  saveState();
+  addExp(expG);
+  closeModal('modal-drink');
+  showToast(`補水成功！+${waterG} 💧 +${expG} EXP`);
 }
 
 // ─── Todo ─────────────────────────────────────────────────────────────────────
@@ -232,23 +211,23 @@ function deleteTodo(i) {
 
 // ─── Info Modal ───────────────────────────────────────────────────────────────
 function renderInfoModal() {
-  const age = Math.floor((Date.now() - state.createdAt) / 86_400_000);
   document.getElementById('info-content').innerHTML = `
     <div class="info-row"><span>名稱</span><span>${state.name}</span></div>
     <div class="info-row"><span>等級</span><span>Lv.${state.level}</span></div>
     <div class="info-row"><span>EXP</span><span>${state.exp} / ${EXP_PER_LEVEL}</span></div>
     <div class="info-row"><span>金幣</span><span>${state.coins} 🪙</span></div>
-    <div class="info-row"><span>年齡</span><span>${age} 天</span></div>
-    <div class="info-row"><span>體重</span><span>${state.weight.toFixed(1)} kg</span></div>
     <div class="info-row"><span>心情</span><span>${Math.round(state.mood)} / 100</span></div>
     <div class="info-row"><span>飽食度</span><span>${Math.round(state.hunger)} / 100</span></div>
+    <div class="info-row"><span>水份</span><span>${Math.round(state.water)} / 100</span></div>
   `;
 }
 
 // ─── Decay (passive stat decrease) ───────────────────────────────────────────
 function decayStats() {
   state.hunger = Math.max(0, state.hunger - 2);
-  state.mood   = Math.max(0, state.mood   - (state.hunger < 20 ? 3 : 1));
+  state.water  = Math.max(0, state.water  - 3);
+  const moodPenalty = (state.hunger < 20 ? 2 : 0) + (state.water < 20 ? 2 : 0) + 1;
+  state.mood   = Math.max(0, state.mood - moodPenalty);
   saveState();
   renderStats();
 }
@@ -314,10 +293,18 @@ function initShop() {
         const expG    = FEED_EXP[id]    ?? 5;
         state.hunger  = Math.min(100, state.hunger + hungerG);
         state.mood    = Math.min(100, state.mood + 5);
-        state.weight  = +(state.weight + 0.05).toFixed(2);
         saveState();
         addExp(expG);
         showToast(`餵食成功！+${expG} EXP`);
+      } else if (type === 'drink') {
+        const waterG = DRINK_WATER[id] ?? 25;
+        const moodG  = DRINK_MOOD[id]  ?? 0;
+        const expG   = DRINK_EXP[id]   ?? 3;
+        state.water  = Math.min(100, state.water + waterG);
+        if (moodG > 0) state.mood = Math.min(100, state.mood + moodG);
+        saveState();
+        addExp(expG);
+        showToast(`補水成功！+${waterG} 💧 +${expG} EXP`);
       } else {
         if (!state.equips.includes(id)) state.equips.push(id);
         saveState();
@@ -333,9 +320,12 @@ function initActions() {
     feedPet('fish');
   });
 
-  document.getElementById('btn-focus').addEventListener('click', () => {
-    openModal('modal-focus');
-    renderFocusDisplay();
+  document.getElementById('btn-drink').addEventListener('click', () => {
+    openModal('modal-drink');
+  });
+
+  document.querySelectorAll('.drink-option').forEach(btn => {
+    btn.addEventListener('click', () => giveDrink(btn.dataset.id));
   });
 
   document.getElementById('btn-todo').addEventListener('click', () => {
@@ -367,9 +357,6 @@ function initActions() {
   document.getElementById('btn-more').addEventListener('click', () => {
     showToast('更多功能即將開放！');
   });
-
-  document.getElementById('focus-start').addEventListener('click', startFocus);
-  document.getElementById('focus-stop').addEventListener('click', stopFocus);
 
   document.getElementById('todo-add').addEventListener('click', addTodo);
   document.getElementById('todo-input').addEventListener('keydown', e => {

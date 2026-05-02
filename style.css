@@ -249,6 +249,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 .mood-fill   { background: linear-gradient(90deg, #66bb6a, #a5d6a7); }
 .hunger-fill { background: linear-gradient(90deg, #ff8a65, #ffcc80); }
+.water-fill  { background: linear-gradient(90deg, #42a5f5, #90caf9); }
 
 /* ─── Action Grid ─── */
 .action-grid {
@@ -442,34 +443,39 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   text-align: center;
 }
 
-/* Focus Timer */
-.focus-display {
-  font-size: 52px;
-  font-weight: 800;
-  text-align: center;
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
-  margin: 12px 0;
-}
-.focus-controls {
+/* Drink Modal */
+.drink-grid {
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.drink-option {
+  display: flex;
+  align-items: center;
   gap: 12px;
-  justify-content: center;
-}
-.focus-controls button {
-  padding: 10px 28px;
-  border-radius: 10px;
-  border: none;
-  background: var(--accent);
-  color: #fff;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.focus-controls button:last-child {
   background: var(--surface2);
   border: 1px solid var(--border);
-  color: var(--text);
+  border-radius: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all .2s;
+  text-align: left;
+  width: 100%;
+}
+.drink-option:hover { border-color: #42a5f5; background: #e3f2fd22; }
+.drink-option:active { transform: scale(.97); }
+.drink-icon { font-size: 28px; flex-shrink: 0; }
+.drink-name { font-size: 15px; font-weight: 700; color: var(--text); flex: 1; }
+.drink-stat { font-size: 11px; color: var(--text2); }
+.drink-cost {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 3px 8px;
+  flex-shrink: 0;
 }
 
 /* Todo */
