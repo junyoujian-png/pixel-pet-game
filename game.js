@@ -12,10 +12,29 @@ const DRINK_EXP      = { water: 3,  juice: 8,  milk: 15 };
 const DECAY_INTERVAL = 60_000;
 
 const PETS = [
-  { id: 'fox',    name: '狐狸',  rarity: 'R',   image: 'assets/pets/fox.png',    expMult: 1.0, weightBase: 0.5 },
-  { id: 'cat',    name: '貓咪',  rarity: 'F',   image: 'assets/pets/cat.png',    expMult: 0.8, weightBase: 0.4 },
-  { id: 'wolf',   name: '狼',    rarity: 'SR',  image: 'assets/pets/wolf.png',   expMult: 1.3, weightBase: 1.2 },
-  { id: 'dragon', name: '龍',    rarity: 'SSR', image: 'assets/pets/dragon.png', expMult: 2.0, weightBase: 2.0 },
+  { id: 'pet1',  name: '小狗',       rarity: 'F',  image: 'assets/pets/小狗' },
+  { id: 'pet2',  name: '柴犬',       rarity: 'F',  image: 'assets/pets/柴犬' },
+  { id: 'pet3',  name: '臘腸狗',     rarity: 'F',  image: 'assets/pets/臘腸狗' },
+  { id: 'pet4',  name: '柯基',       rarity: 'F',  image: 'assets/pets/柯基' },
+  { id: 'pet5',  name: '比格犬',     rarity: 'R',  image: 'assets/pets/比格犬' },
+  { id: 'pet6',  name: '米克斯',     rarity: 'R',  image: 'assets/pets/米克斯' },
+  { id: 'pet7',  name: '貴賓狗',     rarity: 'R',  image: 'assets/pets/臘腸狗' },
+  { id: 'pet8',  name: '比熊',       rarity: 'R',  image: 'assets/pets/比熊' },
+  { id: 'pet9',  name: '德牧',       rarity: 'SR', image: 'assets/pets/德牧' },
+  { id: 'pet10', name: '邊牧',       rarity: 'SR', image: 'assets/pets/邊牧' },
+  { id: 'pet11', name: '伯恩山',     rarity: 'SR', image: 'assets/pets/伯恩山' },
+  { id: 'pet12', name: '牧羊犬',     rarity: 'SR', image: 'assets/pets/牧羊犬' },
+  { id: 'pet13', name: '橘貓',       rarity: 'F',  image: 'assets/pets/橘貓' },
+  { id: 'pet14', name: '灰貓',       rarity: 'F',  image: 'assets/pets/灰貓' },
+  { id: 'pet15', name: '白貓',       rarity: 'F',  image: 'assets/pets/白貓' },
+  { id: 'pet16', name: '黑貓',       rarity: 'F',  image: 'assets/pets/黑貓' },
+  { id: 'pet17', name: '英國短毛貓', rarity: 'R',  image: 'assets/pets/英國短毛貓' },
+  { id: 'pet18', name: '牛奶貓',     rarity: 'R',  image: 'assets/pets/牛奶貓' },
+  { id: 'pet19', name: '布偶貓',     rarity: 'R',  image: 'assets/pets/布偶貓' },
+  { id: 'pet20', name: '三花貓',     rarity: 'SR', image: 'assets/pets/三花貓' },
+  { id: 'pet21', name: '波斯貓',     rarity: 'SR', image: 'assets/pets/波斯貓' },
+  { id: 'pet22', name: '緬因貓',     rarity: 'SR', image: 'assets/pets/緬因貓' },
+  { id: 'pet23', name: '狐狸',       rarity: 'R',  image: 'assets/pets/狐狸' },
 ];
 
 const ITEM_DEFS = {
