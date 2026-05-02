@@ -1,15 +1,22 @@
 'use strict';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-const EXP_PER_LEVEL   = 100;
-const FEED_COSTS      = { fish: 10, meat: 25, cake: 50 };
-const FEED_HUNGER     = { fish: 20, meat: 35, cake: 50 };
-const FEED_EXP        = { fish: 5,  meat: 10, cake: 20 };
-const DRINK_COSTS     = { water: 5, juice: 15, milk: 30 };
-const DRINK_WATER     = { water: 25, juice: 40, milk: 60 };
-const DRINK_MOOD      = { water: 0,  juice: 3,  milk: 5  };
-const DRINK_EXP       = { water: 3,  juice: 8,  milk: 15 };
-const DECAY_INTERVAL  = 60_000; // 1 min
+const EXP_PER_LEVEL  = 100;
+const FEED_COSTS     = { fish: 10, meat: 25, cake: 50 };
+const FEED_HUNGER    = { fish: 20, meat: 35, cake: 50 };
+const FEED_EXP       = { fish: 5,  meat: 10, cake: 20 };
+const DRINK_COSTS    = { water: 5, juice: 15, milk: 30 };
+const DRINK_WATER    = { water: 25, juice: 40, milk: 60 };
+const DRINK_MOOD     = { water: 0,  juice: 3,  milk: 5  };
+const DRINK_EXP      = { water: 3,  juice: 8,  milk: 15 };
+const DECAY_INTERVAL = 60_000;
+
+const PETS = [
+  { id: 'fox',    name: '狐狸',  rarity: 'R',   image: 'assets/pets/fox.png',    expMult: 1.0, weightBase: 0.5 },
+  { id: 'cat',    name: '貓咪',  rarity: 'C',   image: 'assets/pets/cat.png',    expMult: 0.8, weightBase: 0.4 },
+  { id: 'wolf',   name: '狼',    rarity: 'SR',  image: 'assets/pets/wolf.png',   expMult: 1.3, weightBase: 1.2 },
+  { id: 'dragon', name: '龍',    rarity: 'SSR', image: 'assets/pets/dragon.png', expMult: 2.0, weightBase: 2.0 },
+];
 
 const ITEM_DEFS = {
   potion:  { icon: '🧪', name: '回復藥',  desc: '+30飽食 +30水份 +20心情' },
@@ -21,35 +28,109 @@ const EQUIP_DEFS = {
   hat:   { icon: '🎩', name: '紳士帽' },
   scarf: { icon: '🧣', name: '圍巾' },
 };
+
 const MOOD_MOODS = [
   [80, '😄'], [60, '😊'], [40, '😐'], [20, '😟'], [0, '😢']
 ];
 
 // ─── State ───────────────────────────────────────────────────────────────────
-const DEFAULT_STATE = {
-  name:   '小狐',
-  level:  1,
-  exp:    0,
-  coins:  50,
-  hunger: 60,
-  mood:   80,
-  water:  70,
-  items:  {},
-  equips: [],
+const DEFAULT_GLOBAL = {
+  coins: 50, hunger: 60, mood: 80, water: 70, items: {}, equips: [],
 };
+const DEFAULT_PET_STATE = { level: 1, exp: 0 };
 
+let selectedPetId = localStorage.getItem('selectedPetId') || null;
 let state = loadState();
+
+function currentPet() {
+  return PETS.find(p => p.id === selectedPetId) || PETS[0];
+}
 
 // ─── Persistence ─────────────────────────────────────────────────────────────
 function loadState() {
+  let global = { ...DEFAULT_GLOBAL };
   try {
     const raw = localStorage.getItem('pixelPet');
-    return raw ? { ...DEFAULT_STATE, ...JSON.parse(raw) } : { ...DEFAULT_STATE };
-  } catch { return { ...DEFAULT_STATE }; }
+    if (raw) global = { ...DEFAULT_GLOBAL, ...JSON.parse(raw) };
+  } catch {}
+
+  let petSt = { ...DEFAULT_PET_STATE };
+  if (selectedPetId) {
+    try {
+      const raw = localStorage.getItem(`petState_${selectedPetId}`);
+      if (raw) petSt = { ...DEFAULT_PET_STATE, ...JSON.parse(raw) };
+    } catch {}
+  }
+
+  return { ...global, ...petSt };
 }
 
 function saveState() {
-  localStorage.setItem('pixelPet', JSON.stringify(state));
+  const global = {
+    coins: state.coins, hunger: state.hunger, mood: state.mood,
+    water: state.water, items: state.items, equips: state.equips,
+  };
+  localStorage.setItem('pixelPet', JSON.stringify(global));
+
+  if (selectedPetId) {
+    localStorage.setItem(`petState_${selectedPetId}`, JSON.stringify({
+      level: state.level, exp: state.exp,
+    }));
+  }
+}
+
+// ─── Pet Selection ────────────────────────────────────────────────────────────
+function renderSelectScreen() {
+  const grid = document.getElementById('select-grid');
+  grid.innerHTML = '';
+  PETS.forEach(pet => {
+    const card = document.createElement('button');
+    card.className = 'select-card';
+    if (pet.id === selectedPetId) card.classList.add('select-card--active');
+    card.innerHTML = `
+      <div class="select-card__img-wrap">
+        <img src="${pet.image}" alt="${pet.name}" class="pixel-art select-card__img" />
+      </div>
+      <span class="select-card__name">${pet.name}</span>
+      <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
+    `;
+    card.addEventListener('click', () => selectPet(pet.id));
+    grid.appendChild(card);
+  });
+}
+
+function showSelectScreen() {
+  renderSelectScreen();
+  document.getElementById('screen-select').classList.remove('hidden');
+}
+
+function hideSelectScreen() {
+  document.getElementById('screen-select').classList.add('hidden');
+}
+
+function selectPet(id) {
+  if (selectedPetId) {
+    localStorage.setItem(`petState_${selectedPetId}`, JSON.stringify({
+      level: state.level, exp: state.exp,
+    }));
+  }
+
+  selectedPetId = id;
+  localStorage.setItem('selectedPetId', id);
+
+  try {
+    const raw = localStorage.getItem(`petState_${id}`);
+    const petSt = raw ? { ...DEFAULT_PET_STATE, ...JSON.parse(raw) } : { ...DEFAULT_PET_STATE };
+    state.level = petSt.level;
+    state.exp   = petSt.exp;
+  } catch {
+    state.level = DEFAULT_PET_STATE.level;
+    state.exp   = DEFAULT_PET_STATE.exp;
+  }
+
+  hideSelectScreen();
+  renderAll();
+  showToast(`選擇了 ${currentPet().name}！`);
 }
 
 // ─── EXP / Level ─────────────────────────────────────────────────────────────
@@ -92,12 +173,22 @@ function renderAll() {
 }
 
 function renderPetCard() {
-  document.getElementById('pet-name').textContent  = state.name;
+  const pet = currentPet();
+
+  const img = document.getElementById('pet-img');
+  img.src = pet.image;
+  img.alt = pet.name;
+
+  document.getElementById('pet-name').textContent  = pet.name;
   document.getElementById('pet-level').textContent = state.level;
 
+  const badge = document.getElementById('pet-rarity-badge');
+  badge.textContent = pet.rarity;
+  badge.className   = `badge badge--${pet.rarity.toLowerCase()}`;
+
   const pct = Math.floor((state.exp / EXP_PER_LEVEL) * 100);
-  document.getElementById('exp-fill').style.width   = `${pct}%`;
-  document.getElementById('exp-text').textContent   = `${state.exp} / ${EXP_PER_LEVEL}`;
+  document.getElementById('exp-fill').style.width = `${pct}%`;
+  document.getElementById('exp-text').textContent  = `${state.exp} / ${EXP_PER_LEVEL}`;
 }
 
 function renderStats() {
@@ -176,13 +267,11 @@ function useItem(id) {
     state.hunger = Math.min(100, state.hunger + 30);
     state.water  = Math.min(100, state.water  + 30);
     state.mood   = Math.min(100, state.mood   + 20);
-    saveState();
-    renderStats();
+    saveState(); renderStats();
     showToast('使用回復藥！+30飽食 +30水份 +20心情');
   } else if (id === 'candy') {
     state.mood = Math.min(100, state.mood + 40);
-    saveState();
-    renderStats();
+    saveState(); renderStats();
     showToast('使用愛心糖！+40心情 😄');
   } else if (id === 'xpboost') {
     saveState();
@@ -193,7 +282,7 @@ function useItem(id) {
 }
 
 function renderItemBag() {
-  const list = document.getElementById('itembag-list');
+  const list  = document.getElementById('itembag-list');
   const owned = Object.entries(state.items).filter(([, cnt]) => cnt > 0);
   if (owned.length === 0) {
     list.innerHTML = '<p class="empty-hint" style="padding:16px 0">道具背包是空的</p>';
@@ -230,7 +319,7 @@ function renderPetBag() {
   }
   grid.innerHTML = '';
   state.equips.forEach(id => {
-    const def = EQUIP_DEFS[id] ?? { icon: '📦', name: id };
+    const def  = EQUIP_DEFS[id] ?? { icon: '📦', name: id };
     const cell = document.createElement('div');
     cell.className = 'petbag-item';
     cell.innerHTML = `
@@ -242,8 +331,7 @@ function renderPetBag() {
   });
 }
 
-// ─── Info Modal ───────────────────────────────────────────────────────────────
-// ─── Decay (passive stat decrease) ───────────────────────────────────────────
+// ─── Decay ───────────────────────────────────────────────────────────────────
 function decayStats() {
   state.hunger = Math.max(0, state.hunger - 2);
   state.water  = Math.max(0, state.water  - 3);
@@ -267,12 +355,8 @@ function initTabs() {
 }
 
 // ─── Modal System ─────────────────────────────────────────────────────────────
-function openModal(id) {
-  document.getElementById(id)?.classList.remove('hidden');
-}
-function closeModal(id) {
-  document.getElementById(id)?.classList.add('hidden');
-}
+function openModal(id)  { document.getElementById(id)?.classList.remove('hidden'); }
+function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
 
 function initModals() {
   document.querySelectorAll('.modal-close').forEach(btn => {
@@ -329,13 +413,11 @@ function initShop() {
       } else if (type === 'item') {
         state.items[id] = (state.items[id] ?? 0) + 1;
         saveState();
-        const def = ITEM_DEFS[id];
-        showToast(`購買成功：${def?.name ?? id} ×1`);
+        showToast(`購買成功：${ITEM_DEFS[id]?.name ?? id} ×1`);
       } else {
         if (!state.equips.includes(id)) state.equips.push(id);
         saveState();
-        const def = EQUIP_DEFS[id];
-        showToast(`購買成功：${def?.name ?? id}`);
+        showToast(`購買成功：${EQUIP_DEFS[id]?.name ?? id}`);
         renderPetBag();
       }
     });
@@ -344,13 +426,9 @@ function initShop() {
 
 // ─── Action Buttons ──────────────────────────────────────────────────────────
 function initActions() {
-  document.getElementById('btn-feed').addEventListener('click', () => {
-    feedPet('fish');
-  });
+  document.getElementById('btn-feed').addEventListener('click', () => feedPet('fish'));
 
-  document.getElementById('btn-drink').addEventListener('click', () => {
-    openModal('modal-drink');
-  });
+  document.getElementById('btn-drink').addEventListener('click', () => openModal('modal-drink'));
 
   document.querySelectorAll('.drink-option').forEach(btn => {
     btn.addEventListener('click', () => giveDrink(btn.dataset.id));
@@ -367,11 +445,16 @@ function initActions() {
     renderPetBag();
   });
 
+  document.getElementById('btn-change-pet').addEventListener('click', () => showSelectScreen());
 }
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 function init() {
-  renderAll();
+  if (!selectedPetId) {
+    showSelectScreen();
+  } else {
+    renderAll();
+  }
   initTabs();
   initModals();
   initBottomNav();

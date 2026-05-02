@@ -7,6 +7,14 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Pet Select Screen -->
+  <div id="screen-select" class="screen-select hidden">
+    <div class="select-header">
+      <h1 class="select-title">選擇你的寵物</h1>
+    </div>
+    <div id="select-grid" class="select-grid"></div>
+  </div>
+
   <div id="app">
 
     <!-- Top Nav -->
@@ -33,14 +41,14 @@
         <div class="card pet-card">
           <div class="pet-card__left">
             <div class="pet-avatar">
-              <img id="pet-svg" src="assets/pets/fox.png" alt="fox" class="pixel-art" />
+              <img id="pet-img" src="assets/pets/fox.png" alt="fox" class="pixel-art" />
             </div>
             <div id="pet-mood-emoji" class="mood-emoji">😊</div>
           </div>
           <div class="pet-card__right">
             <div class="pet-name-row">
               <span id="pet-name" class="pet-name">小狐</span>
-              <span class="badge badge--r">R</span>
+              <span id="pet-rarity-badge" class="badge badge--r">R</span>
             </div>
             <div class="pet-level-row">
               <span class="label">Lv.</span>
@@ -97,6 +105,14 @@
           <button class="action-btn" id="btn-petbag">
             <span class="action-icon">🐾</span>
             <span>寵物背包</span>
+          </button>
+        </div>
+
+        <!-- Change Pet Button -->
+        <div class="small-btn-row">
+          <button class="small-btn" id="btn-change-pet" title="換寵物">
+            <span>🔄</span>
+            <span class="small-btn-label">換寵物</span>
           </button>
         </div>
 
