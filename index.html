@@ -22,8 +22,7 @@
       <div class="top-bar__tabs">
         <button class="tab active" data-tab="pet">寵物</button>
         <button class="tab" data-tab="bag">背包</button>
-        <button class="tab" data-tab="food">食物</button>
-        <button class="tab" data-tab="equip">裝備</button>
+        <button class="tab" data-tab="shop">商店</button>
       </div>
       <div class="top-bar__coins">
         <span class="coin-icon">🪙</span>
@@ -128,87 +127,136 @@
         </div>
       </section>
 
-      <!-- Food Tab -->
-      <section class="tab-panel" id="tab-food">
-        <div class="card">
-          <h3 class="section-title">食物</h3>
-          <div class="item-grid">
-            <div class="shop-item" data-item="fish">
-              <span class="item-icon">🐟</span>
-              <span class="item-name">小魚</span>
-              <button class="buy-btn" data-cost="10" data-type="food" data-id="fish">10🪙</button>
-            </div>
-            <div class="shop-item" data-item="meat">
-              <span class="item-icon">🍖</span>
-              <span class="item-name">烤肉</span>
-              <button class="buy-btn" data-cost="25" data-type="food" data-id="meat">25🪙</button>
-            </div>
-            <div class="shop-item" data-item="cake">
-              <span class="item-icon">🎂</span>
-              <span class="item-name">蛋糕</span>
-              <button class="buy-btn" data-cost="50" data-type="food" data-id="cake">50🪙</button>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <h3 class="section-title">道具</h3>
-          <div class="item-grid">
-            <div class="shop-item">
-              <span class="item-icon">🧪</span>
-              <span class="item-name">回復藥</span>
-              <button class="buy-btn" data-cost="40" data-type="item" data-id="potion">40🪙</button>
-            </div>
-            <div class="shop-item">
-              <span class="item-icon">🍬</span>
-              <span class="item-name">愛心糖</span>
-              <button class="buy-btn" data-cost="25" data-type="item" data-id="candy">25🪙</button>
-            </div>
-            <div class="shop-item">
-              <span class="item-icon">⭐</span>
-              <span class="item-name">成長藥</span>
-              <button class="buy-btn" data-cost="50" data-type="item" data-id="xpboost">50🪙</button>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <h3 class="section-title">飲料</h3>
-          <div class="item-grid">
-            <div class="shop-item" data-item="water">
-              <span class="item-icon">💧</span>
-              <span class="item-name">清水</span>
-              <button class="buy-btn" data-cost="5" data-type="drink" data-id="water">5🪙</button>
-            </div>
-            <div class="shop-item" data-item="juice">
-              <span class="item-icon">🧃</span>
-              <span class="item-name">果汁</span>
-              <button class="buy-btn" data-cost="15" data-type="drink" data-id="juice">15🪙</button>
-            </div>
-            <div class="shop-item" data-item="milk">
-              <span class="item-icon">🥛</span>
-              <span class="item-name">牛奶</span>
-              <button class="buy-btn" data-cost="30" data-type="drink" data-id="milk">30🪙</button>
-            </div>
-          </div>
-        </div>
-      </section>
+      <!-- Shop Tab -->
+      <section class="tab-panel" id="tab-shop">
 
-      <!-- Equip Tab -->
-      <section class="tab-panel" id="tab-equip">
-        <div class="card">
-          <h3 class="section-title">裝備</h3>
-          <div class="item-grid">
-            <div class="shop-item">
-              <span class="item-icon">🎩</span>
-              <span class="item-name">紳士帽</span>
-              <button class="buy-btn" data-cost="100" data-type="equip" data-id="hat">100🪙</button>
-            </div>
-            <div class="shop-item">
-              <span class="item-icon">🧣</span>
-              <span class="item-name">圍巾</span>
-              <button class="buy-btn" data-cost="80" data-type="equip" data-id="scarf">80🪙</button>
+        <div class="shop-subtabs">
+          <button class="shop-subtab active" data-shop="food">🍖 食物</button>
+          <button class="shop-subtab" data-shop="drink">🥤 飲料</button>
+          <button class="shop-subtab" data-shop="item">🎒 道具</button>
+          <button class="shop-subtab" data-shop="gacha">🎰 扭蛋</button>
+        </div>
+
+        <!-- Food Shop -->
+        <div class="shop-panel active" id="shop-food">
+          <div class="card">
+            <div class="item-grid">
+              <div class="shop-item">
+                <span class="item-icon">🐟</span>
+                <span class="item-name">小魚</span>
+                <span class="item-desc">+20飽食 +5 EXP</span>
+                <button class="buy-btn" data-cost="10" data-type="food" data-id="fish">10🪙</button>
+              </div>
+              <div class="shop-item">
+                <span class="item-icon">🍖</span>
+                <span class="item-name">烤肉</span>
+                <span class="item-desc">+35飽食 +10 EXP</span>
+                <button class="buy-btn" data-cost="25" data-type="food" data-id="meat">25🪙</button>
+              </div>
+              <div class="shop-item">
+                <span class="item-icon">🎂</span>
+                <span class="item-name">蛋糕</span>
+                <span class="item-desc">+50飽食 +20 EXP</span>
+                <button class="buy-btn" data-cost="50" data-type="food" data-id="cake">50🪙</button>
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- Drink Shop -->
+        <div class="shop-panel" id="shop-drink">
+          <div class="card">
+            <div class="item-grid">
+              <div class="shop-item">
+                <span class="item-icon">💧</span>
+                <span class="item-name">清水</span>
+                <span class="item-desc">+25💧 +3 EXP</span>
+                <button class="buy-btn" data-cost="5" data-type="drink" data-id="water">5🪙</button>
+              </div>
+              <div class="shop-item">
+                <span class="item-icon">🧃</span>
+                <span class="item-name">果汁</span>
+                <span class="item-desc">+40💧 +3😄 +8 EXP</span>
+                <button class="buy-btn" data-cost="15" data-type="drink" data-id="juice">15🪙</button>
+              </div>
+              <div class="shop-item">
+                <span class="item-icon">🥛</span>
+                <span class="item-name">牛奶</span>
+                <span class="item-desc">+60💧 +5😄 +15 EXP</span>
+                <button class="buy-btn" data-cost="30" data-type="drink" data-id="milk">30🪙</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Item Shop -->
+        <div class="shop-panel" id="shop-item">
+          <div class="card">
+            <h3 class="section-title">道具</h3>
+            <div class="item-grid">
+              <div class="shop-item">
+                <span class="item-icon">🧪</span>
+                <span class="item-name">回復藥</span>
+                <span class="item-desc">+30飽食 +30💧 +20😄</span>
+                <button class="buy-btn" data-cost="40" data-type="item" data-id="potion">40🪙</button>
+              </div>
+              <div class="shop-item">
+                <span class="item-icon">🍬</span>
+                <span class="item-name">愛心糖</span>
+                <span class="item-desc">+40😄</span>
+                <button class="buy-btn" data-cost="25" data-type="item" data-id="candy">25🪙</button>
+              </div>
+              <div class="shop-item">
+                <span class="item-icon">⭐</span>
+                <span class="item-name">成長藥</span>
+                <span class="item-desc">+50 EXP</span>
+                <button class="buy-btn" data-cost="50" data-type="item" data-id="xpboost">50🪙</button>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 class="section-title">裝備</h3>
+            <div class="item-grid">
+              <div class="shop-item">
+                <span class="item-icon">🎩</span>
+                <span class="item-name">紳士帽</span>
+                <button class="buy-btn" data-cost="100" data-type="equip" data-id="hat">100🪙</button>
+              </div>
+              <div class="shop-item">
+                <span class="item-icon">🧣</span>
+                <span class="item-name">圍巾</span>
+                <button class="buy-btn" data-cost="80" data-type="equip" data-id="scarf">80🪙</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gacha -->
+        <div class="shop-panel" id="shop-gacha">
+          <div class="card gacha-card-wrap">
+            <div class="gacha-machine" id="gacha-machine">🎱</div>
+            <h3 class="gacha-title">運氣扭蛋機</h3>
+            <div class="gacha-btns">
+              <button class="gacha-btn gacha-btn--single" id="btn-gacha-single">
+                <span>單抽</span>
+                <span class="gacha-cost">100 🪙</span>
+              </button>
+              <button class="gacha-btn gacha-btn--ten" id="btn-gacha-ten">
+                <span>十連抽</span>
+                <span class="gacha-cost">900 🪙</span>
+                <span class="gacha-discount">九折優惠</span>
+              </button>
+            </div>
+            <div class="gacha-rates">
+              <div class="rate-row"><span class="badge badge--f">F</span><span class="rate-pct">50%</span></div>
+              <div class="rate-row"><span class="badge badge--r">R</span><span class="rate-pct">30%</span></div>
+              <div class="rate-row"><span class="badge badge--sr">SR</span><span class="rate-pct">15%</span></div>
+              <div class="rate-row"><span class="badge badge--ssr">SSR</span><span class="rate-pct">5%</span></div>
+              <p class="rate-note">✨ 十連抽保底：必得 SR 以上一隻</p>
+            </div>
+          </div>
+        </div>
+
       </section>
 
     </main>
@@ -269,6 +317,15 @@
       <div id="itembag-list" class="itembag-list"></div>
       <p class="modal-hint">到食物頁面購買道具</p>
       <button class="modal-close" data-modal="modal-itembag">✕</button>
+    </div>
+  </div>
+
+  <!-- Gacha Result Modal -->
+  <div id="modal-gacha-result" class="modal hidden">
+    <div class="modal-box gacha-result-box">
+      <h2>🎰 扭蛋結果</h2>
+      <div id="gacha-result-grid" class="gacha-result-grid"></div>
+      <button id="btn-gacha-close" class="btn-confirm">確認</button>
     </div>
   </div>
 

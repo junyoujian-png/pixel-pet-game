@@ -128,6 +128,31 @@ function saveState() {
 
 const RARITY_ORDER = { 'F': 0, 'R': 1, 'SR': 2, 'SSR': 3 };
 
+const GACHA_COST_SINGLE = 100;
+const GACHA_COST_TEN    = 900;
+const RARITY_RATES = [
+  { rarity: 'SSR', weight: 5  },
+  { rarity: 'SR',  weight: 15 },
+  { rarity: 'R',   weight: 30 },
+  { rarity: 'F',   weight: 50 },
+];
+
+let unlockedPets = (() => {
+  try {
+    const raw = localStorage.getItem('unlockedPets');
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return ['pet1'];
+})();
+
+function saveUnlockedPets() {
+  localStorage.setItem('unlockedPets', JSON.stringify(unlockedPets));
+}
+
+function isUnlocked(id) {
+  return unlockedPets.includes(id);
+}
+
 // ─── Pet Selection ────────────────────────────────────────────────────────────
 function renderSelectScreen() {
   const grid = document.getElementById('select-grid');
@@ -144,18 +169,115 @@ function renderSelectScreen() {
       divider.textContent = pet.rarity;
       grid.appendChild(divider);
     }
+    const locked = !isUnlocked(pet.id);
     const card = document.createElement('button');
-    card.className = 'select-card';
-    if (pet.id === selectedPetId) card.classList.add('select-card--active');
+    card.className = 'select-card' + (locked ? ' select-card--locked' : '');
+    if (!locked && pet.id === selectedPetId) card.classList.add('select-card--active');
     card.innerHTML = `
       <div class="select-card__img-wrap">
+        ${locked ? '<div class="select-card__lock-overlay">🔒</div>' : ''}
         <img src="${pet.image}" alt="${pet.name}" class="pixel-art select-card__img" />
       </div>
       <span class="select-card__name">${pet.name}</span>
       <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
     `;
-    card.addEventListener('click', () => selectPet(pet.id));
+    card.addEventListener('click', () => {
+      if (locked) { showToast('前往扭蛋機解鎖！'); return; }
+      selectPet(pet.id);
+    });
     grid.appendChild(card);
+  });
+}
+
+// ─── Gacha ────────────────────────────────────────────────────────────────────
+function rollPet(forcedMinRarity = null) {
+  let rarity;
+  if (forcedMinRarity) {
+    const minOrder = RARITY_ORDER[forcedMinRarity];
+    const eligible = RARITY_RATES.filter(r => RARITY_ORDER[r.rarity] >= minOrder);
+    const total = eligible.reduce((s, r) => s + r.weight, 0);
+    let rand = Math.random() * total;
+    for (const { rarity: r, weight } of eligible) {
+      rand -= weight;
+      if (rand <= 0) { rarity = r; break; }
+    }
+    rarity = rarity || forcedMinRarity;
+  } else {
+    const total = RARITY_RATES.reduce((s, r) => s + r.weight, 0);
+    let rand = Math.random() * total;
+    for (const { rarity: r, weight } of RARITY_RATES) {
+      rand -= weight;
+      if (rand <= 0) { rarity = r; break; }
+    }
+    rarity = rarity || 'F';
+  }
+  const pool = PETS.filter(p => p.rarity === rarity);
+  return pool[Math.floor(Math.random() * pool.length)] || PETS[0];
+}
+
+function doGachaRolls(count) {
+  const results = [];
+  let hasSRPlus = false;
+  for (let i = 0; i < count; i++) {
+    const needPity = count === 10 && i === count - 1 && !hasSRPlus;
+    const pet = rollPet(needPity ? 'SR' : null);
+    if (RARITY_ORDER[pet.rarity] >= 2) hasSRPlus = true;
+    const isNew = !isUnlocked(pet.id);
+    if (isNew) {
+      unlockedPets.push(pet.id);
+    } else {
+      state.coins += 50;
+    }
+    results.push({ pet, isNew, compensation: isNew ? 0 : 50 });
+  }
+  saveUnlockedPets();
+  saveState();
+  renderCoins();
+  return results;
+}
+
+function showGachaResult(results) {
+  const grid = document.getElementById('gacha-result-grid');
+  grid.innerHTML = '';
+  results.forEach((r, i) => {
+    const card = document.createElement('div');
+    card.className = `gacha-result-card gacha-result-card--${r.pet.rarity.toLowerCase()}`;
+    card.style.animationDelay = `${i * 0.08}s`;
+    card.innerHTML = `
+      <img src="${r.pet.image}" alt="${r.pet.name}" class="pixel-art gacha-result-card__img" />
+      <span class="gacha-result-card__name">${r.pet.name}</span>
+      <span class="badge badge--${r.pet.rarity.toLowerCase()}">${r.pet.rarity}</span>
+      ${r.isNew
+        ? '<span class="gacha-tag gacha-tag--new">NEW！</span>'
+        : '<span class="gacha-tag gacha-tag--dup">已擁有 +50G</span>'}
+    `;
+    grid.appendChild(card);
+  });
+  openModal('modal-gacha-result');
+}
+
+function initGacha() {
+  document.getElementById('btn-gacha-single')?.addEventListener('click', () => {
+    if (!spendCoins(GACHA_COST_SINGLE)) { showToast('金幣不足！'); return; }
+    const machine = document.getElementById('gacha-machine');
+    machine?.classList.add('gacha-spin');
+    setTimeout(() => {
+      machine?.classList.remove('gacha-spin');
+      showGachaResult(doGachaRolls(1));
+    }, 1200);
+  });
+  document.getElementById('btn-gacha-ten')?.addEventListener('click', () => {
+    if (!spendCoins(GACHA_COST_TEN)) { showToast('金幣不足！'); return; }
+    const machine = document.getElementById('gacha-machine');
+    machine?.classList.add('gacha-spin');
+    setTimeout(() => {
+      machine?.classList.remove('gacha-spin');
+      showGachaResult(doGachaRolls(10));
+    }, 1200);
+  });
+  document.getElementById('btn-gacha-close')?.addEventListener('click', () => {
+    closeModal('modal-gacha-result');
+    renderSelectScreen();
   });
 }
 
@@ -401,6 +523,17 @@ function decayStats() {
   renderStats();
 }
 
+// ─── Shop Sub-tabs ────────────────────────────────────────────────────────────
+function initShopTabs() {
+  document.querySelectorAll('.shop-subtab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.shop;
+      document.querySelectorAll('.shop-subtab').forEach(b => b.classList.toggle('active', b === btn));
+      document.querySelectorAll('.shop-panel').forEach(p => p.classList.toggle('active', p.id === `shop-${target}`));
+    });
+  });
+}
+
 // ─── Tab System ──────────────────────────────────────────────────────────────
 function initTabs() {
   document.querySelectorAll('.tab').forEach(btn => {
@@ -435,8 +568,8 @@ function initBottomNav() {
       btn.classList.add('active');
       const nav = btn.dataset.nav;
       if (nav === 'shop') {
-        document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'food'));
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-food'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'shop'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-shop'));
       } else if (nav === 'home') {
         document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'pet'));
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-pet'));
@@ -511,15 +644,18 @@ function initActions() {
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 function init() {
   if (!selectedPetId) {
-    showSelectScreen();
-  } else {
-    renderAll();
+    selectedPetId = 'pet1';
+    localStorage.setItem('selectedPetId', selectedPetId);
+    state = loadState();
   }
+  renderAll();
   initTabs();
   initModals();
   initBottomNav();
   initActions();
   initShop();
+  initShopTabs();
+  initGacha();
   setInterval(decayStats, DECAY_INTERVAL);
 }
 
