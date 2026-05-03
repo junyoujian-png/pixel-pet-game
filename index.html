@@ -5,6 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pixel Pet</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    .content {
+      flex: 1 !important;
+      overflow-y: auto !important;
+      min-height: 0 !important;
+      height: 0 !important;
+    }
+
+    .tab-panel {
+      height: 100% !important;
+      overflow-y: auto !important;
+      box-sizing: border-box !important;
+    }
+
+    .shop-panel {
+      height: 100% !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+  </style>
 </head>
 <body>
   <!-- Pet Select Screen -->
