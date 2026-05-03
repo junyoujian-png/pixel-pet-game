@@ -126,11 +126,24 @@ function saveState() {
   }
 }
 
+const RARITY_ORDER = { 'F': 0, 'R': 1, 'SR': 2, 'SSR': 3 };
+
 // ─── Pet Selection ────────────────────────────────────────────────────────────
 function renderSelectScreen() {
   const grid = document.getElementById('select-grid');
   grid.innerHTML = '';
-  PETS.forEach(pet => {
+
+  const sorted = [...PETS].sort((a, b) => RARITY_ORDER[a.rarity] - RARITY_ORDER[b.rarity]);
+
+  let lastRarity = null;
+  sorted.forEach(pet => {
+    if (pet.rarity !== lastRarity) {
+      lastRarity = pet.rarity;
+      const divider = document.createElement('div');
+      divider.className = 'rarity-divider rarity-divider--' + pet.rarity.toLowerCase();
+      divider.textContent = pet.rarity;
+      grid.appendChild(divider);
+    }
     const card = document.createElement('button');
     card.className = 'select-card';
     if (pet.id === selectedPetId) card.classList.add('select-card--active');

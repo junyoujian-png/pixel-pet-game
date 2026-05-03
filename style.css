@@ -179,6 +179,29 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .badge--sr  { background: #f3e5f5; color: #6a1b9a; border: 1px solid #ce93d8; }
 .badge--ssr { background: #fff8e1; color: #e65100; border: 1px solid #ffcc80; }
 
+.rarity-divider {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin: 8px 0 2px;
+}
+.rarity-divider::before,
+.rarity-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+  opacity: .3;
+}
+.rarity-divider--f   { color: #9e9e9e; }
+.rarity-divider--r   { color: #4a90d9; }
+.rarity-divider--sr  { color: #9c27b0; }
+.rarity-divider--ssr { color: #ff6b35; }
+
 .pet-level-row {
   display: flex;
   align-items: baseline;
