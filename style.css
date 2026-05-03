@@ -101,7 +101,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 
 .tab-panel { display: none; flex-direction: column; gap: 12px; }
-.tab-panel.active { display: flex; }
+.tab-panel.active { display: flex; flex: 1; min-height: 0; }
 
 /* ─── Cards ─── */
 .card {
@@ -683,7 +683,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 .shop-subtab.active { color: var(--accent); border-bottom-color: var(--accent); }
 .shop-panel { display: none; }
-.shop-panel.active { display: block; }
+.shop-panel.active { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
 .item-desc { font-size: 11px; color: var(--text2); text-align: center; }
 
 /* ─── Locked Select Card ─── */

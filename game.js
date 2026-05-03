@@ -528,8 +528,13 @@ function initShopTabs() {
   document.querySelectorAll('.shop-subtab').forEach(btn => {
     btn.addEventListener('click', () => {
       const target = btn.dataset.shop;
+      console.log('[ShopTab] switching to:', target);
       document.querySelectorAll('.shop-subtab').forEach(b => b.classList.toggle('active', b === btn));
-      document.querySelectorAll('.shop-panel').forEach(p => p.classList.toggle('active', p.id === `shop-${target}`));
+      document.querySelectorAll('.shop-panel').forEach(p => {
+        const isTarget = p.id === `shop-${target}`;
+        p.classList.toggle('active', isTarget);
+        console.log(`[ShopTab] ${p.id} active=${isTarget}`);
+      });
     });
   });
 }
