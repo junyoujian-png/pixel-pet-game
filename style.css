@@ -37,6 +37,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   max-width: 430px;
   margin: 0 auto;
   height: 100dvh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   background: var(--bg);
@@ -92,16 +93,14 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 /* ─── Main Content ─── */
 .content {
   flex: 1;
-  overflow-y: auto;
-  padding: 12px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 12px;
   min-height: 0;
 }
 
-.tab-panel { display: none; flex-direction: column; gap: 12px; }
-.tab-panel.active { display: flex; flex: 1; min-height: 0; }
+.tab-panel { display: none; flex-direction: column; height: 100%; overflow-y: auto; }
+.tab-panel.active { display: flex; padding: 12px; gap: 12px; }
 
 /* ─── Cards ─── */
 .card {
@@ -664,7 +663,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   position: sticky;
-  top: var(--top-h);
+  top: 0;
   z-index: 5;
   margin: -12px -12px 12px;
   padding: 0 8px;
