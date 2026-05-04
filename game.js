@@ -533,24 +533,35 @@ const SHOP_TITLES = {
 };
 
 const showShopMain = () => {
-  document.getElementById('shop-main').style.display = 'block';
+  console.log('[Shop] showShopMain called');
+  document.getElementById('shop-main').style.display = 'flex';
   document.getElementById('shop-sub').style.display = 'none';
   document.querySelectorAll('.shop-panel').forEach(p => p.classList.remove('active'));
 };
 
 const showShopSub = (type) => {
-  document.getElementById('shop-main').style.display = 'none';
-  document.getElementById('shop-sub').style.display = 'block';
+  console.log('[Shop] showShopSub called, type =', type);
+  const main = document.getElementById('shop-main');
+  const sub  = document.getElementById('shop-sub');
+  console.log('[Shop] main el:', main, '| sub el:', sub);
+  if (!main || !sub) { console.error('[Shop] missing element!'); return; }
+  main.style.display = 'none';
+  sub.style.display = 'flex';
   document.getElementById('shop-subpage-title').textContent = SHOP_TITLES[type] || '';
   document.querySelectorAll('.shop-panel').forEach(p => {
     p.classList.toggle('active', p.id === `shop-${type}`);
   });
+  console.log('[Shop] active panel: shop-' + type);
 };
 
 function initShopCards() {
-  document.querySelectorAll('.shop-card__btn').forEach(btn => {
+  const btns = document.querySelectorAll('.shop-card__btn');
+  console.log('[Shop] initShopCards — found', btns.length, 'buttons');
+  btns.forEach(btn => {
     btn.addEventListener('click', () => {
-      showShopSub(btn.closest('.shop-card').dataset.shop);
+      const type = btn.closest('.shop-card')?.dataset.shop;
+      console.log('[Shop] card btn clicked, type =', type);
+      showShopSub(type);
     });
   });
   document.getElementById('btn-shop-back').addEventListener('click', showShopMain);
