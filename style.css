@@ -656,33 +656,110 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   color: var(--text);
 }
 
-/* ─── Shop Sub-tabs ─── */
-.shop-subtabs {
+/* ─── Shop Lobby ─── */
+.shop-lobby { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+.shop-lobby__title { font-size: 22px; font-weight: 800; color: var(--text); text-align: center; }
+.shop-lobby__subtitle { font-size: 13px; color: var(--text2); }
+
+.shop-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.shop-card {
+  border-radius: 20px;
+  padding: 16px;
   display: flex;
-  gap: 2px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  margin: -12px -12px 12px;
-  padding: 0 8px;
-}
-.shop-subtab {
-  flex: 1;
-  padding: 10px 4px;
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  overflow: hidden;
+  min-height: 175px;
+  gap: 4px;
   cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text2);
-  transition: all .2s;
+  transition: transform .15s;
 }
-.shop-subtab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.shop-card:active { transform: scale(.97); }
+
+.shop-card__number {
+  position: absolute;
+  top: -8px;
+  left: 10px;
+  font-size: 90px;
+  font-weight: 900;
+  color: white;
+  opacity: 0.15;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.shop-card__icon {
+  font-size: 38px;
+  margin-top: 40px;
+  margin-bottom: 6px;
+}
+
+.shop-card__name {
+  font-size: 15px;
+  font-weight: 700;
+  color: white;
+}
+
+.shop-card__desc {
+  font-size: 11px;
+  color: rgba(255,255,255,0.7);
+  flex: 1;
+  margin-bottom: 6px;
+}
+
+.shop-card__btn {
+  background: rgba(255,255,255,0.25);
+  border: none;
+  color: white;
+  border-radius: 20px;
+  padding: 6px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+}
+.shop-card__btn:hover { background: rgba(255,255,255,0.35); }
+.shop-card__btn:active { transform: scale(.95); }
+
+/* ─── Shop Sub-page ─── */
+.shop-subpage { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+.shop-subpage.hidden { display: none; }
+
+.shop-subpage__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.shop-back-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.shop-back-btn:hover { background: var(--surface2); }
+
+.shop-subpage__title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+}
+
 .shop-panel { display: none; }
-.shop-panel.active { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+.shop-panel.active { display: flex; flex-direction: column; gap: 12px; }
 .item-desc { font-size: 11px; color: var(--text2); text-align: center; }
 
 /* ─── Locked Select Card ─── */

@@ -26,11 +26,6 @@
       box-sizing: border-box !important;
     }
 
-    .shop-panel {
-      height: 100% !important;
-      display: flex !important;
-      flex-direction: column !important;
-    }
   </style>
 </head>
 <body>
@@ -157,131 +152,184 @@
       <!-- Shop Tab -->
       <section class="tab-panel" id="tab-shop">
 
-        <div class="shop-subtabs">
-          <button class="shop-subtab active" data-shop="food">🍖 食物</button>
-          <button class="shop-subtab" data-shop="drink">🥤 飲料</button>
-          <button class="shop-subtab" data-shop="item">🎒 道具</button>
-          <button class="shop-subtab" data-shop="gacha">🎰 扭蛋</button>
-        </div>
-
-        <!-- Food Shop -->
-        <div class="shop-panel active" id="shop-food">
-          <div class="card">
-            <div class="item-grid">
-              <div class="shop-item">
-                <span class="item-icon">🐟</span>
-                <span class="item-name">小魚</span>
-                <span class="item-desc">+20飽食 +5 EXP</span>
-                <button class="buy-btn" data-cost="10" data-type="food" data-id="fish">10🪙</button>
-              </div>
-              <div class="shop-item">
-                <span class="item-icon">🍖</span>
-                <span class="item-name">烤肉</span>
-                <span class="item-desc">+35飽食 +10 EXP</span>
-                <button class="buy-btn" data-cost="25" data-type="food" data-id="meat">25🪙</button>
-              </div>
-              <div class="shop-item">
-                <span class="item-icon">🎂</span>
-                <span class="item-name">蛋糕</span>
-                <span class="item-desc">+50飽食 +20 EXP</span>
-                <button class="buy-btn" data-cost="50" data-type="food" data-id="cake">50🪙</button>
-              </div>
+        <!-- Shop Lobby -->
+        <div id="shop-lobby" class="shop-lobby">
+          <h2 class="shop-lobby__title">商店</h2>
+          <p class="shop-lobby__subtitle">銀行與商店</p>
+          <div class="shop-card-grid">
+            <div class="shop-card" style="background:#4CAF91" data-shop="bank">
+              <span class="shop-card__number">01</span>
+              <span class="shop-card__icon">💎</span>
+              <span class="shop-card__name">能量銀行</span>
+              <span class="shop-card__desc">兌換存儲管理像素晶石</span>
+              <button class="shop-card__btn">查看</button>
+            </div>
+            <div class="shop-card" style="background:#8B5CF6" data-shop="food">
+              <span class="shop-card__number">02</span>
+              <span class="shop-card__icon">🍖</span>
+              <span class="shop-card__name">食物商店</span>
+              <span class="shop-card__desc">購買食物</span>
+              <button class="shop-card__btn">查看</button>
+            </div>
+            <div class="shop-card" style="background:#E57373" data-shop="drink">
+              <span class="shop-card__number">03</span>
+              <span class="shop-card__icon">🥤</span>
+              <span class="shop-card__name">飲料商店</span>
+              <span class="shop-card__desc">購買飲料</span>
+              <button class="shop-card__btn">查看</button>
+            </div>
+            <div class="shop-card" style="background:#6B8FA8" data-shop="item">
+              <span class="shop-card__number">04</span>
+              <span class="shop-card__icon">🎒</span>
+              <span class="shop-card__name">道具商店</span>
+              <span class="shop-card__desc">購買寵物道具</span>
+              <button class="shop-card__btn">查看</button>
+            </div>
+            <div class="shop-card" style="background:#4FC3F7" data-shop="gacha">
+              <span class="shop-card__number">05</span>
+              <span class="shop-card__icon">🎰</span>
+              <span class="shop-card__name">扭蛋機</span>
+              <span class="shop-card__desc">抽取稀有寵物</span>
+              <button class="shop-card__btn">查看</button>
             </div>
           </div>
         </div>
 
-        <!-- Drink Shop -->
-        <div class="shop-panel" id="shop-drink">
-          <div class="card">
-            <div class="item-grid">
-              <div class="shop-item">
-                <span class="item-icon">💧</span>
-                <span class="item-name">清水</span>
-                <span class="item-desc">+25💧 +3 EXP</span>
-                <button class="buy-btn" data-cost="5" data-type="drink" data-id="water">5🪙</button>
-              </div>
-              <div class="shop-item">
-                <span class="item-icon">🧃</span>
-                <span class="item-name">果汁</span>
-                <span class="item-desc">+40💧 +3😄 +8 EXP</span>
-                <button class="buy-btn" data-cost="15" data-type="drink" data-id="juice">15🪙</button>
-              </div>
-              <div class="shop-item">
-                <span class="item-icon">🥛</span>
-                <span class="item-name">牛奶</span>
-                <span class="item-desc">+60💧 +5😄 +15 EXP</span>
-                <button class="buy-btn" data-cost="30" data-type="drink" data-id="milk">30🪙</button>
-              </div>
-            </div>
+        <!-- Sub-shop Page -->
+        <div id="shop-subpage" class="shop-subpage hidden">
+          <div class="shop-subpage__header">
+            <button id="btn-shop-back" class="shop-back-btn">← 返回</button>
+            <h3 id="shop-subpage-title" class="shop-subpage__title"></h3>
           </div>
-        </div>
 
-        <!-- Item Shop -->
-        <div class="shop-panel" id="shop-item">
-          <div class="card">
-            <h3 class="section-title">道具</h3>
-            <div class="item-grid">
-              <div class="shop-item">
-                <span class="item-icon">🧪</span>
-                <span class="item-name">回復藥</span>
-                <span class="item-desc">+30飽食 +30💧 +20😄</span>
-                <button class="buy-btn" data-cost="40" data-type="item" data-id="potion">40🪙</button>
-              </div>
-              <div class="shop-item">
-                <span class="item-icon">🍬</span>
-                <span class="item-name">愛心糖</span>
-                <span class="item-desc">+40😄</span>
-                <button class="buy-btn" data-cost="25" data-type="item" data-id="candy">25🪙</button>
-              </div>
-              <div class="shop-item">
-                <span class="item-icon">⭐</span>
-                <span class="item-name">成長藥</span>
-                <span class="item-desc">+50 EXP</span>
-                <button class="buy-btn" data-cost="50" data-type="item" data-id="xpboost">50🪙</button>
-              </div>
+          <!-- Bank -->
+          <div class="shop-panel" id="shop-bank">
+            <div class="card">
+              <h3 class="section-title">💎 能量銀行</h3>
+              <p class="empty-hint" style="padding:20px 0">敬請期待...</p>
             </div>
           </div>
-          <div class="card">
-            <h3 class="section-title">裝備</h3>
-            <div class="item-grid">
-              <div class="shop-item">
-                <span class="item-icon">🎩</span>
-                <span class="item-name">紳士帽</span>
-                <button class="buy-btn" data-cost="100" data-type="equip" data-id="hat">100🪙</button>
-              </div>
-              <div class="shop-item">
-                <span class="item-icon">🧣</span>
-                <span class="item-name">圍巾</span>
-                <button class="buy-btn" data-cost="80" data-type="equip" data-id="scarf">80🪙</button>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <!-- Gacha -->
-        <div class="shop-panel" id="shop-gacha">
-          <div class="card gacha-card-wrap">
-            <div class="gacha-machine" id="gacha-machine">🎱</div>
-            <h3 class="gacha-title">運氣扭蛋機</h3>
-            <div class="gacha-btns">
-              <button class="gacha-btn gacha-btn--single" id="btn-gacha-single">
-                <span>單抽</span>
-                <span class="gacha-cost">100 🪙</span>
-              </button>
-              <button class="gacha-btn gacha-btn--ten" id="btn-gacha-ten">
-                <span>十連抽</span>
-                <span class="gacha-cost">900 🪙</span>
-                <span class="gacha-discount">九折優惠</span>
-              </button>
-            </div>
-            <div class="gacha-rates">
-              <div class="rate-row"><span class="badge badge--f">F</span><span class="rate-pct">50%</span></div>
-              <div class="rate-row"><span class="badge badge--r">R</span><span class="rate-pct">30%</span></div>
-              <div class="rate-row"><span class="badge badge--sr">SR</span><span class="rate-pct">15%</span></div>
-              <div class="rate-row"><span class="badge badge--ssr">SSR</span><span class="rate-pct">5%</span></div>
-              <p class="rate-note">✨ 十連抽保底：必得 SR 以上一隻</p>
+          <!-- Food -->
+          <div class="shop-panel" id="shop-food">
+            <div class="card">
+              <div class="item-grid">
+                <div class="shop-item">
+                  <span class="item-icon">🐟</span>
+                  <span class="item-name">小魚</span>
+                  <span class="item-desc">+20飽食 +5 EXP</span>
+                  <button class="buy-btn" data-cost="10" data-type="food" data-id="fish">10🪙</button>
+                </div>
+                <div class="shop-item">
+                  <span class="item-icon">🍖</span>
+                  <span class="item-name">烤肉</span>
+                  <span class="item-desc">+35飽食 +10 EXP</span>
+                  <button class="buy-btn" data-cost="25" data-type="food" data-id="meat">25🪙</button>
+                </div>
+                <div class="shop-item">
+                  <span class="item-icon">🎂</span>
+                  <span class="item-name">蛋糕</span>
+                  <span class="item-desc">+50飽食 +20 EXP</span>
+                  <button class="buy-btn" data-cost="50" data-type="food" data-id="cake">50🪙</button>
+                </div>
+              </div>
             </div>
           </div>
+
+          <!-- Drink -->
+          <div class="shop-panel" id="shop-drink">
+            <div class="card">
+              <div class="item-grid">
+                <div class="shop-item">
+                  <span class="item-icon">💧</span>
+                  <span class="item-name">清水</span>
+                  <span class="item-desc">+25💧 +3 EXP</span>
+                  <button class="buy-btn" data-cost="5" data-type="drink" data-id="water">5🪙</button>
+                </div>
+                <div class="shop-item">
+                  <span class="item-icon">🧃</span>
+                  <span class="item-name">果汁</span>
+                  <span class="item-desc">+40💧 +3😄 +8 EXP</span>
+                  <button class="buy-btn" data-cost="15" data-type="drink" data-id="juice">15🪙</button>
+                </div>
+                <div class="shop-item">
+                  <span class="item-icon">🥛</span>
+                  <span class="item-name">牛奶</span>
+                  <span class="item-desc">+60💧 +5😄 +15 EXP</span>
+                  <button class="buy-btn" data-cost="30" data-type="drink" data-id="milk">30🪙</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Item -->
+          <div class="shop-panel" id="shop-item">
+            <div class="card">
+              <h3 class="section-title">道具</h3>
+              <div class="item-grid">
+                <div class="shop-item">
+                  <span class="item-icon">🧪</span>
+                  <span class="item-name">回復藥</span>
+                  <span class="item-desc">+30飽食 +30💧 +20😄</span>
+                  <button class="buy-btn" data-cost="40" data-type="item" data-id="potion">40🪙</button>
+                </div>
+                <div class="shop-item">
+                  <span class="item-icon">🍬</span>
+                  <span class="item-name">愛心糖</span>
+                  <span class="item-desc">+40😄</span>
+                  <button class="buy-btn" data-cost="25" data-type="item" data-id="candy">25🪙</button>
+                </div>
+                <div class="shop-item">
+                  <span class="item-icon">⭐</span>
+                  <span class="item-name">成長藥</span>
+                  <span class="item-desc">+50 EXP</span>
+                  <button class="buy-btn" data-cost="50" data-type="item" data-id="xpboost">50🪙</button>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <h3 class="section-title">裝備</h3>
+              <div class="item-grid">
+                <div class="shop-item">
+                  <span class="item-icon">🎩</span>
+                  <span class="item-name">紳士帽</span>
+                  <button class="buy-btn" data-cost="100" data-type="equip" data-id="hat">100🪙</button>
+                </div>
+                <div class="shop-item">
+                  <span class="item-icon">🧣</span>
+                  <span class="item-name">圍巾</span>
+                  <button class="buy-btn" data-cost="80" data-type="equip" data-id="scarf">80🪙</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gacha -->
+          <div class="shop-panel" id="shop-gacha">
+            <div class="card gacha-card-wrap">
+              <div class="gacha-machine" id="gacha-machine">🎱</div>
+              <h3 class="gacha-title">運氣扭蛋機</h3>
+              <div class="gacha-btns">
+                <button class="gacha-btn gacha-btn--single" id="btn-gacha-single">
+                  <span>單抽</span>
+                  <span class="gacha-cost">100 🪙</span>
+                </button>
+                <button class="gacha-btn gacha-btn--ten" id="btn-gacha-ten">
+                  <span>十連抽</span>
+                  <span class="gacha-cost">900 🪙</span>
+                  <span class="gacha-discount">九折優惠</span>
+                </button>
+              </div>
+              <div class="gacha-rates">
+                <div class="rate-row"><span class="badge badge--f">F</span><span class="rate-pct">50%</span></div>
+                <div class="rate-row"><span class="badge badge--r">R</span><span class="rate-pct">30%</span></div>
+                <div class="rate-row"><span class="badge badge--sr">SR</span><span class="rate-pct">15%</span></div>
+                <div class="rate-row"><span class="badge badge--ssr">SSR</span><span class="rate-pct">5%</span></div>
+                <p class="rate-note">✨ 十連抽保底：必得 SR 以上一隻</p>
+              </div>
+            </div>
+          </div>
+
         </div>
 
       </section>

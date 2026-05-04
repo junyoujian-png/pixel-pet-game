@@ -523,19 +523,36 @@ function decayStats() {
   renderStats();
 }
 
-// ─── Shop Sub-tabs ────────────────────────────────────────────────────────────
-function initShopTabs() {
-  document.querySelectorAll('.shop-subtab').forEach(btn => {
+// ─── Shop Cards ───────────────────────────────────────────────────────────────
+const SHOP_TITLES = {
+  bank:  '能量銀行',
+  food:  '食物商店',
+  drink: '飲料商店',
+  item:  '道具商店',
+  gacha: '扭蛋機',
+};
+
+function initShopCards() {
+  const lobby    = document.getElementById('shop-lobby');
+  const subpage  = document.getElementById('shop-subpage');
+  const titleEl  = document.getElementById('shop-subpage-title');
+
+  document.querySelectorAll('.shop-card__btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const target = btn.dataset.shop;
-      console.log('[ShopTab] switching to:', target);
-      document.querySelectorAll('.shop-subtab').forEach(b => b.classList.toggle('active', b === btn));
+      const shopId = btn.closest('.shop-card').dataset.shop;
+      lobby.classList.add('hidden');
+      subpage.classList.remove('hidden');
+      titleEl.textContent = SHOP_TITLES[shopId] || '';
       document.querySelectorAll('.shop-panel').forEach(p => {
-        const isTarget = p.id === `shop-${target}`;
-        p.classList.toggle('active', isTarget);
-        console.log(`[ShopTab] ${p.id} active=${isTarget}`);
+        p.classList.toggle('active', p.id === `shop-${shopId}`);
       });
     });
+  });
+
+  document.getElementById('btn-shop-back').addEventListener('click', () => {
+    subpage.classList.add('hidden');
+    lobby.classList.remove('hidden');
+    document.querySelectorAll('.shop-panel').forEach(p => p.classList.remove('active'));
   });
 }
 
@@ -659,7 +676,7 @@ function init() {
   initBottomNav();
   initActions();
   initShop();
-  initShopTabs();
+  initShopCards();
   initGacha();
   setInterval(decayStats, DECAY_INTERVAL);
 }
