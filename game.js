@@ -532,28 +532,28 @@ const SHOP_TITLES = {
   gacha: '扭蛋機',
 };
 
-function initShopCards() {
-  const lobby    = document.getElementById('shop-lobby');
-  const subpage  = document.getElementById('shop-subpage');
-  const titleEl  = document.getElementById('shop-subpage-title');
+const showShopMain = () => {
+  document.getElementById('shop-main').style.display = 'block';
+  document.getElementById('shop-sub').style.display = 'none';
+  document.querySelectorAll('.shop-panel').forEach(p => p.classList.remove('active'));
+};
 
+const showShopSub = (type) => {
+  document.getElementById('shop-main').style.display = 'none';
+  document.getElementById('shop-sub').style.display = 'block';
+  document.getElementById('shop-subpage-title').textContent = SHOP_TITLES[type] || '';
+  document.querySelectorAll('.shop-panel').forEach(p => {
+    p.classList.toggle('active', p.id === `shop-${type}`);
+  });
+};
+
+function initShopCards() {
   document.querySelectorAll('.shop-card__btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const shopId = btn.closest('.shop-card').dataset.shop;
-      lobby.classList.add('hidden');
-      subpage.classList.remove('hidden');
-      titleEl.textContent = SHOP_TITLES[shopId] || '';
-      document.querySelectorAll('.shop-panel').forEach(p => {
-        p.classList.toggle('active', p.id === `shop-${shopId}`);
-      });
+      showShopSub(btn.closest('.shop-card').dataset.shop);
     });
   });
-
-  document.getElementById('btn-shop-back').addEventListener('click', () => {
-    subpage.classList.add('hidden');
-    lobby.classList.remove('hidden');
-    document.querySelectorAll('.shop-panel').forEach(p => p.classList.remove('active'));
-  });
+  document.getElementById('btn-shop-back').addEventListener('click', showShopMain);
 }
 
 // ─── Tab System ──────────────────────────────────────────────────────────────

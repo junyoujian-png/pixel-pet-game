@@ -730,7 +730,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 /* ─── Shop Sub-page ─── */
 .shop-subpage { width: 100%; display: flex; flex-direction: column; gap: 12px; }
-.shop-subpage.hidden { display: none; }
 
 .shop-subpage__header {
   display: flex;
