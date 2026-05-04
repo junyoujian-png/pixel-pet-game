@@ -528,29 +528,73 @@ const SHOP_TITLES = {
   food:  '食物商店',
   drink: '飲料商店',
   item:  '道具商店',
-  gacha: '扭蛋機',
+  gacha: '寵物抽獎',
 };
 
+// ─── Gacha Pet Grid Shuffle ───────────────────────────────────────────────────
+let gachaShuffleTimer = null;
+
+function fisherYatesShuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function renderGachaPetGrid() {
+  const grid = document.getElementById('gacha-pet-grid');
+  if (!grid) return;
+  const shuffled = [...PETS];
+  fisherYatesShuffle(shuffled);
+  grid.innerHTML = '';
+  shuffled.forEach(pet => {
+    const cell = document.createElement('div');
+    cell.className = 'gacha-pet-cell';
+    const img = document.createElement('img');
+    img.src = pet.image;
+    img.alt = pet.name;
+    cell.appendChild(img);
+    grid.appendChild(cell);
+  });
+}
+
+function startGachaShuffle() {
+  renderGachaPetGrid();
+  if (gachaShuffleTimer) return;
+  gachaShuffleTimer = setInterval(() => {
+    const grid = document.getElementById('gacha-pet-grid');
+    if (!grid) return;
+    grid.classList.add('fade');
+    setTimeout(() => {
+      renderGachaPetGrid();
+      grid.classList.remove('fade');
+    }, 300);
+  }, 2000);
+}
+
+function stopGachaShuffle() {
+  clearInterval(gachaShuffleTimer);
+  gachaShuffleTimer = null;
+}
+
 const showShopMain = () => {
-  console.log('[Shop] showShopMain called');
+  stopGachaShuffle();
   document.getElementById('shop-main').style.display = 'flex';
   document.getElementById('shop-sub').style.display = 'none';
   document.querySelectorAll('.shop-panel').forEach(p => p.classList.remove('active'));
 };
 
 const showShopSub = (type) => {
-  console.log('[Shop] showShopSub called, type =', type);
   const main = document.getElementById('shop-main');
   const sub  = document.getElementById('shop-sub');
-  console.log('[Shop] main el:', main, '| sub el:', sub);
-  if (!main || !sub) { console.error('[Shop] missing element!'); return; }
+  if (!main || !sub) return;
   main.style.display = 'none';
   sub.style.display = 'flex';
   document.getElementById('shop-subpage-title').textContent = SHOP_TITLES[type] || '';
   document.querySelectorAll('.shop-panel').forEach(p => {
     p.classList.toggle('active', p.id === `shop-${type}`);
   });
-  console.log('[Shop] active panel: shop-' + type);
+  if (type === 'gacha') startGachaShuffle(); else stopGachaShuffle();
 };
 
 function initShopCards() {
