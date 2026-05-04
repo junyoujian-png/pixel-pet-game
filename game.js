@@ -534,11 +534,18 @@ const SHOP_TITLES = {
 // ─── Gacha Panel ─────────────────────────────────────────────────────────────
 let gachaInterval = null;
 
-function gachaPetCellsHTML() {
-  const picked = [...PETS].sort(() => Math.random() - 0.5).slice(0, 16);
-  return picked.map(p => `
+function getRandomPets(count) {
+  const result = [];
+  for (let i = 0; i < count; i++) {
+    result.push(PETS[Math.floor(Math.random() * PETS.length)]);
+  }
+  return result;
+}
+
+function petCellsHTML(pets) {
+  return pets.map(p => `
     <div style="background:#f0f0f0;border-radius:12px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;overflow:hidden">
-      <img src="${p.image}" style="width:80%;height:80%;object-fit:contain;image-rendering:pixelated" onerror="this.style.display='none'">
+      <img src="${p.image}" style="width:80%;height:80%;object-fit:contain;image-rendering:pixelated" onerror="this.parentElement.innerHTML='?'">
     </div>`).join('');
 }
 
@@ -548,8 +555,8 @@ function buildGachaPanel() {
   panel.innerHTML = `
     <p style="font-size:14px;color:#888;text-align:center;margin-bottom:4px">常駐寵物卡池</p>
     <div style="display:inline-flex;background:#e8e8e8;border-radius:20px;padding:5px 14px;font-size:13px;font-weight:600;margin-bottom:8px;cursor:pointer">常駐卡池 ▼</div>
-    <div id="gacha-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-      ${gachaPetCellsHTML()}
+    <div id="gacha-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px;transition:opacity 0.3s">
+      ${petCellsHTML(getRandomPets(16))}
     </div>
     <div style="display:flex;gap:10px;position:sticky;bottom:0;background:#f5f0eb;padding:10px 0 4px;margin-top:12px">
       <button onclick="doGacha(1)" style="flex:1;padding:14px 8px;border-radius:30px;background:#f0ebe4;border:1px solid #ddd5c8;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px">
@@ -591,9 +598,15 @@ const showShopSub = (type) => {
   });
   if (type === 'gacha') {
     buildGachaPanel();
+    if (gachaInterval) clearInterval(gachaInterval);
     gachaInterval = setInterval(() => {
       const grid = document.getElementById('gacha-grid');
-      if (grid) grid.innerHTML = gachaPetCellsHTML();
+      if (!grid) { clearInterval(gachaInterval); return; }
+      grid.style.opacity = '0';
+      setTimeout(() => {
+        grid.innerHTML = petCellsHTML(getRandomPets(16));
+        grid.style.opacity = '1';
+      }, 300);
     }, 2000);
   }
 };
