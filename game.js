@@ -535,7 +535,8 @@ const SHOP_TITLES = {
 let gachaInterval = null;
 
 function gachaPetCellsHTML() {
-  return [...PETS].sort(() => Math.random() - 0.5).map(p => `
+  const picked = [...PETS].sort(() => Math.random() - 0.5).slice(0, 16);
+  return picked.map(p => `
     <div style="background:#f0f0f0;border-radius:12px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;overflow:hidden">
       <img src="${p.image}" style="width:80%;height:80%;object-fit:contain;image-rendering:pixelated" onerror="this.style.display='none'">
     </div>`).join('');
