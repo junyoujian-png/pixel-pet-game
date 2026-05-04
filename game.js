@@ -131,10 +131,9 @@ const RARITY_ORDER = { 'F': 0, 'R': 1, 'SR': 2, 'SSR': 3 };
 const GACHA_COST_SINGLE = 100;
 const GACHA_COST_TEN    = 900;
 const RARITY_RATES = [
-  { rarity: 'SSR', weight: 5  },
-  { rarity: 'SR',  weight: 15 },
-  { rarity: 'R',   weight: 30 },
-  { rarity: 'F',   weight: 50 },
+  { rarity: 'SR', weight: 5  },
+  { rarity: 'R',  weight: 30 },
+  { rarity: 'F',  weight: 65 },
 ];
 
 let unlockedPets = (() => {
