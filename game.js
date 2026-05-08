@@ -257,7 +257,7 @@ function showGachaResult(results) {
 
 function initGacha() {
   document.getElementById('btn-gacha-single')?.addEventListener('click', () => {
-    if (!spendCoins(GACHA_COST_SINGLE)) { showToast('金幣不足！'); return; }
+    if (!spendCoins(GACHA_COST_SINGLE)) { showToast('能量石不足！'); return; }
     const machine = document.getElementById('gacha-machine');
     machine?.classList.add('gacha-spin');
     setTimeout(() => {
@@ -266,7 +266,7 @@ function initGacha() {
     }, 1200);
   });
   document.getElementById('btn-gacha-ten')?.addEventListener('click', () => {
-    if (!spendCoins(GACHA_COST_TEN)) { showToast('金幣不足！'); return; }
+    if (!spendCoins(GACHA_COST_TEN)) { showToast('能量石不足！'); return; }
     const machine = document.getElementById('gacha-machine');
     machine?.classList.add('gacha-spin');
     setTimeout(() => {
@@ -412,7 +412,7 @@ function feedPet(type = 'fish') {
   const hungerG = FEED_HUNGER[type] ?? 20;
   const expG    = FEED_EXP[type]    ?? 5;
 
-  if (!spendCoins(cost)) { showToast('金幣不足！'); return; }
+  if (!spendCoins(cost)) { showToast('能量石不足！'); return; }
 
   state.hunger = Math.min(100, state.hunger + hungerG);
   state.mood   = Math.min(100, state.mood + 5);
@@ -428,7 +428,7 @@ function giveDrink(type = 'water') {
   const moodG  = DRINK_MOOD[type]  ?? 0;
   const expG   = DRINK_EXP[type]   ?? 3;
 
-  if (!spendCoins(cost)) { showToast('金幣不足！'); return; }
+  if (!spendCoins(cost)) { showToast('能量石不足！'); return; }
 
   state.water = Math.min(100, state.water + waterG);
   if (moodG > 0) state.mood = Math.min(100, state.mood + moodG);
@@ -561,18 +561,18 @@ function buildGachaPanel() {
     <div style="display:flex;gap:10px;position:sticky;bottom:0;background:#f5f0eb;padding:10px 0 4px;margin-top:12px">
       <button onclick="doGacha(1)" style="flex:1;padding:14px 8px;border-radius:30px;background:#f0ebe4;border:1px solid #ddd5c8;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px">
         <span style="font-size:15px;font-weight:700">單次抽獎</span>
-        <span style="font-size:12px;color:#6b5a47">100 金幣</span>
+        <span style="font-size:12px;color:#6b5a47">100 💎</span>
       </button>
       <button onclick="doGacha(10)" style="flex:1;padding:14px 8px;border-radius:30px;background:#f0ebe4;border:1px solid #ddd5c8;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px">
         <span style="font-size:15px;font-weight:700">十次抽獎</span>
-        <span style="font-size:12px;color:#6b5a47">900 金幣</span>
+        <span style="font-size:12px;color:#6b5a47">900 💎</span>
       </button>
     </div>`;
 }
 
 function doGacha(count) {
   const cost = count === 1 ? GACHA_COST_SINGLE : GACHA_COST_TEN;
-  if (!spendCoins(cost)) { showToast('金幣不足！'); return; }
+  if (!spendCoins(cost)) { showToast('能量石不足！'); return; }
   showGachaResult(doGachaRolls(count));
 }
 
@@ -675,7 +675,7 @@ function initShop() {
       const cost = parseInt(btn.dataset.cost, 10);
       const type = btn.dataset.type;
       const id   = btn.dataset.id;
-      if (!spendCoins(cost)) { showToast('金幣不足！'); return; }
+      if (!spendCoins(cost)) { showToast('能量石不足！'); return; }
       if (type === 'food') {
         const hungerG = FEED_HUNGER[id] ?? 20;
         const expG    = FEED_EXP[id]    ?? 5;
