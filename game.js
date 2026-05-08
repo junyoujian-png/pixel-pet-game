@@ -768,6 +768,8 @@ function initBottomNav() {
       } else if (nav === 'home') {
         document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'pet'));
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-pet'));
+      } else if (nav === 'explore') {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-explore'));
       }
     });
   });
