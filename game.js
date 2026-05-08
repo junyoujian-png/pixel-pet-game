@@ -66,17 +66,15 @@ const PETS = [
 ];
 
 const DRINKS = [
-  { id: 'drink_01', name: '清水',     rarity: 'F',   image: 'assets/drinks/drink_01.png', effect: { water: 20 },                          desc: '+20 水份' },
-  { id: 'drink_02', name: '蘋果汁',   rarity: 'F',   image: 'assets/drinks/drink_02.png', effect: { hunger: 15 },                         desc: '+15 飽食度' },
-  { id: 'drink_03', name: '綠茶',     rarity: 'R',   image: 'assets/drinks/drink_03.png', effect: { water: 30, exp: 10 },                  desc: '+30 水份 +10 EXP' },
-  { id: 'drink_04', name: '能量飲料', rarity: 'R',   image: 'assets/drinks/drink_04.png', effect: { mood: 20 },                           desc: '+20 心情' },
-  { id: 'drink_05', name: '芒果昔',   rarity: 'SR',  image: 'assets/drinks/drink_05.png', effect: { water: 50, mood: 20 },                 desc: '+50 水份 +20 心情' },
-  { id: 'drink_06', name: '魔力茶',   rarity: 'SR',  image: 'assets/drinks/drink_06.png', effect: { exp: 50 },                            desc: '+50 EXP' },
-  { id: 'drink_07', name: '靈泉水',   rarity: 'SSR', image: 'assets/drinks/drink_07.png', effect: { water: 80, exp: 80 },                  desc: '+80 水份 +80 EXP' },
-  { id: 'drink_08', name: '神聖露水', rarity: 'SSR', image: 'assets/drinks/drink_08.png', effect: { water: 50, hunger: 50, mood: 50, exp: 100 }, desc: '+50全屬性 +100 EXP' },
+  { id: 'drink_01', name: '礦泉水', rarity: 'F',   image: 'assets/drinks/drink_01.png', price: 50,  effect: { water: 10, exp: 5  }, desc: '+10 水份 +5 EXP'           },
+  { id: 'drink_02', name: '紅茶',   rarity: 'R',   image: 'assets/drinks/drink_02.png', price: 100, effect: { water: 30, exp: 15 }, desc: '+30 水份 +15 EXP'          },
+  { id: 'drink_03', name: '綠茶',   rarity: 'R',   image: 'assets/drinks/drink_03.png', price: 100, effect: { water: 30, exp: 15 }, desc: '+30 水份 +15 EXP'          },
+  { id: 'drink_04', name: '葡萄汁', rarity: 'SR',  image: 'assets/drinks/drink_04.png', price: 250, effect: { water: 60, exp: 25 }, desc: '+60 水份 +25 EXP'          },
+  { id: 'drink_05', name: '蘋果汁', rarity: 'SR',  image: 'assets/drinks/drink_05.png', price: 250, effect: { water: 60, exp: 25 }, desc: '+60 水份 +25 EXP'          },
+  { id: 'drink_06', name: '可樂',   rarity: 'SSR', image: 'assets/drinks/drink_06.png', price: 500, effect: { water: 90, mood: 10, exp: 50  }, desc: '+90 水份 +10 心情 +50 EXP' },
+  { id: 'drink_07', name: '牛奶',   rarity: 'SSR', image: 'assets/drinks/drink_07.png', price: 500, effect: { water: 90, hunger: 10, exp: 50 }, desc: '+90 水份 +10 飽食 +50 EXP' },
+  { id: 'drink_08', name: '咖啡',   rarity: 'SSR', image: 'assets/drinks/drink_08.png', price: 500, effect: { water: 100, exp: 60 }, desc: '+100 水份 +60 EXP'         },
 ];
-
-const DRINK_PRICES = { F: 50, R: 100, SR: 250, SSR: 500 };
 
 const ITEM_DEFS = {
   potion:  { icon: '🧪', name: '回復藥',  desc: '+30飽食 +30水份 +20心情' },
@@ -536,8 +534,7 @@ function saveInventory(inv) {
 function buyDrink(id) {
   const drink = DRINKS.find(d => d.id === id);
   if (!drink) return;
-  const price = DRINK_PRICES[drink.rarity];
-  if (!spendCoins(price)) { showToast('能量石不足！'); return; }
+  if (!spendCoins(drink.price)) { showToast('能量石不足！'); return; }
   const inv = loadInventory();
   inv[id] = (inv[id] || 0) + 1;
   saveInventory(inv);
@@ -572,7 +569,7 @@ function renderDrinkShop() {
   rarities.forEach(rarity => {
     const group = DRINKS.filter(d => d.rarity === rarity);
     if (!group.length) return;
-    const price = DRINK_PRICES[rarity];
+    const price = group[0].price;
     const canBuy = coins >= price;
     html += `<div class="rarity-divider rarity-divider--${rarity.toLowerCase()}">${rarity}</div>
       <div class="drink-shop-grid">
@@ -584,9 +581,9 @@ function renderDrinkShop() {
               <span class="badge badge--${d.rarity.toLowerCase()}">${d.rarity}</span>
               <span class="drink-shop-desc">${d.desc}</span>
             </div>
-            <button class="buy-btn${canBuy ? '' : ' buy-btn--disabled'}"
-              onclick="buyDrink('${d.id}')" ${canBuy ? '' : 'disabled'}>
-              ${price} 💎
+            <button class="buy-btn${coins >= d.price ? '' : ' buy-btn--disabled'}"
+              onclick="buyDrink('${d.id}')" ${coins >= d.price ? '' : 'disabled'}>
+              ${d.price} 💎
             </button>
           </div>`).join('')}
       </div>`;
