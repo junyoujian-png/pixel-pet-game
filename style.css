@@ -788,6 +788,42 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   z-index: 1;
 }
 
+/* ─── Drink Shop ─── */
+.drink-shop-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.drink-shop-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+.drink-shop-img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 4px;
+}
+.drink-shop-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.drink-shop-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.drink-shop-desc { font-size: 11px; color: var(--text2); }
+.buy-btn--disabled { opacity: 0.4; cursor: not-allowed; }
+
 /* ─── Gacha Redesign ─── */
 .gacha-subtitle {
   font-size: 14px;

@@ -137,6 +137,10 @@
       <!-- Bag Tab -->
       <section class="tab-panel" id="tab-bag">
         <div class="card">
+          <h3 class="section-title">🥤 飲料背包</h3>
+          <div id="drinkbag-list" class="itembag-list"></div>
+        </div>
+        <div class="card">
           <h3 class="section-title">🐾 寵物背包</h3>
           <div id="petbag-grid" class="item-grid">
             <div class="empty-hint">還沒有任何裝備</div>
@@ -232,30 +236,8 @@
           </div>
 
           <!-- Drink -->
-          <div class="shop-panel" id="shop-drink">
-            <div class="card">
-              <div class="item-grid">
-                <div class="shop-item">
-                  <span class="item-icon">💧</span>
-                  <span class="item-name">清水</span>
-                  <span class="item-desc">+25💧 +3 EXP</span>
-                  <button class="buy-btn" data-cost="5" data-type="drink" data-id="water">5💎</button>
-                </div>
-                <div class="shop-item">
-                  <span class="item-icon">🧃</span>
-                  <span class="item-name">果汁</span>
-                  <span class="item-desc">+40💧 +3😄 +8 EXP</span>
-                  <button class="buy-btn" data-cost="15" data-type="drink" data-id="juice">15💎</button>
-                </div>
-                <div class="shop-item">
-                  <span class="item-icon">🥛</span>
-                  <span class="item-name">牛奶</span>
-                  <span class="item-desc">+60💧 +5😄 +15 EXP</span>
-                  <button class="buy-btn" data-cost="30" data-type="drink" data-id="milk">30💎</button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <!-- Drink — content built by renderDrinkShop() in JS -->
+          <div class="shop-panel" id="shop-drink"></div>
 
           <!-- Item -->
           <div class="shop-panel" id="shop-item">

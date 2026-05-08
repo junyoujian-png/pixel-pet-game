@@ -65,6 +65,19 @@ const PETS = [
   { id: 'pet51', name: '紅浣熊',       rarity: 'SR', image: 'assets/pets/紅浣熊.png' },
 ];
 
+const DRINKS = [
+  { id: 'drink_01', name: '清水',     rarity: 'F',   image: 'assets/drinks/drink_01.png', effect: { water: 20 },                          desc: '+20 水份' },
+  { id: 'drink_02', name: '蘋果汁',   rarity: 'F',   image: 'assets/drinks/drink_02.png', effect: { hunger: 15 },                         desc: '+15 飽食度' },
+  { id: 'drink_03', name: '綠茶',     rarity: 'R',   image: 'assets/drinks/drink_03.png', effect: { water: 30, exp: 10 },                  desc: '+30 水份 +10 EXP' },
+  { id: 'drink_04', name: '能量飲料', rarity: 'R',   image: 'assets/drinks/drink_04.png', effect: { mood: 20 },                           desc: '+20 心情' },
+  { id: 'drink_05', name: '芒果昔',   rarity: 'SR',  image: 'assets/drinks/drink_05.png', effect: { water: 50, mood: 20 },                 desc: '+50 水份 +20 心情' },
+  { id: 'drink_06', name: '魔力茶',   rarity: 'SR',  image: 'assets/drinks/drink_06.png', effect: { exp: 50 },                            desc: '+50 EXP' },
+  { id: 'drink_07', name: '靈泉水',   rarity: 'SSR', image: 'assets/drinks/drink_07.png', effect: { water: 80, exp: 80 },                  desc: '+80 水份 +80 EXP' },
+  { id: 'drink_08', name: '神聖露水', rarity: 'SSR', image: 'assets/drinks/drink_08.png', effect: { water: 50, hunger: 50, mood: 50, exp: 100 }, desc: '+50全屬性 +100 EXP' },
+];
+
+const DRINK_PRICES = { F: 50, R: 100, SR: 250, SSR: 500 };
+
 const ITEM_DEFS = {
   potion:  { icon: '🧪', name: '回復藥',  desc: '+30飽食 +30水份 +20心情' },
   candy:   { icon: '🍬', name: '愛心糖',  desc: '+40心情' },
@@ -512,6 +525,99 @@ function renderPetBag() {
   });
 }
 
+// ─── Drink Inventory ─────────────────────────────────────────────────────────
+function loadInventory() {
+  try { const r = localStorage.getItem('inventory'); return r ? JSON.parse(r) : {}; } catch { return {}; }
+}
+function saveInventory(inv) {
+  localStorage.setItem('inventory', JSON.stringify(inv));
+}
+
+function buyDrink(id) {
+  const drink = DRINKS.find(d => d.id === id);
+  if (!drink) return;
+  const price = DRINK_PRICES[drink.rarity];
+  if (!spendCoins(price)) { showToast('能量石不足！'); return; }
+  const inv = loadInventory();
+  inv[id] = (inv[id] || 0) + 1;
+  saveInventory(inv);
+  showToast(`購買成功：${drink.name} ×1`);
+  renderDrinkShop();
+}
+
+function useDrink(id) {
+  const drink = DRINKS.find(d => d.id === id);
+  if (!drink) return;
+  const inv = loadInventory();
+  if (!inv[id] || inv[id] <= 0) return;
+  inv[id]--;
+  if (inv[id] === 0) delete inv[id];
+  saveInventory(inv);
+  const e = drink.effect;
+  if (e.water)  state.water  = Math.min(100, state.water  + e.water);
+  if (e.hunger) state.hunger = Math.min(100, state.hunger + e.hunger);
+  if (e.mood)   state.mood   = Math.min(100, state.mood   + e.mood);
+  saveState();
+  if (e.exp) addExp(e.exp); else renderAll();
+  showToast(`使用 ${drink.name}！${drink.desc}`);
+  renderDrinkBag();
+}
+
+function renderDrinkShop() {
+  const panel = document.getElementById('shop-drink');
+  if (!panel) return;
+  const coins = state.coins;
+  const rarities = ['F', 'R', 'SR', 'SSR'];
+  let html = '';
+  rarities.forEach(rarity => {
+    const group = DRINKS.filter(d => d.rarity === rarity);
+    if (!group.length) return;
+    const price = DRINK_PRICES[rarity];
+    const canBuy = coins >= price;
+    html += `<div class="rarity-divider rarity-divider--${rarity.toLowerCase()}">${rarity}</div>
+      <div class="drink-shop-grid">
+        ${group.map(d => `
+          <div class="drink-shop-card">
+            <img src="${d.image}" class="drink-shop-img" onerror="this.style.opacity='0.15'">
+            <div class="drink-shop-info">
+              <span class="drink-shop-name">${d.name}</span>
+              <span class="badge badge--${d.rarity.toLowerCase()}">${d.rarity}</span>
+              <span class="drink-shop-desc">${d.desc}</span>
+            </div>
+            <button class="buy-btn${canBuy ? '' : ' buy-btn--disabled'}"
+              onclick="buyDrink('${d.id}')" ${canBuy ? '' : 'disabled'}>
+              ${price} 💎
+            </button>
+          </div>`).join('')}
+      </div>`;
+  });
+  panel.innerHTML = `<div class="card" style="display:flex;flex-direction:column;gap:10px">${html}</div>`;
+}
+
+function renderDrinkBag() {
+  const list = document.getElementById('drinkbag-list');
+  if (!list) return;
+  const inv = loadInventory();
+  const owned = Object.entries(inv).filter(([, cnt]) => cnt > 0);
+  if (!owned.length) {
+    list.innerHTML = '<p class="empty-hint" style="padding:12px 0">飲料背包是空的</p>';
+    return;
+  }
+  list.innerHTML = owned.map(([id, cnt]) => {
+    const d = DRINKS.find(x => x.id === id);
+    if (!d) return '';
+    return `<div class="itembag-row">
+      <img src="${d.image}" style="width:32px;height:32px;object-fit:contain;image-rendering:pixelated;flex-shrink:0" onerror="this.style.opacity='0.15'">
+      <div class="itembag-info">
+        <span class="itembag-name">${d.name}</span>
+        <span class="itembag-desc">${d.desc}</span>
+      </div>
+      <span class="itembag-count">×${cnt}</span>
+      <button class="use-btn" onclick="useDrink('${id}')">使用</button>
+    </div>`;
+  }).join('');
+}
+
 // ─── Decay ───────────────────────────────────────────────────────────────────
 function decayStats() {
   state.hunger = Math.max(0, state.hunger - 2);
@@ -596,7 +702,9 @@ const showShopSub = (type) => {
   document.querySelectorAll('.shop-panel').forEach(p => {
     p.classList.toggle('active', p.id === `shop-${type}`);
   });
-  if (type === 'gacha') {
+  if (type === 'drink') {
+    renderDrinkShop();
+  } else if (type === 'gacha') {
     buildGachaPanel();
     if (gachaInterval) clearInterval(gachaInterval);
     gachaInterval = setInterval(() => {
@@ -726,6 +834,7 @@ function initActions() {
     document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'bag'));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-bag'));
     renderPetBag();
+    renderDrinkBag();
   });
 
   document.getElementById('btn-change-pet').addEventListener('click', () => showSelectScreen());
