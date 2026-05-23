@@ -12,18 +12,18 @@ const DRINK_EXP      = { water: 3,  juice: 8,  milk: 15 };
 const DECAY_INTERVAL = 60_000;
 
 const PETS = [
-  { id: 'pet1',  name: '小狗',       rarity: 'F',  image: 'assets/pets/小狗.png',   skill: { name: '咬',   desc: '用尖牙狠狠咬住敵人',             effect: 'atk', power: 10, icon: '🦷' } },
-  { id: 'pet2',  name: '柴犬',       rarity: 'F',  image: 'assets/pets/柴犬.png',   skill: { name: '咬',   desc: '用尖牙狠狠咬住敵人',             effect: 'atk', power: 10, icon: '🦷' } },
-  { id: 'pet3',  name: '臘腸狗',     rarity: 'F',  image: 'assets/pets/臘腸狗.png', skill: { name: '咬',   desc: '用尖牙狠狠咬住敵人',             effect: 'atk', power: 10, icon: '🦷' } },
-  { id: 'pet4',  name: '柯基',       rarity: 'F',  image: 'assets/pets/柯基.png',   skill: { name: '咬',   desc: '用尖牙狠狠咬住敵人',             effect: 'atk', power: 10, icon: '🦷' } },
-  { id: 'pet5',  name: '比格犬',     rarity: 'R',  image: 'assets/pets/比格犬.png', skill: { name: '撕咬', desc: '憤怒地咬住敵人不放',             effect: 'atk', power: 24, icon: '🦷' } },
-  { id: 'pet6',  name: '米克斯',     rarity: 'R',  image: 'assets/pets/米克斯.png', skill: { name: '撕咬', desc: '憤怒地咬住敵人不放',             effect: 'atk', power: 24, icon: '🦷' } },
-  { id: 'pet7',  name: '貴賓狗',     rarity: 'R',  image: 'assets/pets/貴賓狗.png', skill: { name: '撕咬', desc: '憤怒地咬住敵人不放',             effect: 'atk', power: 24, icon: '🦷' } },
-  { id: 'pet8',  name: '比熊',       rarity: 'R',  image: 'assets/pets/比熊.png',   skill: { name: '撕咬', desc: '憤怒地咬住敵人不放',             effect: 'atk', power: 24, icon: '🦷' } },
-  { id: 'pet9',  name: '德牧',       rarity: 'SR', image: 'assets/pets/德牧.png',   skill: { name: '強咬', desc: '以獵犬本能發動致命一咬',         effect: 'atk', power: 45, icon: '🦷' } },
-  { id: 'pet10', name: '邊牧',       rarity: 'SR', image: 'assets/pets/邊牧.png',   skill: { name: '強咬', desc: '以獵犬本能發動致命一咬',         effect: 'atk', power: 45, icon: '🦷' } },
-  { id: 'pet11', name: '伯恩山',     rarity: 'SR', image: 'assets/pets/伯恩山.png', skill: { name: '強咬', desc: '以獵犬本能發動致命一咬',         effect: 'atk', power: 45, icon: '🦷' } },
-  { id: 'pet12', name: '牧羊犬',     rarity: 'SR', image: 'assets/pets/牧羊犬.png', skill: { name: '強咬', desc: '以獵犬本能發動致命一咬',         effect: 'atk', power: 45, icon: '🦷' } },
+  { id: 'pet1',  name: '小狗',   rarity: 'F',  image: 'assets/pets/小狗.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷' }] },
+  { id: 'pet2',  name: '柴犬',   rarity: 'F',  image: 'assets/pets/柴犬.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷' }] },
+  { id: 'pet3',  name: '臘腸狗', rarity: 'F',  image: 'assets/pets/臘腸狗.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷' }] },
+  { id: 'pet4',  name: '柯基',   rarity: 'F',  image: 'assets/pets/柯基.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷' }] },
+  { id: 'pet5',  name: '比格犬', rarity: 'R',  image: 'assets/pets/比格犬.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷' }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 24, icon: '🦷' }] },
+  { id: 'pet6',  name: '米克斯', rarity: 'R',  image: 'assets/pets/米克斯.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷' }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 24, icon: '🦷' }] },
+  { id: 'pet7',  name: '貴賓狗', rarity: 'R',  image: 'assets/pets/貴賓狗.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷' }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 24, icon: '🦷' }] },
+  { id: 'pet8',  name: '比熊',   rarity: 'R',  image: 'assets/pets/比熊.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷' }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 24, icon: '🦷' }] },
+  { id: 'pet9',  name: '德牧',   rarity: 'SR', image: 'assets/pets/德牧.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷' }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 24, icon: '🦷' }, { name: '強咬', desc: '以獵犬本能發動致命一咬', effect: 'atk', power: 45, icon: '🦷' }] },
+  { id: 'pet10', name: '邊牧',   rarity: 'SR', image: 'assets/pets/邊牧.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷' }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 24, icon: '🦷' }, { name: '強咬', desc: '以獵犬本能發動致命一咬', effect: 'atk', power: 45, icon: '🦷' }] },
+  { id: 'pet11', name: '伯恩山', rarity: 'SR', image: 'assets/pets/伯恩山.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷' }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 24, icon: '🦷' }, { name: '強咬', desc: '以獵犬本能發動致命一咬', effect: 'atk', power: 45, icon: '🦷' }] },
+  { id: 'pet12', name: '牧羊犬', rarity: 'SR', image: 'assets/pets/牧羊犬.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷' }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 24, icon: '🦷' }, { name: '強咬', desc: '以獵犬本能發動致命一咬', effect: 'atk', power: 45, icon: '🦷' }] },
   { id: 'pet13', name: '橘貓',       rarity: 'F',  image: 'assets/pets/橘貓.png' },
   { id: 'pet14', name: '灰貓',       rarity: 'F',  image: 'assets/pets/灰貓.png' },
   { id: 'pet15', name: '白貓',       rarity: 'F',  image: 'assets/pets/白貓.png' },
@@ -111,10 +111,23 @@ const RARITY_BASE_STATS = {
 };
 
 const RARITY_SKILLS = {
-  F:   { name: '普通攻擊', desc: '普通的一擊',             effect: 'atk', power: 10, icon: '⚔️'  },
-  R:   { name: '強力一擊', desc: '蓄力後猛烈攻擊',         effect: 'atk', power: 25, icon: '💥'  },
-  SR:  { name: '元素爆發', desc: '釋放元素能量',           effect: 'atk', power: 45, icon: '🔮'  },
-  SSR: { name: '究極必殺', desc: '毀天滅地的終極技能',     effect: 'atk', power: 80, icon: '⚡'  },
+  F: [
+    { name: '普通攻擊', desc: '普通的一擊',             effect: 'atk', power: 10, icon: '⚔️' },
+  ],
+  R: [
+    { name: '普通攻擊', desc: '普通的一擊',             effect: 'atk', power: 10, icon: '⚔️' },
+    { name: '強力一擊', desc: '蓄力後猛烈攻擊',         effect: 'atk', power: 25, icon: '💥' },
+  ],
+  SR: [
+    { name: '普通攻擊', desc: '普通的一擊',             effect: 'atk', power: 10, icon: '⚔️' },
+    { name: '強力一擊', desc: '蓄力後猛烈攻擊',         effect: 'atk', power: 25, icon: '💥' },
+    { name: '元素爆發', desc: '釋放強大的元素能量',     effect: 'atk', power: 45, icon: '🔮' },
+  ],
+  SSR: [
+    { name: '強力一擊', desc: '蓄力後猛烈攻擊',         effect: 'atk', power: 25, icon: '💥' },
+    { name: '元素爆發', desc: '釋放強大的元素能量',     effect: 'atk', power: 45, icon: '🔮' },
+    { name: '究極必殺', desc: '毀天滅地的終極技能',     effect: 'atk', power: 80, icon: '⚡' },
+  ],
 };
 
 const calcStats = (pet, level) => {
@@ -126,7 +139,7 @@ const calcStats = (pet, level) => {
   };
 };
 
-const getPetSkill = (pet) => pet.skill || RARITY_SKILLS[pet.rarity] || RARITY_SKILLS.F;
+const getPetSkills = (pet) => pet.skills || RARITY_SKILLS[pet.rarity] || RARITY_SKILLS.F;
 
 const MOOD_MOODS = [
   [80, '😄'], [60, '😊'], [40, '😐'], [20, '😟'], [0, '😢']
@@ -343,10 +356,10 @@ function hideSelectScreen() {
 
 // ─── Pet Detail Screen ────────────────────────────────────────────────────────
 function showPetDetail() {
-  const pet   = currentPet();
-  const level = state.level;
-  const stats = calcStats(pet, level);
-  const skill = getPetSkill(pet);
+  const pet    = currentPet();
+  const level  = state.level;
+  const stats  = calcStats(pet, level);
+  const skills = getPetSkills(pet);
 
   document.getElementById('detail-pet-img').src = pet.image;
   document.getElementById('detail-pet-img').alt = pet.name;
@@ -362,10 +375,16 @@ function showPetDetail() {
   document.getElementById('detail-def').textContent        = stats.def;
   document.getElementById('detail-rarity-val').textContent = pet.rarity;
 
-  document.getElementById('detail-skill-icon').textContent  = skill.icon;
-  document.getElementById('detail-skill-name').textContent  = skill.name;
-  document.getElementById('detail-skill-power').textContent = `威力: ${skill.power}`;
-  document.getElementById('detail-skill-desc').textContent  = skill.desc;
+  const container = document.getElementById('detail-skills-container');
+  container.className = `detail-skills-container detail-skills-count-${skills.length}`;
+  container.innerHTML = skills.map(s => `
+    <div class="detail-skill-card">
+      <div class="detail-skill-card__icon">${s.icon}</div>
+      <div class="detail-skill-card__name">${s.name}</div>
+      <div class="detail-skill-card__desc">${s.desc}</div>
+      <div class="detail-skill-card__power">威力：${s.power}</div>
+    </div>
+  `).join('');
 
   document.getElementById('screen-pet-detail').classList.remove('hidden');
 }
