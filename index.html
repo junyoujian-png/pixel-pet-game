@@ -126,6 +126,10 @@
 
         <!-- Change Pet Button -->
         <div class="small-btn-row">
+          <button class="small-btn" id="btn-pet-detail" title="寵物詳細">
+            <span>ℹ️</span>
+            <span class="small-btn-label">資訊</span>
+          </button>
           <button class="small-btn" id="btn-change-pet" title="換寵物">
             <span>🔄</span>
             <span class="small-btn-label">換寵物</span>
@@ -320,6 +324,73 @@
       </button>
     </nav>
 
+  </div>
+
+  <!-- Pet Detail Screen -->
+  <div id="screen-pet-detail" class="screen-detail hidden">
+    <div class="detail-header">
+      <button id="btn-detail-back" class="shop-back-btn">← 返回</button>
+      <h2 class="detail-title">寵物詳細</h2>
+    </div>
+
+    <!-- Pet Info Row -->
+    <div class="detail-pet-info">
+      <div class="detail-avatar">
+        <img id="detail-pet-img" src="" alt="" class="pixel-art" />
+      </div>
+      <div class="detail-pet-meta">
+        <div class="detail-pet-name-row">
+          <span id="detail-pet-name" class="pet-name"></span>
+          <span id="detail-pet-rarity" class="badge"></span>
+        </div>
+        <div class="pet-level-row">
+          <span class="label">Lv.</span>
+          <span id="detail-pet-level" class="level-num">1</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Combat Stats Grid (2×2) -->
+    <div class="card">
+      <h3 class="section-title">⚔️ 戰鬥屬性</h3>
+      <div class="detail-stats-grid">
+        <div class="detail-stat-cell">
+          <span class="detail-stat-icon">❤️</span>
+          <span class="detail-stat-label">HP</span>
+          <span id="detail-hp" class="detail-stat-value">—</span>
+        </div>
+        <div class="detail-stat-cell">
+          <span class="detail-stat-icon">⚔️</span>
+          <span class="detail-stat-label">ATK</span>
+          <span id="detail-atk" class="detail-stat-value">—</span>
+        </div>
+        <div class="detail-stat-cell">
+          <span class="detail-stat-icon">🛡️</span>
+          <span class="detail-stat-label">DEF</span>
+          <span id="detail-def" class="detail-stat-value">—</span>
+        </div>
+        <div class="detail-stat-cell">
+          <span class="detail-stat-icon">⭐</span>
+          <span class="detail-stat-label">稀有度</span>
+          <span id="detail-rarity-val" class="detail-stat-value">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skill Card -->
+    <div class="card">
+      <h3 class="section-title">✨ 技能</h3>
+      <div class="detail-skill-body">
+        <span id="detail-skill-icon" class="detail-skill-icon">⚔️</span>
+        <div class="detail-skill-info">
+          <div class="detail-skill-name-row">
+            <span id="detail-skill-name" class="detail-skill-name"></span>
+            <span id="detail-skill-power" class="detail-skill-power">威力: —</span>
+          </div>
+          <p id="detail-skill-desc" class="detail-skill-desc"></p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Modals -->

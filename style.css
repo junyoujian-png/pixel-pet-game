@@ -963,3 +963,146 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   100% { transform: scale(1); }
 }
 .level-up-anim { animation: level-up .5s ease; }
+
+/* ─── Pet Detail Screen ─── */
+.screen-detail {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--bg);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 16px 32px;
+  gap: 16px;
+  max-width: 430px;
+  margin: 0 auto;
+}
+.screen-detail.hidden { display: none; }
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 8px;
+}
+.detail-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.detail-pet-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.detail-avatar {
+  width: 96px;
+  height: 96px;
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.detail-pet-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-pet-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 2×2 Combat Stats Grid */
+.detail-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.detail-stat-cell {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.detail-stat-icon { font-size: 22px; }
+.detail-stat-label {
+  font-size: 11px;
+  color: var(--text2);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.detail-stat-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+/* Skill Card */
+.detail-skill-body {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.detail-skill-icon { font-size: 36px; flex-shrink: 0; }
+
+.detail-skill-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-skill-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.detail-skill-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.detail-skill-power {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.detail-skill-desc {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.5;
+}

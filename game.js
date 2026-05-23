@@ -103,6 +103,31 @@ const EQUIP_DEFS = {
   scarf: { icon: '🧣', name: '圍巾' },
 };
 
+const RARITY_BASE_STATS = {
+  F:   { hp: 100, atk: 10, def: 5  },
+  R:   { hp: 150, atk: 18, def: 10 },
+  SR:  { hp: 220, atk: 30, def: 18 },
+  SSR: { hp: 350, atk: 50, def: 30 },
+};
+
+const RARITY_SKILLS = {
+  F:   { name: '普通攻擊', desc: '普通的一擊',             effect: 'atk', power: 10, icon: '⚔️'  },
+  R:   { name: '強力一擊', desc: '蓄力後猛烈攻擊',         effect: 'atk', power: 25, icon: '💥'  },
+  SR:  { name: '元素爆發', desc: '釋放元素能量',           effect: 'atk', power: 45, icon: '🔮'  },
+  SSR: { name: '究極必殺', desc: '毀天滅地的終極技能',     effect: 'atk', power: 80, icon: '⚡'  },
+};
+
+const calcStats = (pet, level) => {
+  const base = pet.baseStats || RARITY_BASE_STATS[pet.rarity] || RARITY_BASE_STATS.F;
+  return {
+    hp:  base.hp  + (level - 1) * 10,
+    atk: base.atk + (level - 1) * 2,
+    def: base.def + (level - 1) * 1,
+  };
+};
+
+const getPetSkill = (pet) => pet.skill || RARITY_SKILLS[pet.rarity] || RARITY_SKILLS.F;
+
 const MOOD_MOODS = [
   [80, '😄'], [60, '😊'], [40, '😐'], [20, '😟'], [0, '😢']
 ];
@@ -314,6 +339,39 @@ function showSelectScreen() {
 
 function hideSelectScreen() {
   document.getElementById('screen-select').classList.add('hidden');
+}
+
+// ─── Pet Detail Screen ────────────────────────────────────────────────────────
+function showPetDetail() {
+  const pet   = currentPet();
+  const level = state.level;
+  const stats = calcStats(pet, level);
+  const skill = getPetSkill(pet);
+
+  document.getElementById('detail-pet-img').src = pet.image;
+  document.getElementById('detail-pet-img').alt = pet.name;
+  document.getElementById('detail-pet-name').textContent  = pet.name;
+  document.getElementById('detail-pet-level').textContent = level;
+
+  const badge = document.getElementById('detail-pet-rarity');
+  badge.textContent = pet.rarity;
+  badge.className   = `badge badge--${pet.rarity.toLowerCase()}`;
+
+  document.getElementById('detail-hp').textContent         = stats.hp;
+  document.getElementById('detail-atk').textContent        = stats.atk;
+  document.getElementById('detail-def').textContent        = stats.def;
+  document.getElementById('detail-rarity-val').textContent = pet.rarity;
+
+  document.getElementById('detail-skill-icon').textContent  = skill.icon;
+  document.getElementById('detail-skill-name').textContent  = skill.name;
+  document.getElementById('detail-skill-power').textContent = `威力: ${skill.power}`;
+  document.getElementById('detail-skill-desc').textContent  = skill.desc;
+
+  document.getElementById('screen-pet-detail').classList.remove('hidden');
+}
+
+function hidePetDetail() {
+  document.getElementById('screen-pet-detail').classList.add('hidden');
 }
 
 function selectPet(id) {
@@ -939,6 +997,9 @@ function initActions() {
   });
 
   document.getElementById('btn-change-pet').addEventListener('click', () => showSelectScreen());
+
+  document.getElementById('btn-pet-detail').addEventListener('click', () => showPetDetail());
+  document.getElementById('btn-detail-back').addEventListener('click', () => hidePetDetail());
 }
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
