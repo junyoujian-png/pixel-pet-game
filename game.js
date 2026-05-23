@@ -65,6 +65,17 @@ const PETS = [
   { id: 'pet51', name: '紅浣熊',       rarity: 'SR', image: 'assets/pets/紅浣熊.png' },
 ];
 
+const FOODS = [
+  { id: 'food_01', name: '名稱', rarity: 'F',   image: 'assets/foods/food_01.png', price: 30,  effect: { water: 0, hunger: 0, mood: 0, exp: 0 }, desc: '效果說明' },
+  { id: 'food_02', name: '名稱', rarity: 'F',   image: 'assets/foods/food_02.png', price: 30,  effect: { water: 0, hunger: 0, mood: 0, exp: 0 }, desc: '效果說明' },
+  { id: 'food_03', name: '名稱', rarity: 'R',   image: 'assets/foods/food_03.png', price: 80,  effect: { water: 0, hunger: 0, mood: 0, exp: 0 }, desc: '效果說明' },
+  { id: 'food_04', name: '名稱', rarity: 'R',   image: 'assets/foods/food_04.png', price: 80,  effect: { water: 0, hunger: 0, mood: 0, exp: 0 }, desc: '效果說明' },
+  { id: 'food_05', name: '名稱', rarity: 'SR',  image: 'assets/foods/food_05.png', price: 200, effect: { water: 0, hunger: 0, mood: 0, exp: 0 }, desc: '效果說明' },
+  { id: 'food_06', name: '名稱', rarity: 'SR',  image: 'assets/foods/food_06.png', price: 200, effect: { water: 0, hunger: 0, mood: 0, exp: 0 }, desc: '效果說明' },
+  { id: 'food_07', name: '名稱', rarity: 'SSR', image: 'assets/foods/food_07.png', price: 500, effect: { water: 0, hunger: 0, mood: 0, exp: 0 }, desc: '效果說明' },
+  { id: 'food_08', name: '名稱', rarity: 'SSR', image: 'assets/foods/food_08.png', price: 500, effect: { water: 0, hunger: 0, mood: 0, exp: 0 }, desc: '效果說明' },
+];
+
 const DRINKS = [
   { id: 'drink_01', name: '礦泉水', rarity: 'F',   image: 'assets/drinks/drink_01.png', price: 50,  effect: { water: 5,   exp: 5  }, desc: '+5 水份 +5 EXP'            },
   { id: 'drink_02', name: '紅茶',   rarity: 'R',   image: 'assets/drinks/drink_02.png', price: 100, effect: { water: 15,  exp: 15 }, desc: '+15 水份 +15 EXP'          },
@@ -523,6 +534,89 @@ function renderPetBag() {
   });
 }
 
+// ─── Food System ─────────────────────────────────────────────────────────────
+function buyFood(id) {
+  const food = FOODS.find(f => f.id === id);
+  if (!food) return;
+  if (!spendCoins(food.price)) { showToast('能量石不足！'); return; }
+  const inv = loadInventory();
+  inv[id] = (inv[id] || 0) + 1;
+  saveInventory(inv);
+  showToast(`購買成功：${food.name} ×1`);
+  renderFoodShop();
+}
+
+function useFood(id) {
+  const food = FOODS.find(f => f.id === id);
+  if (!food) return;
+  const inv = loadInventory();
+  if (!inv[id] || inv[id] <= 0) return;
+  inv[id]--;
+  if (inv[id] === 0) delete inv[id];
+  saveInventory(inv);
+  const e = food.effect;
+  if (e.water)  state.water  = Math.min(100, state.water  + e.water);
+  if (e.hunger) state.hunger = Math.min(100, state.hunger + e.hunger);
+  if (e.mood)   state.mood   = Math.min(100, state.mood   + e.mood);
+  saveState();
+  if (e.exp) addExp(e.exp); else renderAll();
+  showToast(`使用 ${food.name}！${food.desc}`);
+  renderFoodBag();
+}
+
+function renderFoodShop() {
+  const panel = document.getElementById('shop-food');
+  if (!panel) return;
+  const coins = state.coins;
+  const rarities = ['F', 'R', 'SR', 'SSR'];
+  let html = '';
+  rarities.forEach(rarity => {
+    const group = FOODS.filter(f => f.rarity === rarity);
+    if (!group.length) return;
+    html += `<div class="rarity-divider rarity-divider--${rarity.toLowerCase()}">${rarity}</div>
+      <div class="drink-shop-grid">
+        ${group.map(f => `
+          <div class="drink-shop-card">
+            <img src="${f.image}" class="drink-shop-img" onerror="this.style.opacity='0.15'">
+            <div class="drink-shop-info">
+              <span class="drink-shop-name">${f.name}</span>
+              <span class="badge badge--${f.rarity.toLowerCase()}">${f.rarity}</span>
+              <span class="drink-shop-desc">${f.desc}</span>
+            </div>
+            <button class="buy-btn${coins >= f.price ? '' : ' buy-btn--disabled'}"
+              onclick="buyFood('${f.id}')" ${coins >= f.price ? '' : 'disabled'}>
+              ${f.price} 💎
+            </button>
+          </div>`).join('')}
+      </div>`;
+  });
+  panel.innerHTML = `<div class="card" style="display:flex;flex-direction:column;gap:10px">${html}</div>`;
+}
+
+function renderFoodBag() {
+  const list = document.getElementById('foodbag-list');
+  if (!list) return;
+  const inv = loadInventory();
+  const owned = Object.entries(inv).filter(([id, cnt]) => cnt > 0 && id.startsWith('food_'));
+  if (!owned.length) {
+    list.innerHTML = '<p class="empty-hint" style="padding:12px 0">食物背包是空的</p>';
+    return;
+  }
+  list.innerHTML = owned.map(([id, cnt]) => {
+    const f = FOODS.find(x => x.id === id);
+    if (!f) return '';
+    return `<div class="itembag-row">
+      <img src="${f.image}" style="width:32px;height:32px;object-fit:contain;image-rendering:pixelated;flex-shrink:0" onerror="this.style.opacity='0.15'">
+      <div class="itembag-info">
+        <span class="itembag-name">${f.name}</span>
+        <span class="itembag-desc">${f.desc}</span>
+      </div>
+      <span class="itembag-count">×${cnt}</span>
+      <button class="use-btn" onclick="useFood('${id}')">使用</button>
+    </div>`;
+  }).join('');
+}
+
 // ─── Drink Inventory ─────────────────────────────────────────────────────────
 function loadInventory() {
   try { const r = localStorage.getItem('inventory'); return r ? JSON.parse(r) : {}; } catch { return {}; }
@@ -699,7 +793,9 @@ const showShopSub = (type) => {
   document.querySelectorAll('.shop-panel').forEach(p => {
     p.classList.toggle('active', p.id === `shop-${type}`);
   });
-  if (type === 'drink') {
+  if (type === 'food') {
+    renderFoodShop();
+  } else if (type === 'drink') {
     renderDrinkShop();
   } else if (type === 'gacha') {
     buildGachaPanel();
@@ -833,6 +929,7 @@ function initActions() {
     document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'bag'));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-bag'));
     renderPetBag();
+    renderFoodBag();
     renderDrinkBag();
   });
 

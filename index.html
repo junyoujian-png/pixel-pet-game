@@ -161,6 +161,10 @@
       <!-- Bag Tab -->
       <section class="tab-panel" id="tab-bag">
         <div class="card">
+          <h3 class="section-title">🍖 食物背包</h3>
+          <div id="foodbag-list" class="itembag-list"></div>
+        </div>
+        <div class="card">
           <h3 class="section-title">🥤 飲料背包</h3>
           <div id="drinkbag-list" class="itembag-list"></div>
         </div>
@@ -234,30 +238,8 @@
           </div>
 
           <!-- Food -->
-          <div class="shop-panel" id="shop-food">
-            <div class="card">
-              <div class="item-grid">
-                <div class="shop-item">
-                  <span class="item-icon">🐟</span>
-                  <span class="item-name">小魚</span>
-                  <span class="item-desc">+20飽食 +5 EXP</span>
-                  <button class="buy-btn" data-cost="10" data-type="food" data-id="fish">10💎</button>
-                </div>
-                <div class="shop-item">
-                  <span class="item-icon">🍖</span>
-                  <span class="item-name">烤肉</span>
-                  <span class="item-desc">+35飽食 +10 EXP</span>
-                  <button class="buy-btn" data-cost="25" data-type="food" data-id="meat">25💎</button>
-                </div>
-                <div class="shop-item">
-                  <span class="item-icon">🎂</span>
-                  <span class="item-name">蛋糕</span>
-                  <span class="item-desc">+50飽食 +20 EXP</span>
-                  <button class="buy-btn" data-cost="50" data-type="food" data-id="cake">50💎</button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <!-- Food — content built by renderFoodShop() in JS -->
+          <div class="shop-panel" id="shop-food"></div>
 
           <!-- Drink -->
           <!-- Drink — content built by renderDrinkShop() in JS -->
