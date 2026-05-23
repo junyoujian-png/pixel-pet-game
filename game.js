@@ -66,14 +66,19 @@ const PETS = [
 ];
 
 const FOODS = [
-  { id: 'food_01', name: '名稱', rarity: 'F',   image: 'assets/foods/food_01.png', price: 30,  effect: { water: 0, hunger: 0, mood: 0, exp: 0 }, desc: '效果說明' },
-  { id: 'food_02', name: '名稱', rarity: 'F',   image: 'assets/foods/food_02.png', price: 30,  effect: { water: 0, hunger: 0, mood: 0, exp: 0 }, desc: '效果說明' },
-  { id: 'food_03', name: '名稱', rarity: 'R',   image: 'assets/foods/food_03.png', price: 80,  effect: { water: 0, hunger: 0, mood: 0, exp: 0 }, desc: '效果說明' },
-  { id: 'food_04', name: '名稱', rarity: 'R',   image: 'assets/foods/food_04.png', price: 80,  effect: { water: 0, hunger: 0, mood: 0, exp: 0 }, desc: '效果說明' },
-  { id: 'food_05', name: '名稱', rarity: 'SR',  image: 'assets/foods/food_05.png', price: 200, effect: { water: 0, hunger: 0, mood: 0, exp: 0 }, desc: '效果說明' },
-  { id: 'food_06', name: '名稱', rarity: 'SR',  image: 'assets/foods/food_06.png', price: 200, effect: { water: 0, hunger: 0, mood: 0, exp: 0 }, desc: '效果說明' },
-  { id: 'food_07', name: '名稱', rarity: 'SSR', image: 'assets/foods/food_07.png', price: 500, effect: { water: 0, hunger: 0, mood: 0, exp: 0 }, desc: '效果說明' },
-  { id: 'food_08', name: '名稱', rarity: 'SSR', image: 'assets/foods/food_08.png', price: 500, effect: { water: 0, hunger: 0, mood: 0, exp: 0 }, desc: '效果說明' },
+  { id: 'food_01', name: '餅乾屑', rarity: 'F',   image: 'assets/foods/food_01.png', price: 10,  effect: { hunger: 1,  exp: 1  }, desc: '+1 飽食 +1 EXP'            },
+  { id: 'food_02', name: '餅乾',   rarity: 'F',   image: 'assets/foods/food_02.png', price: 50,  effect: { hunger: 5,  exp: 5  }, desc: '+5 飽食 +5 EXP'            },
+  { id: 'food_03', name: '玉米',   rarity: 'F',   image: 'assets/foods/food_03.png', price: 50,  effect: { hunger: 5,  exp: 5  }, desc: '+5 飽食 +5 EXP'            },
+  { id: 'food_04', name: '吐司',   rarity: 'F',   image: 'assets/foods/food_04.png', price: 50,  effect: { hunger: 5,  exp: 5  }, desc: '+5 飽食 +5 EXP'            },
+  { id: 'food_05', name: '甜甜圈', rarity: 'R',   image: 'assets/foods/food_05.png', price: 100, effect: { hunger: 15, exp: 15 }, desc: '+15 飽食 +15 EXP'          },
+  { id: 'food_06', name: '薯條',   rarity: 'R',   image: 'assets/foods/food_06.png', price: 100, effect: { hunger: 15, exp: 15 }, desc: '+15 飽食 +15 EXP'          },
+  { id: 'food_07', name: '熱狗',   rarity: 'R',   image: 'assets/foods/food_07.png', price: 100, effect: { hunger: 15, exp: 15 }, desc: '+15 飽食 +15 EXP'          },
+  { id: 'food_08', name: '雞腿',   rarity: 'SR',  image: 'assets/foods/food_08.png', price: 250, effect: { hunger: 50, exp: 25 }, desc: '+50 飽食 +25 EXP'          },
+  { id: 'food_09', name: '披薩',   rarity: 'SR',  image: 'assets/foods/food_09.png', price: 250, effect: { hunger: 50, exp: 25 }, desc: '+50 飽食 +25 EXP'          },
+  { id: 'food_10', name: '漢堡',   rarity: 'SR',  image: 'assets/foods/food_10.png', price: 250, effect: { hunger: 50, exp: 25 }, desc: '+50 飽食 +25 EXP'          },
+  { id: 'food_11', name: '鮭魚',   rarity: 'SSR', image: 'assets/foods/food_11.png', price: 500, effect: { water: 10, hunger: 90, exp: 50 }, desc: '+10 水份 +90 飽食 +50 EXP' },
+  { id: 'food_12', name: '巧克力', rarity: 'SSR', image: 'assets/foods/food_12.png', price: 500, effect: { hunger: 90, mood: 10, exp: 50  }, desc: '+90 飽食 +10 心情 +50 EXP' },
+  { id: 'food_13', name: '蛋糕',   rarity: 'SSR', image: 'assets/foods/food_13.png', price: 500, effect: { hunger: 90, exp: 60 }, desc: '+90 飽食 +60 EXP'          },
 ];
 
 const DRINKS = [
