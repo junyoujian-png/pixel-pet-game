@@ -34,7 +34,7 @@ const PETS = [
   { id: 'pet20', name: '三花貓',     rarity: 'SR', image: 'assets/pets/三花貓.png' },
   { id: 'pet21', name: '波斯貓',     rarity: 'SR', image: 'assets/pets/波斯貓.png' },
   { id: 'pet22', name: '緬因貓',     rarity: 'SR', image: 'assets/pets/緬因貓.png' },
-  { id: 'pet23', name: '狐狸',       rarity: 'R',  image: 'assets/pets/狐狸.png' },
+  { id: 'pet23', name: '狐狸',       rarity: 'R',  image: 'assets/pets/狐狸.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷', maxPP: 10, currentPP: 10 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 24, icon: '🦷', maxPP: 5, currentPP: 5 }] },
   { id: 'pet24', name: '小豬',         rarity: 'F',  image: 'assets/pets/小豬.png' },
   { id: 'pet25', name: '麝香豬',       rarity: 'R',  image: 'assets/pets/麝香豬.png' },
   { id: 'pet26', name: '灰兔',         rarity: 'F',  image: 'assets/pets/灰兔.png' },
