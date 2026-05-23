@@ -1095,3 +1095,44 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   margin-top: 4px;
   white-space: nowrap;
 }
+
+/* PP dots */
+.detail-skill-card__pp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  margin-top: 6px;
+  width: 100%;
+}
+.pp-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  justify-content: center;
+}
+.pp-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.pp-dot--full  { background: var(--accent); }
+.pp-dot--empty { background: var(--border); }
+.pp-count {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text2);
+}
+
+/* PP 不足狀態 */
+.detail-skill-card--empty {
+  opacity: 0.55;
+}
+.pp-empty-hint {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--red);
+  margin-top: 2px;
+}
