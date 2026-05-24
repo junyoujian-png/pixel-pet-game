@@ -110,8 +110,9 @@ const DRINKS = [
 ];
 
 const ITEM_DEFS = {
-  candy:   { icon: '🍬', name: '愛心糖', desc: '+10心情' },
-  xpboost: { icon: '⭐', name: '成長藥', desc: '+20 EXP' },
+  candy:     { icon: '🍬', name: '愛心糖', desc: '+10心情' },
+  xpboost:   { icon: '⭐', name: '成長藥',  desc: '+20 EXP' },
+  pprestore: { icon: '💊', name: 'PP 回復', desc: '回復一個技能的 PP' },
 };
 
 const BOSSES = [
@@ -716,6 +717,13 @@ function giveDrink(type = 'water') {
 // ─── Item Bag ─────────────────────────────────────────────────────────────────
 function useItem(id) {
   if (!state.items[id] || state.items[id] <= 0) return;
+
+  if (id === 'pprestore') {
+    // 先開技能選擇 modal，選完才扣道具
+    showPPRestoreModal();
+    return;
+  }
+
   state.items[id]--;
   if (state.items[id] === 0) delete state.items[id];
 
@@ -729,6 +737,53 @@ function useItem(id) {
     showToast('使用成長藥！+20 EXP ⭐');
   }
   renderItemBag();
+}
+
+// ─── PP Restore Modal ─────────────────────────────────────────────────────────
+function showPPRestoreModal() {
+  const pet    = currentPet();
+  const skills = getSkillsWithPP(pet);
+  const list   = document.getElementById('pp-restore-list');
+
+  list.innerHTML = skills.map((s, i) => {
+    const full = s.currentPP >= s.maxPP;
+    return `
+      <div class="pp-restore-row${full ? ' pp-restore-row--full' : ''}">
+        <span class="pp-restore-icon">${s.icon}</span>
+        <div class="pp-restore-info">
+          <span class="pp-restore-name">${s.name}</span>
+          <div class="pp-restore-bar">
+            ${renderPPDots(s.currentPP, s.maxPP)}
+            <span class="pp-restore-count">${s.currentPP} / ${s.maxPP}</span>
+          </div>
+        </div>
+        <button class="pp-restore-btn${full ? ' pp-restore-btn--disabled' : ''}"
+                ${full ? 'disabled' : `onclick="confirmPPRestore(${i})"`}>
+          ${full ? '已滿' : '回復'}
+        </button>
+      </div>`;
+  }).join('');
+
+  openModal('modal-pp-restore');
+}
+
+function confirmPPRestore(skillIndex) {
+  const pet    = currentPet();
+  const skills = getPetSkills(pet);
+  const saved  = loadSkillPP(pet.id) || skills.map(s => s.maxPP);
+
+  saved[skillIndex] = skills[skillIndex].maxPP;
+  saveSkillPP(pet.id, saved);
+
+  // 扣道具
+  state.items['pprestore']--;
+  if (state.items['pprestore'] === 0) delete state.items['pprestore'];
+  saveState();
+
+  closeModal('modal-pp-restore');
+  showToast(`💊 ${skills[skillIndex].name} PP 已回滿！`);
+  renderItemBag();
+  showPetDetail(); // 重繪技能頁
 }
 
 function renderItemBag() {
