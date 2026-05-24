@@ -1136,3 +1136,148 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   color: var(--red);
   margin-top: 2px;
 }
+
+/* ─── Boss List ─── */
+.boss-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.boss-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  box-shadow: var(--shadow);
+  transition: border-color .2s;
+}
+.boss-card:hover { border-color: #E53935; }
+.boss-card--defeated { opacity: 0.65; }
+.boss-card--locked   { opacity: 0.5; }
+
+/* Boss image */
+.boss-card__img-wrap {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.boss-card__img {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  object-fit: contain;
+}
+.boss-card__img-fallback {
+  display: none;
+  font-size: 32px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+.boss-card__defeated-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(76, 175, 80, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: white;
+  font-weight: 900;
+  border-radius: 8px;
+}
+
+/* Boss info column */
+.boss-card__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.boss-card__name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.boss-card__name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.boss-card__level {
+  font-size: 11px;
+  color: #E53935;
+  font-weight: 600;
+}
+.boss-card__stats {
+  font-size: 11px;
+  color: var(--text2);
+}
+.boss-card__desc {
+  font-size: 11px;
+  color: var(--text2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.boss-card__reward {
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Boss action column */
+.boss-card__action {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+.boss-challenge-btn {
+  padding: 8px 14px;
+  background: #E53935;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .2s, transform .1s;
+  white-space: nowrap;
+}
+.boss-challenge-btn:hover  { opacity: .85; }
+.boss-challenge-btn:active { transform: scale(.94); }
+
+.boss-status {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  text-align: center;
+}
+.boss-status--done {
+  background: #e8f5e9;
+  color: var(--green);
+  border: 1px solid var(--green);
+}
+.boss-status--locked {
+  background: var(--surface2);
+  color: var(--text2);
+  border: 1px solid var(--border);
+}

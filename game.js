@@ -104,6 +104,25 @@ const EQUIP_DEFS = {
   scarf: { icon: '🧣', name: '圍巾' },
 };
 
+const BOSSES = [
+  { id: 'boss_01', name: '野兔霸王',   image: 'assets/boss/boss_01.png', level: 1,  hp: 200,  atk: 15,  def: 5,   reward: { coins: 50,   rarity: 'F'   }, desc: '看似可愛卻異常凶猛的野兔首領' },
+  { id: 'boss_02', name: '憤怒山豬',   image: 'assets/boss/boss_02.png', level: 3,  hp: 300,  atk: 20,  def: 8,   reward: { coins: 80,   rarity: 'F'   }, desc: '暴走的野山豬，衝撞力十足' },
+  { id: 'boss_03', name: '毒蜘蛛女王', image: 'assets/boss/boss_03.png', level: 5,  hp: 400,  atk: 28,  def: 12,  reward: { coins: 120,  rarity: 'R'   }, desc: '在暗處潛伏的蜘蛛女王' },
+  { id: 'boss_04', name: '狂暴猿猴',   image: 'assets/boss/boss_04.png', level: 8,  hp: 500,  atk: 35,  def: 15,  reward: { coins: 150,  rarity: 'R'   }, desc: '精力旺盛的猿猴王，力大無比' },
+  { id: 'boss_05', name: '沙漠蠍王',   image: 'assets/boss/boss_05.png', level: 10, hp: 650,  atk: 45,  def: 20,  reward: { coins: 200,  rarity: 'R'   }, desc: '沙漠中最危險的捕獵者' },
+  { id: 'boss_06', name: '深海章魚',   image: 'assets/boss/boss_06.png', level: 13, hp: 800,  atk: 55,  def: 25,  reward: { coins: 250,  rarity: 'R'   }, desc: '觸手遍布四方的神秘海洋生物' },
+  { id: 'boss_07', name: '雷霆之虎',   image: 'assets/boss/boss_07.png', level: 15, hp: 1000, atk: 65,  def: 30,  reward: { coins: 300,  rarity: 'SR'  }, desc: '閃電般迅速的猛虎，令人聞風喪膽' },
+  { id: 'boss_08', name: '熔岩犀牛',   image: 'assets/boss/boss_08.png', level: 18, hp: 1200, atk: 75,  def: 35,  reward: { coins: 380,  rarity: 'SR'  }, desc: '周身包覆熔岩的狂暴犀牛' },
+  { id: 'boss_09', name: '冰霜北極熊', image: 'assets/boss/boss_09.png', level: 20, hp: 1500, atk: 90,  def: 42,  reward: { coins: 450,  rarity: 'SR'  }, desc: '掌控冰雪風暴的極地霸主' },
+  { id: 'boss_10', name: '黑暗獅王',   image: 'assets/boss/boss_10.png', level: 23, hp: 1800, atk: 105, def: 50,  reward: { coins: 550,  rarity: 'SR'  }, desc: '在黑暗中統治一切的獅王' },
+  { id: 'boss_11', name: '風暴鷹王',   image: 'assets/boss/boss_11.png', level: 25, hp: 2200, atk: 120, def: 60,  reward: { coins: 650,  rarity: 'SR'  }, desc: '乘風破浪、統領天空的霸主' },
+  { id: 'boss_12', name: '混沌火龍',   image: 'assets/boss/boss_12.png', level: 28, hp: 2800, atk: 140, def: 70,  reward: { coins: 800,  rarity: 'SSR' }, desc: '燃燒萬物的遠古混沌火龍' },
+  { id: 'boss_13', name: '時空狼王',   image: 'assets/boss/boss_13.png', level: 30, hp: 3500, atk: 160, def: 85,  reward: { coins: 1000, rarity: 'SSR' }, desc: '能穿越時空的神秘狼王' },
+  { id: 'boss_14', name: '星際巨鯨',   image: 'assets/boss/boss_14.png', level: 35, hp: 4500, atk: 190, def: 100, reward: { coins: 1300, rarity: 'SSR' }, desc: '遨遊於星際之間的傳說生物' },
+  { id: 'boss_15', name: '神話鳳凰',   image: 'assets/boss/boss_15.png', level: 40, hp: 6000, atk: 220, def: 120, reward: { coins: 1800, rarity: 'SSR' }, desc: '從灰燼中涅槃重生的不死神鳥' },
+  { id: 'boss_16', name: '虛空神獸',   image: 'assets/boss/boss_16.png', level: 50, hp: 9999, atk: 300, def: 150, reward: { coins: 3000, rarity: 'SSR' }, desc: '宇宙誕生之初便存在的神秘存在，終極BOSS' },
+];
+
 const RARITY_BASE_STATS = {
   F:   { hp: 100, atk: 10, def: 5  },
   R:   { hp: 150, atk: 18, def: 10 },
@@ -1077,6 +1096,106 @@ function initActions() {
   document.getElementById('btn-detail-back').addEventListener('click', () => hidePetDetail());
 }
 
+// ─── Boss System ─────────────────────────────────────────────────────────────
+function loadDefeatedBosses() {
+  try { return JSON.parse(localStorage.getItem('defeatedBosses') || '[]'); } catch { return []; }
+}
+function saveDefeatedBosses(arr) {
+  localStorage.setItem('defeatedBosses', JSON.stringify(arr));
+}
+
+function showBossPage() {
+  document.getElementById('explore-lobby').style.display    = 'none';
+  document.getElementById('explore-boss-sub').style.display = 'flex';
+  renderBossList();
+}
+function hideBossPage() {
+  document.getElementById('explore-boss-sub').style.display = 'none';
+  document.getElementById('explore-lobby').style.display    = 'flex';
+}
+
+function renderBossList() {
+  const container = document.getElementById('boss-list-container');
+  if (!container) return;
+  const defeated = loadDefeatedBosses();
+  const level    = state.level;
+
+  container.innerHTML = BOSSES.map(boss => {
+    const isDefeated = defeated.includes(boss.id);
+    const isLocked   = level < boss.level;
+    return `
+      <div class="boss-card${isDefeated ? ' boss-card--defeated' : ''}${isLocked ? ' boss-card--locked' : ''}">
+        <div class="boss-card__img-wrap">
+          <img src="${boss.image}" class="boss-card__img" alt="${boss.name}"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="boss-card__img-fallback">⚔️</div>
+          ${isDefeated ? '<div class="boss-card__defeated-overlay">✓</div>' : ''}
+        </div>
+        <div class="boss-card__info">
+          <div class="boss-card__name-row">
+            <span class="boss-card__name">${boss.name}</span>
+            <span class="badge badge--${boss.reward.rarity.toLowerCase()}">${boss.reward.rarity}</span>
+          </div>
+          <div class="boss-card__level">需求 Lv.${boss.level}</div>
+          <div class="boss-card__stats">❤️ ${boss.hp} &nbsp;⚔️ ${boss.atk} &nbsp;🛡️ ${boss.def}</div>
+          <div class="boss-card__desc">${boss.desc}</div>
+          <div class="boss-card__reward">獎勵 💎${boss.reward.coins}</div>
+        </div>
+        <div class="boss-card__action">
+          ${isDefeated
+            ? '<span class="boss-status boss-status--done">已打敗</span>'
+            : isLocked
+              ? `<span class="boss-status boss-status--locked">Lv.${boss.level}</span>`
+              : `<button class="boss-challenge-btn" data-boss-id="${boss.id}">挑戰</button>`}
+        </div>
+      </div>`;
+  }).join('');
+
+  container.querySelectorAll('.boss-challenge-btn').forEach(btn => {
+    btn.addEventListener('click', () => challengeBoss(btn.dataset.bossId));
+  });
+}
+
+function challengeBoss(bossId) {
+  const boss = BOSSES.find(b => b.id === bossId);
+  if (!boss) return;
+  const pet     = currentPet();
+  const stats   = calcStats(pet, state.level);
+  const petDmg  = Math.max(1, stats.atk - boss.def);
+  const bossDmg = Math.max(1, boss.atk  - stats.def);
+  const petTurns  = Math.ceil(boss.hp  / petDmg);
+  const bossTurns = Math.ceil(stats.hp / bossDmg);
+  const win = petTurns <= bossTurns;
+
+  if (win) {
+    const defeated = loadDefeatedBosses();
+    if (!defeated.includes(bossId)) {
+      defeated.push(bossId);
+      saveDefeatedBosses(defeated);
+      const expGain = boss.level * 10;
+      addCoins(boss.reward.coins);
+      addExp(expGain);
+      showToast(`🎉 打敗 ${boss.name}！+💎${boss.reward.coins} +${expGain} EXP！`);
+    } else {
+      showToast(`${boss.name} 已被打敗過了！`);
+    }
+    renderBossList();
+  } else {
+    showToast(`💀 戰鬥失敗！${boss.name} 太強大，繼續升等再挑戰！`);
+  }
+}
+
+function initExploreCards() {
+  document.querySelectorAll('.shop-card[data-explore] .shop-card__btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const type = btn.closest('.shop-card')?.dataset.explore;
+      if (type === 'boss') showBossPage();
+      else showToast('🚧 敬請期待...');
+    });
+  });
+  document.getElementById('btn-explore-boss-back')?.addEventListener('click', hideBossPage);
+}
+
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 function init() {
   checkDailyPPReset();
@@ -1093,6 +1212,7 @@ function init() {
   initShop();
   initShopCards();
   initGacha();
+  initExploreCards();
   setInterval(decayStats, DECAY_INTERVAL);
 }
 
