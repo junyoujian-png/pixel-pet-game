@@ -423,6 +423,7 @@
     <div class="modal-box modal-pp-restore-box">
       <h2 class="pp-restore-title">💊 選擇要回復的技能</h2>
       <p class="pp-restore-subtitle">每次只能回復一個技能的 PP</p>
+      <p id="pp-restore-count-display" class="pp-restore-count-display"></p>
       <div id="pp-restore-list" class="pp-restore-list"></div>
       <button class="btn-cancel" onclick="closeModal('modal-pp-restore')">取消</button>
     </div>
@@ -458,6 +459,12 @@
             <span class="battle-hp-text" id="battle-boss-hp-text"></span>
           </div>
         </div>
+      </div>
+
+      <!-- Battle Item Toolbar -->
+      <div class="battle-toolbar">
+        <button class="battle-item-toggle-btn" onclick="toggleBattleItemPanel()">🎒 道具</button>
+        <div id="battle-item-panel" class="battle-item-panel hidden"></div>
       </div>
 
       <!-- Battle Log -->

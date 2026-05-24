@@ -740,7 +740,13 @@ function useItem(id) {
 }
 
 // ─── PP Restore Modal ─────────────────────────────────────────────────────────
-function showPPRestoreModal() {
+let ppRestoreFromBattle = false; // 記錄是否從戰鬥中開啟
+
+function showPPRestoreModal(fromBattle = false) {
+  const count = state.items['pprestore'] ?? 0;
+  if (count <= 0) { showToast('背包裡沒有 PP 回復道具！'); return; }
+
+  ppRestoreFromBattle = fromBattle;
   const pet    = currentPet();
   const skills = getSkillsWithPP(pet);
   const list   = document.getElementById('pp-restore-list');
@@ -759,11 +765,12 @@ function showPPRestoreModal() {
         </div>
         <button class="pp-restore-btn${full ? ' pp-restore-btn--disabled' : ''}"
                 ${full ? 'disabled' : `onclick="confirmPPRestore(${i})"`}>
-          ${full ? '已滿' : '回復'}
+          ${full ? 'PP 已滿' : '回復'}
         </button>
       </div>`;
   }).join('');
 
+  document.getElementById('pp-restore-count-display').textContent = `剩餘：${count} 個`;
   openModal('modal-pp-restore');
 }
 
@@ -780,10 +787,46 @@ function confirmPPRestore(skillIndex) {
   if (state.items['pprestore'] === 0) delete state.items['pprestore'];
   saveState();
 
+  const skillName = skills[skillIndex].name;
   closeModal('modal-pp-restore');
-  showToast(`💊 ${skills[skillIndex].name} PP 已回滿！`);
-  renderItemBag();
-  showPetDetail(); // 重繪技能頁
+  showToast(`💊 ${skillName} PP 已回滿！`);
+
+  if (ppRestoreFromBattle) {
+    renderBattleItemPanel(); // 戰鬥中：重繪道具欄
+  } else {
+    renderItemBag();
+    showPetDetail(); // 背包中：重繪技能頁
+  }
+}
+
+// ─── Battle Item Panel ────────────────────────────────────────────────────────
+function toggleBattleItemPanel() {
+  const panel = document.getElementById('battle-item-panel');
+  const isHidden = panel.classList.contains('hidden');
+  if (isHidden) {
+    renderBattleItemPanel();
+    panel.classList.remove('hidden');
+  } else {
+    panel.classList.add('hidden');
+  }
+}
+
+function renderBattleItemPanel() {
+  const panel = document.getElementById('battle-item-panel');
+  const ppCount = state.items['pprestore'] ?? 0;
+
+  if (ppCount <= 0) {
+    panel.innerHTML = '<div class="battle-item-empty">背包沒有道具</div>';
+    return;
+  }
+
+  panel.innerHTML = `
+    <div class="battle-item-row">
+      <span class="battle-item-icon">💊</span>
+      <span class="battle-item-name">PP 回復</span>
+      <span class="battle-item-count">×${ppCount}</span>
+      <button class="battle-item-use-btn" onclick="showPPRestoreModal(true);document.getElementById('battle-item-panel').classList.add('hidden')">使用</button>
+    </div>`;
 }
 
 function renderItemBag() {
@@ -1201,7 +1244,11 @@ function initShop() {
       } else if (type === 'item') {
         state.items[id] = (state.items[id] ?? 0) + 1;
         saveState();
-        showToast(`購買成功：${ITEM_DEFS[id]?.name ?? id} ×1`);
+        if (id === 'pprestore') {
+          showToast('💊 PP 回復已加入背包！');
+        } else {
+          showToast(`購買成功：${ITEM_DEFS[id]?.name ?? id} ×1`);
+        }
       }
     });
   });
