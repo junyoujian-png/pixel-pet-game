@@ -63,6 +63,23 @@ const PETS = [
   { id: 'pet49', name: '梅花鹿', rarity: 'SR', image: 'assets/pets/梅花鹿.png', skills: [{ name: '撞', desc: '低頭用身體衝撞敵人', effect: 'atk', power: 30, icon: '💨', maxPP: 15, currentPP: 15 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 30, icon: '💥', maxPP: 10, currentPP: 10 }, { name: '猛力頭槌', desc: '蓄力後以頭部猛烈撞擊', effect: 'atk', power: 30, icon: '🌪️', maxPP: 5, currentPP: 5 }] },
   { id: 'pet50', name: '綿羊',         rarity: 'R',  image: 'assets/pets/綿羊.png',         skills: [{ name: '撞', desc: '低頭用身體撞敵人', effect: 'atk', power: 20, icon: '💨', maxPP: 10, currentPP: 10 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 20, icon: '💥', maxPP: 5, currentPP: 5 }] },
   { id: 'pet51', name: '紅浣熊',       rarity: 'SR', image: 'assets/pets/紅浣熊.png', skills: [{ name: '抓', desc: '伸出利爪快速抓向敵人', effect: 'atk', power: 30, icon: '🐾', maxPP: 15, currentPP: 15 }, { name: '亂抓', desc: '瘋狂揮舞爪子攻擊', effect: 'atk', power: 30, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '快速亂抓', desc: '瘋狂揮舞爪子快速攻擊', effect: 'atk', power: 30, icon: '🌑', maxPP: 5, currentPP: 5 }] },
+  // ── Boss Pets（轉盤獲得，等級上限同 SSR Lv.50）──
+  { id: 'boss_pet_01', name: '金剛鸚鵡', rarity: 'SSR', image: 'assets/boss/boss_01.png', petVersion: true },
+  { id: 'boss_pet_02', name: '蟒蛇',     rarity: 'SSR', image: 'assets/boss/boss_02.png', petVersion: true },
+  { id: 'boss_pet_03', name: '鴕鳥',     rarity: 'SSR', image: 'assets/boss/boss_03.png', petVersion: true },
+  { id: 'boss_pet_04', name: '狼',       rarity: 'SSR', image: 'assets/boss/boss_04.png', petVersion: true },
+  { id: 'boss_pet_05', name: '袋鼠',     rarity: 'SSR', image: 'assets/boss/boss_05.png', petVersion: true },
+  { id: 'boss_pet_06', name: '獵豹',     rarity: 'SSR', image: 'assets/boss/boss_06.png', petVersion: true },
+  { id: 'boss_pet_07', name: '河馬',     rarity: 'SSR', image: 'assets/boss/boss_07.png', petVersion: true },
+  { id: 'boss_pet_08', name: '犀牛',     rarity: 'SSR', image: 'assets/boss/boss_08.png', petVersion: true },
+  { id: 'boss_pet_09', name: '棕熊',     rarity: 'SSR', image: 'assets/boss/boss_09.png', petVersion: true },
+  { id: 'boss_pet_10', name: '貓頭鷹',   rarity: 'SSR', image: 'assets/boss/boss_10.png', petVersion: true },
+  { id: 'boss_pet_11', name: '大猩猩',   rarity: 'SSR', image: 'assets/boss/boss_11.png', petVersion: true },
+  { id: 'boss_pet_12', name: '藏獒',     rarity: 'SSR', image: 'assets/boss/boss_12.png', petVersion: true },
+  { id: 'boss_pet_13', name: '鱷魚',     rarity: 'SSR', image: 'assets/boss/boss_13.png', petVersion: true },
+  { id: 'boss_pet_14', name: '老鷹',     rarity: 'SSR', image: 'assets/boss/boss_14.png', petVersion: true },
+  { id: 'boss_pet_15', name: '獅子',     rarity: 'SSR', image: 'assets/boss/boss_15.png', petVersion: true },
+  { id: 'boss_pet_16', name: '老虎',     rarity: 'SSR', image: 'assets/boss/boss_16.png', petVersion: true },
 ];
 
 const FOODS = [
@@ -121,6 +138,18 @@ const BOSSES = [
   { id: 'boss_14', name: '老鷹',     image: 'assets/boss/boss_14.png', level: 95,  hp: 2800, atk: 190, def: 74, reward: { coins: 10000, rarity: 'SSR' }, desc: '統御天空的王者，俯衝速度令人窒息' },
   { id: 'boss_15', name: '獅子',     image: 'assets/boss/boss_15.png', level: 100, hp: 2900, atk: 198, def: 77, reward: { coins: 12000, rarity: 'SSR' }, desc: '萬獸之王，吼聲震天的非洲草原霸主' },
   { id: 'boss_16', name: '老虎',     image: 'assets/boss/boss_16.png', level: 105, hp: 3000, atk: 206, def: 80, reward: { coins: 15000, rarity: 'SSR' }, desc: '終極BOSS，山林中最強的孤獨王者' },
+];
+
+// ─── Wheel Segments ──────────────────────────────────────────────────────────
+// index 0~4 = coins; index 5 = boss pet
+// prob is relative weight (total = 100)
+const WHEEL_SEGMENTS = [
+  { coins: 50,  color: '#FF6B6B', prob: 30 },
+  { coins: 100, color: '#FFD93D', prob: 25 },
+  { coins: 150, color: '#6BCB77', prob: 20 },
+  { coins: 200, color: '#4D96FF', prob: 15 },
+  { coins: 250, color: '#C77DFF', prob: 8  },
+  { pet: true,  color: '#FF8C42', prob: 2  },
 ];
 
 const RARITY_BASE_STATS = {
@@ -362,7 +391,7 @@ function rollPet(forcedMinRarity = null) {
     }
     rarity = rarity || 'F';
   }
-  const pool = PETS.filter(p => p.rarity === rarity);
+  const pool = PETS.filter(p => p.rarity === rarity && !p.petVersion);
   return pool[Math.floor(Math.random() * pool.length)] || PETS[0];
 }
 
@@ -549,7 +578,6 @@ function addExp(amount) {
       showToast(`🎉 升級了！現在是 Lv.${state.level}！`);
     }
     animateLevelUp();
-    state.coins += 30;
   }
   saveState();
   renderAll();
@@ -950,7 +978,8 @@ let gachaInterval = null;
 function getRandomPets(count) {
   const result = [];
   for (let i = 0; i < count; i++) {
-    result.push(PETS[Math.floor(Math.random() * PETS.length)]);
+    const pool = PETS.filter(p => !p.petVersion);
+    result.push(pool[Math.floor(Math.random() * pool.length)]);
   }
   return result;
 }
@@ -1153,6 +1182,9 @@ function initActions() {
 
   document.getElementById('btn-pet-detail').addEventListener('click', () => showPetDetail());
   document.getElementById('btn-detail-back').addEventListener('click', () => hidePetDetail());
+
+  document.getElementById('btn-spin')?.addEventListener('click', doSpin);
+  document.getElementById('btn-wheel-close')?.addEventListener('click', closeWheelModal);
 }
 
 // ─── Boss System ─────────────────────────────────────────────────────────────
@@ -1231,17 +1263,136 @@ function challengeBoss(bossId) {
     if (!defeated.includes(bossId)) {
       defeated.push(bossId);
       saveDefeatedBosses(defeated);
-      const expGain = boss.level * 10;
-      addCoins(boss.reward.coins);
-      addExp(expGain);
-      showToast(`🎉 打敗 ${boss.name}！+💎${boss.reward.coins} +${expGain} EXP！`);
+      showWheelModal(boss); // 打贏 → 轉盤
     } else {
       showToast(`${boss.name} 已被打敗過了！`);
     }
-    renderBossList();
   } else {
     showToast(`💀 戰鬥失敗！${boss.name} 太強大，繼續升等再挑戰！`);
   }
+}
+
+// ─── Wheel Modal ─────────────────────────────────────────────────────────────
+let wheelSpinning    = false;
+let wheelCurrentBoss = null;
+
+function showWheelModal(boss) {
+  wheelSpinning    = false;
+  wheelCurrentBoss = boss;
+
+  // Reset disc position instantly (no transition)
+  const disc = document.getElementById('wheel-disc');
+  disc.style.transition = 'none';
+  disc.style.transform  = 'rotate(0deg)';
+
+  buildWheelLabels(boss);
+  document.getElementById('wheel-boss-name').textContent = `恭喜打敗 ${boss.name}！轉動轉盤獲得獎勵！`;
+  document.getElementById('btn-spin').disabled           = false;
+  document.getElementById('btn-spin').classList.remove('hidden');
+  document.getElementById('wheel-result').classList.add('hidden');
+
+  openModal('modal-wheel');
+}
+
+function buildWheelLabels(boss) {
+  const disc = document.getElementById('wheel-disc');
+  disc.querySelectorAll('.wheel-label').forEach(el => el.remove());
+
+  const R = 130; // disc radius in px (disc = 260px)
+  const r = 84;  // label center distance from disc centre
+
+  WHEEL_SEGMENTS.forEach((seg, i) => {
+    const angleDeg = i * 60 + 30;
+    const angleRad = angleDeg * Math.PI / 180;
+    const cx = R + r * Math.sin(angleRad);
+    const cy = R - r * Math.cos(angleRad);
+
+    const label = document.createElement('div');
+    label.className    = 'wheel-label';
+    label.style.left   = `${cx - 30}px`;
+    label.style.top    = `${cy - 28}px`;
+    label.style.transform = `rotate(${angleDeg}deg)`;
+
+    if (seg.pet) {
+      label.innerHTML = `
+        <img src="${boss.image}" class="wheel-boss-img" alt="${boss.name}"
+             onerror="this.style.display='none';this.nextSibling.style.display='block'">
+        <span style="display:none;font-size:20px">🏆</span>
+        <span class="wheel-label-name">寵物</span>`;
+    } else {
+      label.innerHTML = `<span class="wheel-label-icon">💎</span>
+        <span class="wheel-label-coins">${seg.coins}</span>`;
+    }
+    disc.appendChild(label);
+  });
+}
+
+function pickWheelResult() {
+  const total = WHEEL_SEGMENTS.reduce((s, seg) => s + seg.prob, 0);
+  let rand = Math.random() * total;
+  for (let i = 0; i < WHEEL_SEGMENTS.length; i++) {
+    rand -= WHEEL_SEGMENTS[i].prob;
+    if (rand <= 0) return i;
+  }
+  return 0;
+}
+
+function doSpin() {
+  if (wheelSpinning) return;
+  wheelSpinning = true;
+  document.getElementById('btn-spin').disabled = true;
+
+  const resultIdx = pickWheelResult();
+  const segCenter = resultIdx * 60 + 30;            // centre of target segment
+  const wobble    = (Math.random() - 0.5) * 30;    // ±15° within the 60° segment
+  const base      = (360 - segCenter + 360) % 360; // angle to bring that segment to top
+  const totalDeg  = 5 * 360 + base + wobble;        // 5 full spins + land position
+
+  const disc = document.getElementById('wheel-disc');
+  disc.style.transition = 'transform 4.5s cubic-bezier(0.33, 1, 0.68, 1)';
+  disc.style.transform  = `rotate(${totalDeg}deg)`;
+
+  setTimeout(() => showWheelResult(resultIdx), 4800);
+}
+
+function showWheelResult(segIdx) {
+  const seg     = WHEEL_SEGMENTS[segIdx];
+  const boss    = wheelCurrentBoss;
+  const content = document.getElementById('wheel-result-content');
+
+  if (seg.pet) {
+    const petId = boss.id.replace('boss_', 'boss_pet_');
+    const isNew = !unlockedPets.includes(petId);
+    if (isNew) { unlockedPets.push(petId); saveUnlockedPets(); }
+
+    content.innerHTML = `
+      <div class="wheel-result-pet">
+        <div class="wheel-result-pet-frame">
+          <img src="${boss.image}" class="wheel-result-pet-img" alt="${boss.name}"
+               onerror="this.style.opacity='0.2'">
+        </div>
+        <div class="wheel-result-pet-tag${isNew ? ' new-flash' : ''}">${isNew ? '✨ NEW ✨' : '已擁有'}</div>
+        <div class="wheel-result-title">獲得 BOSS 寵物！</div>
+        <div class="wheel-result-subtitle">${boss.name}</div>
+      </div>`;
+  } else {
+    addCoins(seg.coins);
+    content.innerHTML = `
+      <div class="wheel-result-coins">
+        <div class="wheel-result-gem">💎</div>
+        <div class="wheel-result-amount">+${seg.coins}</div>
+        <div class="wheel-result-title">能量石獲得！</div>
+      </div>`;
+  }
+
+  document.getElementById('btn-spin').classList.add('hidden');
+  document.getElementById('wheel-result').classList.remove('hidden');
+  wheelSpinning = false;
+}
+
+function closeWheelModal() {
+  closeModal('modal-wheel');
+  renderBossList();
 }
 
 function initExploreCards() {
