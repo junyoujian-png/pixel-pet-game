@@ -122,22 +122,22 @@ const EQUIP_DEFS = {
 };
 
 const BOSSES = [
-  { id: 'boss_01', name: '金剛鸚鵡', image: 'assets/boss/boss_01.png', level: 30,  hp: 1400, atk: 87,  def: 35, reward: { coins: 800,   rarity: 'SSR' }, desc: '以鋼鐵利喙和強力爪牙令對手喪膽' },
-  { id: 'boss_02', name: '蟒蛇',     image: 'assets/boss/boss_02.png', level: 35,  hp: 1550, atk: 94,  def: 38, reward: { coins: 1000,  rarity: 'SSR' }, desc: '能以驚人力道將獵物纏繞窒息的巨大蟒蛇' },
-  { id: 'boss_03', name: '鴕鳥',     image: 'assets/boss/boss_03.png', level: 40,  hp: 1700, atk: 102, def: 41, reward: { coins: 1200,  rarity: 'SSR' }, desc: '奔速如風、一踢可碎石的沙漠巨鳥' },
-  { id: 'boss_04', name: '狼',       image: 'assets/boss/boss_04.png', level: 45,  hp: 1750, atk: 110, def: 44, reward: { coins: 1500,  rarity: 'SSR' }, desc: '統領狼群、嗜血好鬥的孤狼首領' },
-  { id: 'boss_05', name: '袋鼠',     image: 'assets/boss/boss_05.png', level: 50,  hp: 1850, atk: 118, def: 47, reward: { coins: 1800,  rarity: 'SSR' }, desc: '後腿爆發力驚人的拳擊格鬥高手' },
-  { id: 'boss_06', name: '獵豹',     image: 'assets/boss/boss_06.png', level: 55,  hp: 2000, atk: 126, def: 50, reward: { coins: 2200,  rarity: 'SSR' }, desc: '地表最快的掠食者，無處可逃' },
-  { id: 'boss_07', name: '河馬',     image: 'assets/boss/boss_07.png', level: 60,  hp: 2000, atk: 134, def: 53, reward: { coins: 2700,  rarity: 'SSR' }, desc: '龐大體型與驚人咬合力的河中霸主' },
-  { id: 'boss_08', name: '犀牛',     image: 'assets/boss/boss_08.png', level: 65,  hp: 2150, atk: 142, def: 56, reward: { coins: 3300,  rarity: 'SSR' }, desc: '以鋼鐵犀角衝撞萬物的荒野壁壘' },
-  { id: 'boss_09', name: '棕熊',     image: 'assets/boss/boss_09.png', level: 70,  hp: 2300, atk: 150, def: 59, reward: { coins: 4000,  rarity: 'SSR' }, desc: '山林之王，爪力足以撕碎一切' },
-  { id: 'boss_10', name: '貓頭鷹',   image: 'assets/boss/boss_10.png', level: 75,  hp: 2400, atk: 158, def: 62, reward: { coins: 4800,  rarity: 'SSR' }, desc: '黑暗中的智慧獵手，神出鬼沒' },
-  { id: 'boss_11', name: '大猩猩',   image: 'assets/boss/boss_11.png', level: 80,  hp: 2400, atk: 166, def: 65, reward: { coins: 5800,  rarity: 'SSR' }, desc: '叢林之王，力量超群的巨型靈長類' },
-  { id: 'boss_12', name: '藏獒',     image: 'assets/boss/boss_12.png', level: 85,  hp: 2500, atk: 174, def: 68, reward: { coins: 7000,  rarity: 'SSR' }, desc: '高原守護神，忠誠又兇猛的藏地聖犬' },
-  { id: 'boss_13', name: '鱷魚',     image: 'assets/boss/boss_13.png', level: 90,  hp: 2650, atk: 182, def: 71, reward: { coins: 8500,  rarity: 'SSR' }, desc: '遠古爬行霸主，咬合力無與倫比' },
-  { id: 'boss_14', name: '老鷹',     image: 'assets/boss/boss_14.png', level: 95,  hp: 2800, atk: 190, def: 74, reward: { coins: 10000, rarity: 'SSR' }, desc: '統御天空的王者，俯衝速度令人窒息' },
-  { id: 'boss_15', name: '獅子',     image: 'assets/boss/boss_15.png', level: 100, hp: 2900, atk: 198, def: 77, reward: { coins: 12000, rarity: 'SSR' }, desc: '萬獸之王，吼聲震天的非洲草原霸主' },
-  { id: 'boss_16', name: '老虎',     image: 'assets/boss/boss_16.png', level: 105, hp: 3000, atk: 206, def: 80, reward: { coins: 15000, rarity: 'SSR' }, desc: '終極BOSS，山林中最強的孤獨王者' },
+  { id: 'boss_01', name: '金剛鸚鵡', image: 'assets/boss/boss_01.png', level: 30,  baseStats: { hp: 1400, atk: 87,  def: 35 }, reward: { coins: 800,   rarity: 'SSR' }, desc: '以鋼鐵利喙和強力爪牙令對手喪膽' },
+  { id: 'boss_02', name: '蟒蛇',     image: 'assets/boss/boss_02.png', level: 35,  baseStats: { hp: 1550, atk: 94,  def: 38 }, reward: { coins: 1000,  rarity: 'SSR' }, desc: '能以驚人力道將獵物纏繞窒息的巨大蟒蛇' },
+  { id: 'boss_03', name: '鴕鳥',     image: 'assets/boss/boss_03.png', level: 40,  baseStats: { hp: 1700, atk: 102, def: 41 }, reward: { coins: 1200,  rarity: 'SSR' }, desc: '奔速如風、一踢可碎石的沙漠巨鳥' },
+  { id: 'boss_04', name: '狼',       image: 'assets/boss/boss_04.png', level: 45,  baseStats: { hp: 1750, atk: 110, def: 44 }, reward: { coins: 1500,  rarity: 'SSR' }, desc: '統領狼群、嗜血好鬥的孤狼首領' },
+  { id: 'boss_05', name: '袋鼠',     image: 'assets/boss/boss_05.png', level: 50,  baseStats: { hp: 1850, atk: 118, def: 47 }, reward: { coins: 1800,  rarity: 'SSR' }, desc: '後腿爆發力驚人的拳擊格鬥高手' },
+  { id: 'boss_06', name: '獵豹',     image: 'assets/boss/boss_06.png', level: 55,  baseStats: { hp: 2000, atk: 126, def: 50 }, reward: { coins: 2200,  rarity: 'SSR' }, desc: '地表最快的掠食者，無處可逃' },
+  { id: 'boss_07', name: '河馬',     image: 'assets/boss/boss_07.png', level: 60,  baseStats: { hp: 2000, atk: 134, def: 53 }, reward: { coins: 2700,  rarity: 'SSR' }, desc: '龐大體型與驚人咬合力的河中霸主' },
+  { id: 'boss_08', name: '犀牛',     image: 'assets/boss/boss_08.png', level: 65,  baseStats: { hp: 2150, atk: 142, def: 56 }, reward: { coins: 3300,  rarity: 'SSR' }, desc: '以鋼鐵犀角衝撞萬物的荒野壁壘' },
+  { id: 'boss_09', name: '棕熊',     image: 'assets/boss/boss_09.png', level: 70,  baseStats: { hp: 2300, atk: 150, def: 59 }, reward: { coins: 4000,  rarity: 'SSR' }, desc: '山林之王，爪力足以撕碎一切' },
+  { id: 'boss_10', name: '貓頭鷹',   image: 'assets/boss/boss_10.png', level: 75,  baseStats: { hp: 2400, atk: 158, def: 62 }, reward: { coins: 4800,  rarity: 'SSR' }, desc: '黑暗中的智慧獵手，神出鬼沒' },
+  { id: 'boss_11', name: '大猩猩',   image: 'assets/boss/boss_11.png', level: 80,  baseStats: { hp: 2400, atk: 166, def: 65 }, reward: { coins: 5800,  rarity: 'SSR' }, desc: '叢林之王，力量超群的巨型靈長類' },
+  { id: 'boss_12', name: '藏獒',     image: 'assets/boss/boss_12.png', level: 85,  baseStats: { hp: 2500, atk: 174, def: 68 }, reward: { coins: 7000,  rarity: 'SSR' }, desc: '高原守護神，忠誠又兇猛的藏地聖犬' },
+  { id: 'boss_13', name: '鱷魚',     image: 'assets/boss/boss_13.png', level: 90,  baseStats: { hp: 2650, atk: 182, def: 71 }, reward: { coins: 8500,  rarity: 'SSR' }, desc: '遠古爬行霸主，咬合力無與倫比' },
+  { id: 'boss_14', name: '老鷹',     image: 'assets/boss/boss_14.png', level: 95,  baseStats: { hp: 2800, atk: 190, def: 74 }, reward: { coins: 10000, rarity: 'SSR' }, desc: '統御天空的王者，俯衝速度令人窒息' },
+  { id: 'boss_15', name: '獅子',     image: 'assets/boss/boss_15.png', level: 100, baseStats: { hp: 2900, atk: 198, def: 77 }, reward: { coins: 12000, rarity: 'SSR' }, desc: '萬獸之王，吼聲震天的非洲草原霸主' },
+  { id: 'boss_16', name: '老虎',     image: 'assets/boss/boss_16.png', level: 105, baseStats: { hp: 3000, atk: 206, def: 80 }, reward: { coins: 15000, rarity: 'SSR' }, desc: '終極BOSS，山林中最強的孤獨王者' },
 ];
 
 // ─── Wheel Segments ──────────────────────────────────────────────────────────
@@ -204,6 +204,13 @@ const calcStats = (pet, level) => {
     def: base.def + (level - 1) * growth.def,
   };
 };
+
+// BOSS 無等級上限，成長公式獨立於 RARITY_MAX_LEVEL
+const calcBossStats = (boss, level) => ({
+  hp:  boss.baseStats.hp  + (level - 1) * 30,
+  atk: boss.baseStats.atk + (level - 1) * 6,
+  def: boss.baseStats.def + (level - 1) * 3,
+});
 
 const SKILL_CRIT_RATE = { F: 0.05, R: 0.08, SR: 0.12, SSR: 0.15 };
 
@@ -1393,16 +1400,18 @@ let battlePending  = null; // boss to show wheel after battle
 let battleFirstWin = false;
 
 function startBattle(boss, isFirstTime) {
-  const pet    = currentPet();
-  const stats  = calcStats(pet, state.level);
-  const crit   = SKILL_CRIT_RATE[pet.rarity] || 0.05;
-  const skills = getPetSkills(pet);
+  const pet       = currentPet();
+  const stats     = calcStats(pet, state.level);
+  const bossLevel = boss.level;
+  const bossStats = calcBossStats(boss, bossLevel);
+  const crit      = SKILL_CRIT_RATE[pet.rarity] || 0.05;
+  const skills    = getPetSkills(pet);
   battleLog      = [];
   battlePending  = boss;
   battleFirstWin = isFirstTime;
 
   // Simulate full battle turn by turn
-  const turns = simulateBattle(pet, stats, skills, crit, boss);
+  const turns = simulateBattle(pet, stats, skills, crit, boss, bossStats);
 
   // Show modal
   document.getElementById('battle-pet-img').src   = pet.image;
@@ -1414,37 +1423,37 @@ function startBattle(boss, isFirstTime) {
   document.getElementById('battle-pet-hp-bar').style.width  = '100%';
   document.getElementById('battle-boss-hp-bar').style.width = '100%';
   document.getElementById('battle-pet-hp-text').textContent  = `${stats.hp} / ${stats.hp}`;
-  document.getElementById('battle-boss-hp-text').textContent = `${boss.hp} / ${boss.hp}`;
+  document.getElementById('battle-boss-hp-text').textContent = `${bossStats.hp} / ${bossStats.hp}`;
   openModal('modal-battle');
 
   // Animate turns with delay
-  animateBattleTurns(turns, stats.hp, boss.hp, 0);
+  animateBattleTurns(turns, stats.hp, bossStats.hp, 0);
 }
 
 const BATTLE_MAX_TURNS = 40; // cap total turn entries to keep animation under 16s
 
-function simulateBattle(pet, stats, skills, critRate, boss) {
+function simulateBattle(pet, stats, skills, critRate, boss, bossStats) {
   const turns = [];
   let petHp  = stats.hp;
-  let bossHp = boss.hp;
+  let bossHp = bossStats.hp;
 
   while (petHp > 0 && bossHp > 0 && turns.length < BATTLE_MAX_TURNS) {
     // Pet attacks — use highest-power skill
     const skill  = skills.reduce((best, s) => s.power > best.power ? s : best, skills[0]);
-    const petAtk = calcDamage(stats.atk, skill.power, boss.def, critRate);
+    const petAtk = calcDamage(stats.atk, skill.power, bossStats.def, critRate);
     bossHp = Math.max(0, bossHp - petAtk.dmg);
     turns.push({ actor: 'pet', skillName: skill.name, dmg: petAtk.dmg, crit: petAtk.crit, petHp, bossHp });
     if (bossHp <= 0) break;
 
     // Boss attacks back
-    const bossAtk = calcDamage(boss.atk, 1.0, stats.def, 0.05);
+    const bossAtk = calcDamage(bossStats.atk, 1.0, stats.def, 0.05);
     petHp = Math.max(0, petHp - bossAtk.dmg);
     turns.push({ actor: 'boss', skillName: '攻擊', dmg: bossAtk.dmg, crit: bossAtk.crit, petHp, bossHp });
   }
   // Force outcome if capped (whoever has more HP% wins)
   if (turns.length >= BATTLE_MAX_TURNS && petHp > 0 && bossHp > 0) {
     const petPct  = petHp  / stats.hp;
-    const bossPct = bossHp / boss.hp;
+    const bossPct = bossHp / bossStats.hp;
     if (petPct >= bossPct) bossHp = 0;
     else                   petHp  = 0;
     const last = turns[turns.length - 1];
