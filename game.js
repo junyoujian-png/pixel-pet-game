@@ -110,9 +110,10 @@ const DRINKS = [
 ];
 
 const ITEM_DEFS = {
-  candy:     { icon: '🍬', name: '愛心糖', desc: '+10心情' },
-  xpboost:   { icon: '⭐', name: '成長藥',  desc: '+20 EXP' },
-  pprestore: { icon: '💊', name: 'PP 回復', desc: '回復一個技能的 PP' },
+  candy:     { icon: '🍬', name: '愛心糖',  desc: '+10心情' },
+  xpboost:   { icon: '⭐', name: '成長藥',   desc: '+20 EXP' },
+  pprestore: { icon: '💊', name: 'PP 回復',  desc: '回復一個技能的 PP' },
+  hp_potion: { icon: '🧪', name: '回復藥水', desc: '+50 HP' },
 };
 
 const BOSSES = [
@@ -735,6 +736,9 @@ function useItem(id) {
     saveState();
     addExp(20);
     showToast('使用成長藥！+20 EXP ⭐');
+  } else if (id === 'hp_potion') {
+    // 背包外使用：僅顯示提示，實際 HP 只在戰鬥中有效
+    showToast('🧪 回復 50 HP！');
   }
   renderItemBag();
 }
@@ -799,6 +803,40 @@ function confirmPPRestore(skillIndex) {
   }
 }
 
+// ─── HP Potion In-Battle ─────────────────────────────────────────────────────
+function useHpPotionInBattle() {
+  const count = state.items['hp_potion'] ?? 0;
+  if (count <= 0) { showToast('背包裡沒有回復藥水！'); return; }
+
+  const HEAL = 50;
+  // Modify remaining turns: add HEAL to petHp (capped at max)
+  for (let i = battleAnimIdx - 1; i < battleActiveTurns.length; i++) {
+    if (i >= 0) {
+      battleActiveTurns[i].petHp = Math.min(
+        battleAnimMaxPetHp,
+        battleActiveTurns[i].petHp + HEAL
+      );
+    }
+  }
+
+  // Immediately update HP bar with healed value
+  const curIdx     = Math.max(0, battleAnimIdx - 1);
+  const curPetHp   = battleActiveTurns[curIdx]?.petHp ?? battleAnimMaxPetHp;
+  const curBossHp  = battleActiveTurns[curIdx]?.bossHp ?? battleAnimMaxBossHp;
+  updateBattleHPBars(curPetHp, battleAnimMaxPetHp, curBossHp, battleAnimMaxBossHp);
+
+  // Show green heal float on pet side
+  showDamageFloat('battle-pet-side', HEAL, false, true);
+
+  // Deduct item
+  state.items['hp_potion']--;
+  if (state.items['hp_potion'] === 0) delete state.items['hp_potion'];
+  saveState();
+
+  showToast('🧪 回復 50 HP！');
+  renderBattleItemPanel();
+}
+
 // ─── Battle Item Panel ────────────────────────────────────────────────────────
 function toggleBattleItemPanel() {
   const panel = document.getElementById('battle-item-panel');
@@ -812,21 +850,35 @@ function toggleBattleItemPanel() {
 }
 
 function renderBattleItemPanel() {
-  const panel = document.getElementById('battle-item-panel');
-  const ppCount = state.items['pprestore'] ?? 0;
+  const panel    = document.getElementById('battle-item-panel');
+  const ppCount  = state.items['pprestore']  ?? 0;
+  const hpCount  = state.items['hp_potion']  ?? 0;
 
-  if (ppCount <= 0) {
-    panel.innerHTML = '<div class="battle-item-empty">背包沒有道具</div>';
-    return;
+  const rows = [];
+
+  if (hpCount > 0) {
+    rows.push(`
+      <div class="battle-item-row">
+        <span class="battle-item-icon">🧪</span>
+        <span class="battle-item-name">回復藥水</span>
+        <span class="battle-item-count">×${hpCount}</span>
+        <button class="battle-item-use-btn" onclick="useHpPotionInBattle()">使用</button>
+      </div>`);
   }
 
-  panel.innerHTML = `
-    <div class="battle-item-row">
-      <span class="battle-item-icon">💊</span>
-      <span class="battle-item-name">PP 回復</span>
-      <span class="battle-item-count">×${ppCount}</span>
-      <button class="battle-item-use-btn" onclick="showPPRestoreModal(true);document.getElementById('battle-item-panel').classList.add('hidden')">使用</button>
-    </div>`;
+  if (ppCount > 0) {
+    rows.push(`
+      <div class="battle-item-row">
+        <span class="battle-item-icon">💊</span>
+        <span class="battle-item-name">PP 回復</span>
+        <span class="battle-item-count">×${ppCount}</span>
+        <button class="battle-item-use-btn" onclick="showPPRestoreModal(true);document.getElementById('battle-item-panel').classList.add('hidden')">使用</button>
+      </div>`);
+  }
+
+  panel.innerHTML = rows.length
+    ? rows.join('')
+    : '<div class="battle-item-empty">背包沒有道具</div>';
 }
 
 function renderItemBag() {
@@ -1246,6 +1298,8 @@ function initShop() {
         saveState();
         if (id === 'pprestore') {
           showToast('💊 PP 回復已加入背包！');
+        } else if (id === 'hp_potion') {
+          showToast('🧪 回復藥水已加入背包！');
         } else {
           showToast(`購買成功：${ITEM_DEFS[id]?.name ?? id} ×1`);
         }
@@ -1475,9 +1529,13 @@ function closeWheelModal() {
 }
 
 // ─── Battle System ───────────────────────────────────────────────────────────
-let battleLog      = [];
-let battlePending  = null; // boss to show wheel after battle
-let battleFirstWin = false;
+let battleLog           = [];
+let battlePending       = null;
+let battleFirstWin      = false;
+let battleActiveTurns   = [];   // turns array shared with animation
+let battleAnimMaxPetHp  = 0;
+let battleAnimMaxBossHp = 0;
+let battleAnimIdx       = 0;    // index of next turn to process
 
 function startBattle(boss, isFirstTime) {
   const pet       = currentPet();
@@ -1506,8 +1564,17 @@ function startBattle(boss, isFirstTime) {
   document.getElementById('battle-boss-hp-text').textContent = `${bossStats.hp} / ${bossStats.hp}`;
   openModal('modal-battle');
 
-  // Animate turns with delay
-  animateBattleTurns(turns, stats.hp, bossStats.hp, 0);
+  // Init module-level animation state
+  battleActiveTurns   = turns;
+  battleAnimMaxPetHp  = stats.hp;
+  battleAnimMaxBossHp = bossStats.hp;
+  battleAnimIdx       = 0;
+
+  // Hide item panel on new battle
+  document.getElementById('battle-item-panel')?.classList.add('hidden');
+
+  // Animate turns
+  animateBattleTurns();
 }
 
 const BATTLE_MAX_TURNS = 40; // cap total turn entries to keep animation under 16s
@@ -1545,15 +1612,17 @@ function simulateBattle(pet, stats, skills, critRate, boss, bossStats) {
 
 const BATTLE_TURN_MS = 420; // ms per turn animation
 
-function animateBattleTurns(turns, maxPetHp, maxBossHp, idx) {
-  if (idx >= turns.length) {
-    const win = turns[turns.length - 1].bossHp <= 0;
+function animateBattleTurns() {
+  const idx = battleAnimIdx;
+  if (idx >= battleActiveTurns.length) {
+    const win = battleActiveTurns[battleActiveTurns.length - 1].bossHp <= 0;
     showBattleResult(win);
     return;
   }
 
-  const t = turns[idx];
-  updateBattleHPBars(t.petHp, maxPetHp, t.bossHp, maxBossHp);
+  battleAnimIdx++;
+  const t = battleActiveTurns[idx];
+  updateBattleHPBars(t.petHp, battleAnimMaxPetHp, t.bossHp, battleAnimMaxBossHp);
 
   const tgt = t.actor === 'pet' ? 'battle-boss-img' : 'battle-pet-img';
   showDamageFloat(t.actor === 'pet' ? 'battle-boss-side' : 'battle-pet-side', t.dmg, t.crit);
@@ -1563,7 +1632,7 @@ function animateBattleTurns(turns, maxPetHp, maxBossHp, idx) {
 
   addBattleLog(t);
 
-  setTimeout(() => animateBattleTurns(turns, maxPetHp, maxBossHp, idx + 1), BATTLE_TURN_MS);
+  setTimeout(animateBattleTurns, BATTLE_TURN_MS);
 }
 
 function updateBattleHPBars(petHp, maxPetHp, bossHp, maxBossHp) {
@@ -1575,12 +1644,14 @@ function updateBattleHPBars(petHp, maxPetHp, bossHp, maxBossHp) {
   document.getElementById('battle-boss-hp-text').textContent = `${Math.max(0,bossHp)} / ${maxBossHp}`;
 }
 
-function showDamageFloat(sideId, dmg, crit) {
+function showDamageFloat(sideId, dmg, crit, heal = false) {
   const side = document.getElementById(sideId);
   if (!side) return;
   const el = document.createElement('div');
-  el.className  = 'dmg-float' + (crit ? ' dmg-float--crit' : '');
-  el.textContent = (crit ? '暴擊! ' : '') + dmg;
+  if (heal)       el.className = 'dmg-float dmg-float--heal';
+  else if (crit)  el.className = 'dmg-float dmg-float--crit';
+  else            el.className = 'dmg-float';
+  el.textContent = heal ? `+${dmg} HP` : (crit ? '暴擊! ' : '') + dmg;
   side.appendChild(el);
   setTimeout(() => el.remove(), 900);
 }

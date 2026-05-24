@@ -1317,6 +1317,10 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   color: #ffd700;
   font-size: 20px;
 }
+.dmg-float--heal {
+  color: #4caf50;
+  font-size: 17px;
+}
 @keyframes dmg-rise {
   0%   { opacity: 1; transform: translateX(-50%) translateY(0); }
   100% { opacity: 0; transform: translateX(-50%) translateY(-44px); }
