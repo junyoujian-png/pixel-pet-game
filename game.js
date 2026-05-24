@@ -110,15 +110,8 @@ const DRINKS = [
 ];
 
 const ITEM_DEFS = {
-  potion:    { icon: '🧪', name: '回復藥',   desc: '+30飽食 +30水份 +20心情' },
-  candy:     { icon: '🍬', name: '愛心糖',   desc: '+40心情' },
-  xpboost:   { icon: '⭐', name: '成長藥',   desc: '+50 EXP' },
-  pprestore: { icon: '💊', name: 'PP 回復',  desc: '回復所有技能 PP' },
-};
-
-const EQUIP_DEFS = {
-  hat:   { icon: '🎩', name: '紳士帽' },
-  scarf: { icon: '🧣', name: '圍巾' },
+  candy:   { icon: '🍬', name: '愛心糖', desc: '+10心情' },
+  xpboost: { icon: '⭐', name: '成長藥', desc: '+20 EXP' },
 };
 
 const BOSSES = [
@@ -726,23 +719,14 @@ function useItem(id) {
   state.items[id]--;
   if (state.items[id] === 0) delete state.items[id];
 
-  if (id === 'potion') {
-    state.hunger = Math.min(100, state.hunger + 30);
-    state.water  = Math.min(100, state.water  + 30);
-    state.mood   = Math.min(100, state.mood   + 20);
+  if (id === 'candy') {
+    state.mood = Math.min(100, state.mood + 10);
     saveState(); renderStats();
-    showToast('使用回復藥！+30飽食 +30水份 +20心情');
-  } else if (id === 'candy') {
-    state.mood = Math.min(100, state.mood + 40);
-    saveState(); renderStats();
-    showToast('使用愛心糖！+40心情 😄');
+    showToast('使用愛心糖！+10心情 😄');
   } else if (id === 'xpboost') {
     saveState();
-    addExp(50);
-    showToast('使用成長藥！+50 EXP ⭐');
-  } else if (id === 'pprestore') {
-    restoreAllPP();
-    showToast('💊 所有技能 PP 已回滿！');
+    addExp(20);
+    showToast('使用成長藥！+20 EXP ⭐');
   }
   renderItemBag();
 }
@@ -785,12 +769,11 @@ function renderPetBag() {
   }
   grid.innerHTML = '';
   state.equips.forEach(id => {
-    const def  = EQUIP_DEFS[id] ?? { icon: '📦', name: id };
     const cell = document.createElement('div');
     cell.className = 'petbag-item';
     cell.innerHTML = `
-      <span class="item-icon">${def.icon}</span>
-      <span class="item-name">${def.name}</span>
+      <span class="item-icon">📦</span>
+      <span class="item-name">${id}</span>
       <span class="petbag-owned">已擁有</span>
     `;
     grid.appendChild(cell);
@@ -1164,11 +1147,6 @@ function initShop() {
         state.items[id] = (state.items[id] ?? 0) + 1;
         saveState();
         showToast(`購買成功：${ITEM_DEFS[id]?.name ?? id} ×1`);
-      } else {
-        if (!state.equips.includes(id)) state.equips.push(id);
-        saveState();
-        showToast(`購買成功：${EQUIP_DEFS[id]?.name ?? id}`);
-        renderPetBag();
       }
     });
   });
