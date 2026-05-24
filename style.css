@@ -1156,6 +1156,146 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   margin-top: 2px;
 }
 
+/* ─── Battle Modal ─── */
+.modal-battle-box {
+  max-width: 400px;
+  width: 96vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.battle-title {
+  font-size: 18px;
+  font-weight: 800;
+  text-align: center;
+  color: var(--text);
+}
+.battle-combatants {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 6px;
+}
+.battle-side {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+.battle-vs {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--red);
+  align-self: center;
+  padding: 0 4px;
+}
+.battle-sprite {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  transition: filter 0.15s;
+}
+.battle-sprite.battle-hit {
+  filter: brightness(2) saturate(0);
+}
+.battle-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+}
+.battle-hp-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 2px;
+}
+.battle-hp-track {
+  width: 100%;
+  height: 8px;
+  background: #333;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.battle-hp-bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.35s ease;
+}
+.battle-hp-bar--pet  { background: #4caf50; }
+.battle-hp-bar--boss { background: #f44336; }
+.battle-hp-text {
+  font-size: 9px;
+  color: var(--text2);
+}
+/* Floating damage numbers */
+.dmg-float {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  pointer-events: none;
+  animation: dmg-rise 0.85s ease-out forwards;
+  z-index: 10;
+  white-space: nowrap;
+}
+.dmg-float--crit {
+  color: #ffd700;
+  font-size: 20px;
+}
+@keyframes dmg-rise {
+  0%   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-44px); }
+}
+/* Battle log */
+.battle-log {
+  max-height: 120px;
+  overflow-y: auto;
+  background: rgba(0,0,0,0.15);
+  border-radius: 8px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+}
+.battle-log-entry {
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.log-pet  { color: #4caf50; }
+.log-boss { color: #f44336; }
+/* Battle result */
+.battle-result-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px;
+  background: rgba(0,0,0,0.1);
+  border-radius: 10px;
+}
+.battle-result-title {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--text);
+}
+.battle-result-desc {
+  font-size: 12px;
+  color: var(--text2);
+  text-align: center;
+}
+
 /* ─── Wheel Modal ─── */
 .modal-wheel-box {
   max-height: 92vh;

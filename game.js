@@ -12,57 +12,57 @@ const DRINK_EXP      = { water: 3,  juice: 8,  milk: 15 };
 const DECAY_INTERVAL = 60_000;
 
 const PETS = [
-  { id: 'pet1',  name: '小狗',   rarity: 'F',  image: 'assets/pets/小狗.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷', maxPP:  5 }] },
-  { id: 'pet2',  name: '柴犬',   rarity: 'F',  image: 'assets/pets/柴犬.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷', maxPP:  5 }] },
-  { id: 'pet3',  name: '臘腸狗', rarity: 'F',  image: 'assets/pets/臘腸狗.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷', maxPP:  5 }] },
-  { id: 'pet4',  name: '柯基',   rarity: 'F',  image: 'assets/pets/柯基.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷', maxPP:  5 }] },
-  { id: 'pet5',  name: '比格犬', rarity: 'R',  image: 'assets/pets/比格犬.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 20, icon: '🦷', maxPP: 10 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 20, icon: '🦷', maxPP:  5 }] },
-  { id: 'pet6',  name: '米克斯', rarity: 'R',  image: 'assets/pets/米克斯.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 20, icon: '🦷', maxPP: 10 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 20, icon: '🦷', maxPP:  5 }] },
-  { id: 'pet7',  name: '貴賓狗', rarity: 'R',  image: 'assets/pets/貴賓狗.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 20, icon: '🦷', maxPP: 10 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 20, icon: '🦷', maxPP:  5 }] },
-  { id: 'pet8',  name: '比熊',   rarity: 'R',  image: 'assets/pets/比熊.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 20, icon: '🦷', maxPP: 10 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 20, icon: '🦷', maxPP:  5 }] },
-  { id: 'pet9',  name: '德牧',   rarity: 'SR', image: 'assets/pets/德牧.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 30, icon: '🦷', maxPP: 15 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 30, icon: '🦷', maxPP: 10 }, { name: '強咬', desc: '以獵犬本能發動致命一咬', effect: 'atk', power: 30, icon: '🦷', maxPP:  5 }] },
-  { id: 'pet10', name: '邊牧',   rarity: 'SR', image: 'assets/pets/邊牧.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 30, icon: '🦷', maxPP: 15 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 30, icon: '🦷', maxPP: 10 }, { name: '強咬', desc: '以獵犬本能發動致命一咬', effect: 'atk', power: 30, icon: '🦷', maxPP:  5 }] },
-  { id: 'pet11', name: '伯恩山', rarity: 'SR', image: 'assets/pets/伯恩山.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 30, icon: '🦷', maxPP: 15 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 30, icon: '🦷', maxPP: 10 }, { name: '強咬', desc: '以獵犬本能發動致命一咬', effect: 'atk', power: 30, icon: '🦷', maxPP:  5 }] },
-  { id: 'pet12', name: '牧羊犬', rarity: 'SR', image: 'assets/pets/牧羊犬.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 30, icon: '🦷', maxPP: 15 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 30, icon: '🦷', maxPP: 10 }, { name: '強咬', desc: '以獵犬本能發動致命一咬', effect: 'atk', power: 30, icon: '🦷', maxPP:  5 }] },
-  { id: 'pet13', name: '橘貓',       rarity: 'F',  image: 'assets/pets/橘貓.png',       skills: [{ name: '抓', desc: '伸出利爪抓向敵人', effect: 'atk', power: 10, icon: '🐾', maxPP:  5, currentPP:  5 }] },
-  { id: 'pet14', name: '灰貓',       rarity: 'F',  image: 'assets/pets/灰貓.png',       skills: [{ name: '抓', desc: '伸出利爪抓向敵人', effect: 'atk', power: 10, icon: '🐾', maxPP:  5, currentPP:  5 }] },
-  { id: 'pet15', name: '白貓',       rarity: 'F',  image: 'assets/pets/白貓.png',       skills: [{ name: '抓', desc: '伸出利爪抓向敵人', effect: 'atk', power: 10, icon: '🐾', maxPP:  5, currentPP:  5 }] },
-  { id: 'pet16', name: '黑貓',       rarity: 'F',  image: 'assets/pets/黑貓.png',       skills: [{ name: '抓', desc: '伸出利爪抓向敵人', effect: 'atk', power: 10, icon: '🐾', maxPP:  5, currentPP:  5 }] },
-  { id: 'pet17', name: '英國短毛貓', rarity: 'R',  image: 'assets/pets/英國短毛貓.png', skills: [{ name: '抓', desc: '伸出利爪抓向敵人', effect: 'atk', power: 20, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '亂抓', desc: '瘋狂揮舞爪子攻擊', effect: 'atk', power: 20, icon: '🐾', maxPP:  5, currentPP:  5 }] },
-  { id: 'pet18', name: '牛奶貓',     rarity: 'R',  image: 'assets/pets/牛奶貓.png',     skills: [{ name: '抓', desc: '伸出利爪抓向敵人', effect: 'atk', power: 20, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '亂抓', desc: '瘋狂揮舞爪子攻擊', effect: 'atk', power: 20, icon: '🐾', maxPP:  5, currentPP:  5 }] },
-  { id: 'pet19', name: '布偶貓',     rarity: 'R',  image: 'assets/pets/布偶貓.png',     skills: [{ name: '抓', desc: '伸出利爪抓向敵人', effect: 'atk', power: 20, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '亂抓', desc: '瘋狂揮舞爪子攻擊', effect: 'atk', power: 20, icon: '🐾', maxPP:  5, currentPP:  5 }] },
-  { id: 'pet20', name: '三花貓',     rarity: 'SR', image: 'assets/pets/三花貓.png',     skills: [{ name: '抓', desc: '伸出利爪快速抓向敵人', effect: 'atk', power: 30, icon: '🐾', maxPP: 15, currentPP: 15 }, { name: '亂抓', desc: '瘋狂揮舞爪子攻擊', effect: 'atk', power: 30, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '快速亂抓', desc: '瘋狂揮舞爪子快速攻擊', effect: 'atk', power: 30, icon: '🌑', maxPP:  5, currentPP:  5 }] },
-  { id: 'pet21', name: '波斯貓',     rarity: 'SR', image: 'assets/pets/波斯貓.png',     skills: [{ name: '抓', desc: '伸出利爪快速抓向敵人', effect: 'atk', power: 30, icon: '🐾', maxPP: 15, currentPP: 15 }, { name: '亂抓', desc: '瘋狂揮舞爪子攻擊', effect: 'atk', power: 30, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '快速亂抓', desc: '瘋狂揮舞爪子快速攻擊', effect: 'atk', power: 30, icon: '🌑', maxPP:  5, currentPP:  5 }] },
-  { id: 'pet22', name: '緬因貓',     rarity: 'SR', image: 'assets/pets/緬因貓.png',     skills: [{ name: '抓', desc: '伸出利爪快速抓向敵人', effect: 'atk', power: 30, icon: '🐾', maxPP: 15, currentPP: 15 }, { name: '亂抓', desc: '瘋狂揮舞爪子攻擊', effect: 'atk', power: 30, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '快速亂抓', desc: '瘋狂揮舞爪子快速攻擊', effect: 'atk', power: 30, icon: '🌑', maxPP:  5, currentPP:  5 }] },
-  { id: 'pet23', name: '狐狸',       rarity: 'R',  image: 'assets/pets/狐狸.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 20, icon: '🦷', maxPP: 10, currentPP: 10 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 20, icon: '🦷', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet24', name: '小豬',         rarity: 'F',  image: 'assets/pets/小豬.png',         skills: [{ name: '撞', desc: '低頭用身體衝撞敵人', effect: 'atk', power: 10, icon: '💨', maxPP:  5, currentPP:  5 }] },
-  { id: 'pet25', name: '麝香豬',       rarity: 'R',  image: 'assets/pets/麝香豬.png',       skills: [{ name: '撞', desc: '低頭用身體撞敵人', effect: 'atk', power: 20, icon: '💨', maxPP: 10, currentPP: 10 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 20, icon: '💥', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet26', name: '灰兔',   rarity: 'F',  image: 'assets/pets/灰兔.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷', maxPP:  5, currentPP:  5 }] },
-  { id: 'pet27', name: '黑兔',   rarity: 'F',  image: 'assets/pets/黑兔.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷', maxPP:  5, currentPP:  5 }] },
-  { id: 'pet28', name: '白兔',   rarity: 'F',  image: 'assets/pets/白兔.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 10, icon: '🦷', maxPP:  5, currentPP:  5 }] },
-  { id: 'pet29', name: '道奇兔', rarity: 'R',  image: 'assets/pets/道奇兔.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 20, icon: '🦷', maxPP: 10, currentPP: 10 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 20, icon: '🦷', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet30', name: '庫你迷你豬',   rarity: 'R',  image: 'assets/pets/庫你迷你豬.png',   skills: [{ name: '撞', desc: '低頭用身體撞敵人', effect: 'atk', power: 20, icon: '💨', maxPP: 10, currentPP: 10 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 20, icon: '💥', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet31', name: '迷你豬',       rarity: 'SR', image: 'assets/pets/迷你豬.png',       skills: [{ name: '撞', desc: '低頭用身體衝撞敵人', effect: 'atk', power: 30, icon: '💨', maxPP: 15, currentPP: 15 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 30, icon: '💥', maxPP: 10, currentPP: 10 }, { name: '猛力頭槌', desc: '蓄力後以頭部猛烈撞擊', effect: 'atk', power: 30, icon: '🌪️', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet32', name: '長耳兔', rarity: 'SR', image: 'assets/pets/長耳兔.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 30, icon: '🦷', maxPP: 15, currentPP: 15 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 30, icon: '🦷', maxPP: 10, currentPP: 10 }, { name: '強咬', desc: '以獵犬本能發動致命一咬', effect: 'atk', power: 30, icon: '🦷', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet33', name: '海福特牛',     rarity: 'SR', image: 'assets/pets/海福特牛.png',     skills: [{ name: '撞', desc: '低頭用身體衝撞敵人', effect: 'atk', power: 30, icon: '💨', maxPP: 15, currentPP: 15 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 30, icon: '💥', maxPP: 10, currentPP: 10 }, { name: '猛力頭槌', desc: '蓄力後以頭部猛烈撞擊', effect: 'atk', power: 30, icon: '🌪️', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet34', name: '牡丹鸚鵡',     rarity: 'F',  image: 'assets/pets/牡丹鸚鵡.png',     skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 10, icon: '🐦', maxPP:  5, currentPP:  5 }] },
-  { id: 'pet35', name: '折衷鸚鵡',     rarity: 'F',  image: 'assets/pets/折衷鸚鵡.png',     skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 10, icon: '🐦', maxPP:  5, currentPP:  5 }] },
-  { id: 'pet36', name: '虎皮鸚鵡',     rarity: 'R',  image: 'assets/pets/虎皮鸚鵡.png',     skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 20, icon: '🐦', maxPP: 10, currentPP: 10 }, { name: '快速啄擊', desc: '快速啄擊敵人', effect: 'atk', power: 20, icon: '🐦', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet37', name: '玄風鸚鵡',     rarity: 'R',  image: 'assets/pets/玄風鸚鵡.png',     skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 20, icon: '🐦', maxPP: 10, currentPP: 10 }, { name: '快速啄擊', desc: '快速啄擊敵人', effect: 'atk', power: 20, icon: '🐦', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet38', name: '非洲灰鸚鵡',   rarity: 'SR', image: 'assets/pets/非洲灰鸚鵡.png',   skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 30, icon: '🐦', maxPP: 15, currentPP: 15 }, { name: '快速啄擊', desc: '快速啄擊敵人', effect: 'atk', power: 30, icon: '🐦', maxPP: 10, currentPP: 10 }, { name: '連續猛啄', desc: '連續啄擊敵人多次', effect: 'atk', power: 30, icon: '🦅', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet39', name: '鳳頭巴丹鸚鵡', rarity: 'SR', image: 'assets/pets/鳳頭巴丹鸚鵡.png', skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 30, icon: '🐦', maxPP: 15, currentPP: 15 }, { name: '快速啄擊', desc: '快速啄擊敵人', effect: 'atk', power: 30, icon: '🐦', maxPP: 10, currentPP: 10 }, { name: '連續猛啄', desc: '連續啄擊敵人多次', effect: 'atk', power: 30, icon: '🦅', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet40', name: '雞',           rarity: 'R',  image: 'assets/pets/雞.png',           skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 20, icon: '🐔', maxPP: 10, currentPP: 10 }, { name: '快速啄擊', desc: '快速啄擊敵人', effect: 'atk', power: 20, icon: '🐔', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet41', name: '小鴨',         rarity: 'R',  image: 'assets/pets/小鴨.png',         skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 20, icon: '🦆', maxPP: 10, currentPP: 10 }, { name: '快速啄擊', desc: '快速啄擊敵人', effect: 'atk', power: 20, icon: '🦆', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet42', name: '水豚',         rarity: 'SR', image: 'assets/pets/水豚.png',         skills: [{ name: '撞', desc: '低頭用身體衝撞敵人', effect: 'atk', power: 30, icon: '💨', maxPP: 15, currentPP: 15 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 30, icon: '💥', maxPP: 10, currentPP: 10 }, { name: '猛力頭槌', desc: '蓄力後以頭部猛烈撞擊', effect: 'atk', power: 30, icon: '🌪️', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet43', name: '樹麻雀',       rarity: 'R',  image: 'assets/pets/樹麻雀.png',       skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 20, icon: '🐦', maxPP: 10, currentPP: 10 }, { name: '快速啄擊', desc: '快速啄擊敵人', effect: 'atk', power: 20, icon: '🐦', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet44', name: '紅頭山雀',     rarity: 'SR', image: 'assets/pets/紅頭山雀.png',     skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 30, icon: '🐦', maxPP: 15, currentPP: 15 }, { name: '快速啄擊', desc: '快速啄擊敵人', effect: 'atk', power: 30, icon: '🐦', maxPP: 10, currentPP: 10 }, { name: '連續猛啄', desc: '連續啄擊敵人多次', effect: 'atk', power: 30, icon: '🦅', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet45', name: '黃牛',         rarity: 'F',  image: 'assets/pets/黃牛.png',         skills: [{ name: '撞', desc: '低頭用身體衝撞敵人', effect: 'atk', power: 10, icon: '💨', maxPP:  5, currentPP:  5 }] },
-  { id: 'pet46', name: '荷斯坦牛',     rarity: 'R',  image: 'assets/pets/荷斯坦牛.png',     skills: [{ name: '撞', desc: '低頭用身體撞敵人', effect: 'atk', power: 20, icon: '💨', maxPP: 10, currentPP: 10 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 20, icon: '💥', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet47', name: '浣熊',         rarity: 'R',  image: 'assets/pets/浣熊.png',  skills: [{ name: '抓', desc: '伸出利爪抓向敵人', effect: 'atk', power: 20, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '亂抓', desc: '瘋狂揮舞爪子攻擊', effect: 'atk', power: 20, icon: '🐾', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet48', name: '山羌',   rarity: 'R',  image: 'assets/pets/山羌.png',   skills: [{ name: '撞', desc: '低頭用身體撞敵人', effect: 'atk', power: 20, icon: '💨', maxPP: 10, currentPP: 10 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 20, icon: '💥', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet49', name: '梅花鹿', rarity: 'SR', image: 'assets/pets/梅花鹿.png', skills: [{ name: '撞', desc: '低頭用身體衝撞敵人', effect: 'atk', power: 30, icon: '💨', maxPP: 15, currentPP: 15 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 30, icon: '💥', maxPP: 10, currentPP: 10 }, { name: '猛力頭槌', desc: '蓄力後以頭部猛烈撞擊', effect: 'atk', power: 30, icon: '🌪️', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet50', name: '綿羊',         rarity: 'R',  image: 'assets/pets/綿羊.png',         skills: [{ name: '撞', desc: '低頭用身體撞敵人', effect: 'atk', power: 20, icon: '💨', maxPP: 10, currentPP: 10 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 20, icon: '💥', maxPP: 5, currentPP: 5 }] },
-  { id: 'pet51', name: '紅浣熊',       rarity: 'SR', image: 'assets/pets/紅浣熊.png', skills: [{ name: '抓', desc: '伸出利爪快速抓向敵人', effect: 'atk', power: 30, icon: '🐾', maxPP: 15, currentPP: 15 }, { name: '亂抓', desc: '瘋狂揮舞爪子攻擊', effect: 'atk', power: 30, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '快速亂抓', desc: '瘋狂揮舞爪子快速攻擊', effect: 'atk', power: 30, icon: '🌑', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet1',  name: '小狗',   rarity: 'F',  image: 'assets/pets/小狗.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 1.0, icon: '🦷', maxPP:  5 }] },
+  { id: 'pet2',  name: '柴犬',   rarity: 'F',  image: 'assets/pets/柴犬.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 1.0, icon: '🦷', maxPP:  5 }] },
+  { id: 'pet3',  name: '臘腸狗', rarity: 'F',  image: 'assets/pets/臘腸狗.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 1.0, icon: '🦷', maxPP:  5 }] },
+  { id: 'pet4',  name: '柯基',   rarity: 'F',  image: 'assets/pets/柯基.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 1.0, icon: '🦷', maxPP:  5 }] },
+  { id: 'pet5',  name: '比格犬', rarity: 'R',  image: 'assets/pets/比格犬.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 1.0, icon: '🦷', maxPP: 10 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 1.5, icon: '🦷', maxPP:  5 }] },
+  { id: 'pet6',  name: '米克斯', rarity: 'R',  image: 'assets/pets/米克斯.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 1.0, icon: '🦷', maxPP: 10 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 1.5, icon: '🦷', maxPP:  5 }] },
+  { id: 'pet7',  name: '貴賓狗', rarity: 'R',  image: 'assets/pets/貴賓狗.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 1.0, icon: '🦷', maxPP: 10 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 1.5, icon: '🦷', maxPP:  5 }] },
+  { id: 'pet8',  name: '比熊',   rarity: 'R',  image: 'assets/pets/比熊.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 1.0, icon: '🦷', maxPP: 10 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 1.5, icon: '🦷', maxPP:  5 }] },
+  { id: 'pet9',  name: '德牧',   rarity: 'SR', image: 'assets/pets/德牧.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 1.0, icon: '🦷', maxPP: 15 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 1.5, icon: '🦷', maxPP: 10 }, { name: '強咬', desc: '以獵犬本能發動致命一咬', effect: 'atk', power: 2.0, icon: '🦷', maxPP:  5 }] },
+  { id: 'pet10', name: '邊牧',   rarity: 'SR', image: 'assets/pets/邊牧.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 1.0, icon: '🦷', maxPP: 15 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 1.5, icon: '🦷', maxPP: 10 }, { name: '強咬', desc: '以獵犬本能發動致命一咬', effect: 'atk', power: 2.0, icon: '🦷', maxPP:  5 }] },
+  { id: 'pet11', name: '伯恩山', rarity: 'SR', image: 'assets/pets/伯恩山.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 1.0, icon: '🦷', maxPP: 15 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 1.5, icon: '🦷', maxPP: 10 }, { name: '強咬', desc: '以獵犬本能發動致命一咬', effect: 'atk', power: 2.0, icon: '🦷', maxPP:  5 }] },
+  { id: 'pet12', name: '牧羊犬', rarity: 'SR', image: 'assets/pets/牧羊犬.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 1.0, icon: '🦷', maxPP: 15 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 1.5, icon: '🦷', maxPP: 10 }, { name: '強咬', desc: '以獵犬本能發動致命一咬', effect: 'atk', power: 2.0, icon: '🦷', maxPP:  5 }] },
+  { id: 'pet13', name: '橘貓',       rarity: 'F',  image: 'assets/pets/橘貓.png',       skills: [{ name: '抓', desc: '伸出利爪抓向敵人', effect: 'atk', power: 1.0, icon: '🐾', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet14', name: '灰貓',       rarity: 'F',  image: 'assets/pets/灰貓.png',       skills: [{ name: '抓', desc: '伸出利爪抓向敵人', effect: 'atk', power: 1.0, icon: '🐾', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet15', name: '白貓',       rarity: 'F',  image: 'assets/pets/白貓.png',       skills: [{ name: '抓', desc: '伸出利爪抓向敵人', effect: 'atk', power: 1.0, icon: '🐾', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet16', name: '黑貓',       rarity: 'F',  image: 'assets/pets/黑貓.png',       skills: [{ name: '抓', desc: '伸出利爪抓向敵人', effect: 'atk', power: 1.0, icon: '🐾', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet17', name: '英國短毛貓', rarity: 'R',  image: 'assets/pets/英國短毛貓.png', skills: [{ name: '抓', desc: '伸出利爪抓向敵人', effect: 'atk', power: 1.0, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '亂抓', desc: '瘋狂揮舞爪子攻擊', effect: 'atk', power: 1.5, icon: '🐾', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet18', name: '牛奶貓',     rarity: 'R',  image: 'assets/pets/牛奶貓.png',     skills: [{ name: '抓', desc: '伸出利爪抓向敵人', effect: 'atk', power: 1.0, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '亂抓', desc: '瘋狂揮舞爪子攻擊', effect: 'atk', power: 1.5, icon: '🐾', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet19', name: '布偶貓',     rarity: 'R',  image: 'assets/pets/布偶貓.png',     skills: [{ name: '抓', desc: '伸出利爪抓向敵人', effect: 'atk', power: 1.0, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '亂抓', desc: '瘋狂揮舞爪子攻擊', effect: 'atk', power: 1.5, icon: '🐾', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet20', name: '三花貓',     rarity: 'SR', image: 'assets/pets/三花貓.png',     skills: [{ name: '抓', desc: '伸出利爪快速抓向敵人', effect: 'atk', power: 1.0, icon: '🐾', maxPP: 15, currentPP: 15 }, { name: '亂抓', desc: '瘋狂揮舞爪子攻擊', effect: 'atk', power: 1.5, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '快速亂抓', desc: '瘋狂揮舞爪子快速攻擊', effect: 'atk', power: 2.0, icon: '🌑', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet21', name: '波斯貓',     rarity: 'SR', image: 'assets/pets/波斯貓.png',     skills: [{ name: '抓', desc: '伸出利爪快速抓向敵人', effect: 'atk', power: 1.0, icon: '🐾', maxPP: 15, currentPP: 15 }, { name: '亂抓', desc: '瘋狂揮舞爪子攻擊', effect: 'atk', power: 1.5, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '快速亂抓', desc: '瘋狂揮舞爪子快速攻擊', effect: 'atk', power: 2.0, icon: '🌑', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet22', name: '緬因貓',     rarity: 'SR', image: 'assets/pets/緬因貓.png',     skills: [{ name: '抓', desc: '伸出利爪快速抓向敵人', effect: 'atk', power: 1.0, icon: '🐾', maxPP: 15, currentPP: 15 }, { name: '亂抓', desc: '瘋狂揮舞爪子攻擊', effect: 'atk', power: 1.5, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '快速亂抓', desc: '瘋狂揮舞爪子快速攻擊', effect: 'atk', power: 2.0, icon: '🌑', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet23', name: '狐狸',       rarity: 'R',  image: 'assets/pets/狐狸.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 1.0, icon: '🦷', maxPP: 10, currentPP: 10 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 1.5, icon: '🦷', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet24', name: '小豬',         rarity: 'F',  image: 'assets/pets/小豬.png',         skills: [{ name: '撞', desc: '低頭用身體衝撞敵人', effect: 'atk', power: 1.0, icon: '💨', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet25', name: '麝香豬',       rarity: 'R',  image: 'assets/pets/麝香豬.png',       skills: [{ name: '撞', desc: '低頭用身體撞敵人', effect: 'atk', power: 1.0, icon: '💨', maxPP: 10, currentPP: 10 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 1.5, icon: '💥', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet26', name: '灰兔',   rarity: 'F',  image: 'assets/pets/灰兔.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 1.0, icon: '🦷', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet27', name: '黑兔',   rarity: 'F',  image: 'assets/pets/黑兔.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 1.0, icon: '🦷', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet28', name: '白兔',   rarity: 'F',  image: 'assets/pets/白兔.png',   skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 1.0, icon: '🦷', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet29', name: '道奇兔', rarity: 'R',  image: 'assets/pets/道奇兔.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 1.0, icon: '🦷', maxPP: 10, currentPP: 10 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 1.5, icon: '🦷', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet30', name: '庫你迷你豬',   rarity: 'R',  image: 'assets/pets/庫你迷你豬.png',   skills: [{ name: '撞', desc: '低頭用身體撞敵人', effect: 'atk', power: 1.0, icon: '💨', maxPP: 10, currentPP: 10 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 1.5, icon: '💥', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet31', name: '迷你豬',       rarity: 'SR', image: 'assets/pets/迷你豬.png',       skills: [{ name: '撞', desc: '低頭用身體衝撞敵人', effect: 'atk', power: 1.0, icon: '💨', maxPP: 15, currentPP: 15 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 1.5, icon: '💥', maxPP: 10, currentPP: 10 }, { name: '猛力頭槌', desc: '蓄力後以頭部猛烈撞擊', effect: 'atk', power: 2.0, icon: '🌪️', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet32', name: '長耳兔', rarity: 'SR', image: 'assets/pets/長耳兔.png', skills: [{ name: '咬', desc: '用尖牙狠狠咬住敵人', effect: 'atk', power: 1.0, icon: '🦷', maxPP: 15, currentPP: 15 }, { name: '撕咬', desc: '憤怒地咬住敵人不放', effect: 'atk', power: 1.5, icon: '🦷', maxPP: 10, currentPP: 10 }, { name: '強咬', desc: '以獵犬本能發動致命一咬', effect: 'atk', power: 2.0, icon: '🦷', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet33', name: '海福特牛',     rarity: 'SR', image: 'assets/pets/海福特牛.png',     skills: [{ name: '撞', desc: '低頭用身體衝撞敵人', effect: 'atk', power: 1.0, icon: '💨', maxPP: 15, currentPP: 15 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 1.5, icon: '💥', maxPP: 10, currentPP: 10 }, { name: '猛力頭槌', desc: '蓄力後以頭部猛烈撞擊', effect: 'atk', power: 2.0, icon: '🌪️', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet34', name: '牡丹鸚鵡',     rarity: 'F',  image: 'assets/pets/牡丹鸚鵡.png',     skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 1.0, icon: '🐦', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet35', name: '折衷鸚鵡',     rarity: 'F',  image: 'assets/pets/折衷鸚鵡.png',     skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 1.0, icon: '🐦', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet36', name: '虎皮鸚鵡',     rarity: 'R',  image: 'assets/pets/虎皮鸚鵡.png',     skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 1.0, icon: '🐦', maxPP: 10, currentPP: 10 }, { name: '快速啄擊', desc: '快速啄擊敵人', effect: 'atk', power: 1.5, icon: '🐦', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet37', name: '玄風鸚鵡',     rarity: 'R',  image: 'assets/pets/玄風鸚鵡.png',     skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 1.0, icon: '🐦', maxPP: 10, currentPP: 10 }, { name: '快速啄擊', desc: '快速啄擊敵人', effect: 'atk', power: 1.5, icon: '🐦', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet38', name: '非洲灰鸚鵡',   rarity: 'SR', image: 'assets/pets/非洲灰鸚鵡.png',   skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 1.0, icon: '🐦', maxPP: 15, currentPP: 15 }, { name: '快速啄擊', desc: '快速啄擊敵人', effect: 'atk', power: 1.5, icon: '🐦', maxPP: 10, currentPP: 10 }, { name: '連續猛啄', desc: '連續啄擊敵人多次', effect: 'atk', power: 2.0, icon: '🦅', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet39', name: '鳳頭巴丹鸚鵡', rarity: 'SR', image: 'assets/pets/鳳頭巴丹鸚鵡.png', skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 1.0, icon: '🐦', maxPP: 15, currentPP: 15 }, { name: '快速啄擊', desc: '快速啄擊敵人', effect: 'atk', power: 1.5, icon: '🐦', maxPP: 10, currentPP: 10 }, { name: '連續猛啄', desc: '連續啄擊敵人多次', effect: 'atk', power: 2.0, icon: '🦅', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet40', name: '雞',           rarity: 'R',  image: 'assets/pets/雞.png',           skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 1.0, icon: '🐔', maxPP: 10, currentPP: 10 }, { name: '快速啄擊', desc: '快速啄擊敵人', effect: 'atk', power: 1.5, icon: '🐔', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet41', name: '小鴨',         rarity: 'R',  image: 'assets/pets/小鴨.png',         skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 1.0, icon: '🦆', maxPP: 10, currentPP: 10 }, { name: '快速啄擊', desc: '快速啄擊敵人', effect: 'atk', power: 1.5, icon: '🦆', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet42', name: '水豚',         rarity: 'SR', image: 'assets/pets/水豚.png',         skills: [{ name: '撞', desc: '低頭用身體衝撞敵人', effect: 'atk', power: 1.0, icon: '💨', maxPP: 15, currentPP: 15 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 1.5, icon: '💥', maxPP: 10, currentPP: 10 }, { name: '猛力頭槌', desc: '蓄力後以頭部猛烈撞擊', effect: 'atk', power: 2.0, icon: '🌪️', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet43', name: '樹麻雀',       rarity: 'R',  image: 'assets/pets/樹麻雀.png',       skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 1.0, icon: '🐦', maxPP: 10, currentPP: 10 }, { name: '快速啄擊', desc: '快速啄擊敵人', effect: 'atk', power: 1.5, icon: '🐦', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet44', name: '紅頭山雀',     rarity: 'SR', image: 'assets/pets/紅頭山雀.png',     skills: [{ name: '啄擊', desc: '用尖嘴啄向敵人', effect: 'atk', power: 1.0, icon: '🐦', maxPP: 15, currentPP: 15 }, { name: '快速啄擊', desc: '快速啄擊敵人', effect: 'atk', power: 1.5, icon: '🐦', maxPP: 10, currentPP: 10 }, { name: '連續猛啄', desc: '連續啄擊敵人多次', effect: 'atk', power: 2.0, icon: '🦅', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet45', name: '黃牛',         rarity: 'F',  image: 'assets/pets/黃牛.png',         skills: [{ name: '撞', desc: '低頭用身體衝撞敵人', effect: 'atk', power: 1.0, icon: '💨', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet46', name: '荷斯坦牛',     rarity: 'R',  image: 'assets/pets/荷斯坦牛.png',     skills: [{ name: '撞', desc: '低頭用身體撞敵人', effect: 'atk', power: 1.0, icon: '💨', maxPP: 10, currentPP: 10 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 1.5, icon: '💥', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet47', name: '浣熊',         rarity: 'R',  image: 'assets/pets/浣熊.png',  skills: [{ name: '抓', desc: '伸出利爪抓向敵人', effect: 'atk', power: 1.0, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '亂抓', desc: '瘋狂揮舞爪子攻擊', effect: 'atk', power: 1.5, icon: '🐾', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet48', name: '山羌',   rarity: 'R',  image: 'assets/pets/山羌.png',   skills: [{ name: '撞', desc: '低頭用身體撞敵人', effect: 'atk', power: 1.0, icon: '💨', maxPP: 10, currentPP: 10 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 1.5, icon: '💥', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet49', name: '梅花鹿', rarity: 'SR', image: 'assets/pets/梅花鹿.png', skills: [{ name: '撞', desc: '低頭用身體衝撞敵人', effect: 'atk', power: 1.0, icon: '💨', maxPP: 15, currentPP: 15 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 1.5, icon: '💥', maxPP: 10, currentPP: 10 }, { name: '猛力頭槌', desc: '蓄力後以頭部猛烈撞擊', effect: 'atk', power: 2.0, icon: '🌪️', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet50', name: '綿羊',         rarity: 'R',  image: 'assets/pets/綿羊.png',         skills: [{ name: '撞', desc: '低頭用身體撞敵人', effect: 'atk', power: 1.0, icon: '💨', maxPP: 10, currentPP: 10 }, { name: '衝撞', desc: '低頭用身體全力衝撞敵人', effect: 'atk', power: 1.5, icon: '💥', maxPP: 5, currentPP: 5 }] },
+  { id: 'pet51', name: '紅浣熊',       rarity: 'SR', image: 'assets/pets/紅浣熊.png', skills: [{ name: '抓', desc: '伸出利爪快速抓向敵人', effect: 'atk', power: 1.0, icon: '🐾', maxPP: 15, currentPP: 15 }, { name: '亂抓', desc: '瘋狂揮舞爪子攻擊', effect: 'atk', power: 1.5, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '快速亂抓', desc: '瘋狂揮舞爪子快速攻擊', effect: 'atk', power: 2.0, icon: '🌑', maxPP: 5, currentPP: 5 }] },
   // ── Boss Pets（轉盤獲得，等級上限同 SSR Lv.50）──
   { id: 'boss_pet_01', name: '金剛鸚鵡', rarity: 'SSR', image: 'assets/boss/boss_01.png', petVersion: true },
   { id: 'boss_pet_02', name: '蟒蛇',     rarity: 'SSR', image: 'assets/boss/boss_02.png', petVersion: true },
@@ -177,21 +177,21 @@ const getMaxLevel = (rarity) => RARITY_MAX_LEVEL[rarity] || 10;
 
 const RARITY_SKILLS = {
   F: [
-    { name: '普通攻擊', desc: '普通的一擊',             effect: 'atk', power: 10, icon: '⚔️', maxPP:  5 },
+    { name: '普通攻擊', desc: '普通的一擊',             effect: 'atk', power: 1.0, icon: '⚔️', maxPP:  5 },
   ],
   R: [
-    { name: '普通攻擊', desc: '普通的一擊',             effect: 'atk', power: 20, icon: '⚔️', maxPP: 10 },
-    { name: '強力一擊', desc: '蓄力後猛烈攻擊',         effect: 'atk', power: 20, icon: '💥', maxPP:  5 },
+    { name: '普通攻擊', desc: '普通的一擊',             effect: 'atk', power: 1.0, icon: '⚔️', maxPP: 10 },
+    { name: '強力一擊', desc: '蓄力後猛烈攻擊',         effect: 'atk', power: 1.5, icon: '💥', maxPP:  5 },
   ],
   SR: [
-    { name: '普通攻擊', desc: '普通的一擊',             effect: 'atk', power: 30, icon: '⚔️', maxPP: 15 },
-    { name: '強力一擊', desc: '蓄力後猛烈攻擊',         effect: 'atk', power: 30, icon: '💥', maxPP: 10 },
-    { name: '元素爆發', desc: '釋放強大的元素能量',     effect: 'atk', power: 30, icon: '🔮', maxPP:  5 },
+    { name: '普通攻擊', desc: '普通的一擊',             effect: 'atk', power: 1.0, icon: '⚔️', maxPP: 15 },
+    { name: '強力一擊', desc: '蓄力後猛烈攻擊',         effect: 'atk', power: 1.5, icon: '💥', maxPP: 10 },
+    { name: '元素爆發', desc: '釋放強大的元素能量',     effect: 'atk', power: 2.0, icon: '🔮', maxPP:  5 },
   ],
   SSR: [
-    { name: '強力一擊', desc: '蓄力後猛烈攻擊',         effect: 'atk', power: 45, icon: '💥', maxPP: 15 },
-    { name: '元素爆發', desc: '釋放強大的元素能量',     effect: 'atk', power: 45, icon: '🔮', maxPP: 10 },
-    { name: '究極必殺', desc: '毀天滅地的終極技能',     effect: 'atk', power: 45, icon: '⚡', maxPP:  5 },
+    { name: '強力一擊', desc: '蓄力後猛烈攻擊',         effect: 'atk', power: 1.5, icon: '💥', maxPP: 15 },
+    { name: '元素爆發', desc: '釋放強大的元素能量',     effect: 'atk', power: 2.0, icon: '🔮', maxPP: 10 },
+    { name: '究極必殺', desc: '毀天滅地的終極技能',     effect: 'atk', power: 2.5, icon: '⚡', maxPP:  5 },
   ],
 };
 
@@ -203,6 +203,18 @@ const calcStats = (pet, level) => {
     atk: base.atk + (level - 1) * growth.atk,
     def: base.def + (level - 1) * growth.def,
   };
+};
+
+const SKILL_CRIT_RATE = { F: 0.05, R: 0.08, SR: 0.12, SSR: 0.15 };
+
+const calcDamage = (attackerAtk, skillPower, defenderDef, critRate) => {
+  const base     = attackerAtk * skillPower;
+  const defense  = Math.floor(defenderDef * 0.5);
+  const raw      = Math.max(1, base - defense);
+  const variance = 0.9 + Math.random() * 0.2;
+  const isCrit   = Math.random() < (critRate || 0.05);
+  const dmg      = Math.floor(raw * variance * (isCrit ? 1.5 : 1));
+  return { dmg, crit: isCrit };
 };
 
 const getPetSkills = (pet) => pet.skills || RARITY_SKILLS[pet.rarity] || RARITY_SKILLS.F;
@@ -504,7 +516,7 @@ function showPetDetail() {
       <div class="detail-skill-card__icon">${s.icon}</div>
       <div class="detail-skill-card__name">${s.name}</div>
       <div class="detail-skill-card__desc">${s.desc}</div>
-      <div class="detail-skill-card__power">威力：${s.power}</div>
+      <div class="detail-skill-card__power">威力：${Number(s.power).toFixed(1)}×</div>
       <div class="detail-skill-card__pp">
         <div class="pp-dots">${renderPPDots(s.currentPP, s.maxPP)}</div>
         <span class="pp-count">${s.currentPP} / ${s.maxPP}</span>
@@ -1250,26 +1262,9 @@ function renderBossList() {
 function challengeBoss(bossId) {
   const boss = BOSSES.find(b => b.id === bossId);
   if (!boss) return;
-  const pet     = currentPet();
-  const stats   = calcStats(pet, state.level);
-  const petDmg  = Math.max(1, stats.atk - boss.def);
-  const bossDmg = Math.max(1, boss.atk  - stats.def);
-  const petTurns  = Math.ceil(boss.hp  / petDmg);
-  const bossTurns = Math.ceil(stats.hp / bossDmg);
-  const win = petTurns <= bossTurns;
-
-  if (win) {
-    const defeated = loadDefeatedBosses();
-    if (!defeated.includes(bossId)) {
-      defeated.push(bossId);
-      saveDefeatedBosses(defeated);
-      showWheelModal(boss); // 打贏 → 轉盤
-    } else {
-      showToast(`${boss.name} 已被打敗過了！`);
-    }
-  } else {
-    showToast(`💀 戰鬥失敗！${boss.name} 太強大，繼續升等再挑戰！`);
-  }
+  const defeated    = loadDefeatedBosses();
+  const isFirstTime = !defeated.includes(bossId);
+  startBattle(boss, isFirstTime);
 }
 
 // ─── Wheel Modal ─────────────────────────────────────────────────────────────
@@ -1393,6 +1388,162 @@ function showWheelResult(segIdx) {
 function closeWheelModal() {
   closeModal('modal-wheel');
   renderBossList();
+}
+
+// ─── Battle System ───────────────────────────────────────────────────────────
+let battleLog      = [];
+let battlePending  = null; // boss to show wheel after battle
+let battleFirstWin = false;
+
+function startBattle(boss, isFirstTime) {
+  const pet    = currentPet();
+  const stats  = calcStats(pet, state.level);
+  const crit   = SKILL_CRIT_RATE[pet.rarity] || 0.05;
+  const skills = getPetSkills(pet);
+  battleLog      = [];
+  battlePending  = boss;
+  battleFirstWin = isFirstTime;
+
+  // Simulate full battle turn by turn
+  const turns = simulateBattle(pet, stats, skills, crit, boss);
+
+  // Show modal
+  document.getElementById('battle-pet-img').src   = pet.image;
+  document.getElementById('battle-pet-name').textContent  = pet.name;
+  document.getElementById('battle-boss-img').src  = boss.image;
+  document.getElementById('battle-boss-name').textContent = boss.name;
+  document.getElementById('battle-log').innerHTML  = '';
+  document.getElementById('battle-result-box').classList.add('hidden');
+  document.getElementById('battle-pet-hp-bar').style.width  = '100%';
+  document.getElementById('battle-boss-hp-bar').style.width = '100%';
+  document.getElementById('battle-pet-hp-text').textContent  = `${stats.hp} / ${stats.hp}`;
+  document.getElementById('battle-boss-hp-text').textContent = `${boss.hp} / ${boss.hp}`;
+  openModal('modal-battle');
+
+  // Animate turns with delay
+  animateBattleTurns(turns, stats.hp, boss.hp, 0);
+}
+
+const BATTLE_MAX_TURNS = 40; // cap total turn entries to keep animation under 16s
+
+function simulateBattle(pet, stats, skills, critRate, boss) {
+  const turns = [];
+  let petHp  = stats.hp;
+  let bossHp = boss.hp;
+
+  while (petHp > 0 && bossHp > 0 && turns.length < BATTLE_MAX_TURNS) {
+    // Pet attacks — use highest-power skill
+    const skill  = skills.reduce((best, s) => s.power > best.power ? s : best, skills[0]);
+    const petAtk = calcDamage(stats.atk, skill.power, boss.def, critRate);
+    bossHp = Math.max(0, bossHp - petAtk.dmg);
+    turns.push({ actor: 'pet', skillName: skill.name, dmg: petAtk.dmg, crit: petAtk.crit, petHp, bossHp });
+    if (bossHp <= 0) break;
+
+    // Boss attacks back
+    const bossAtk = calcDamage(boss.atk, 1.0, stats.def, 0.05);
+    petHp = Math.max(0, petHp - bossAtk.dmg);
+    turns.push({ actor: 'boss', skillName: '攻擊', dmg: bossAtk.dmg, crit: bossAtk.crit, petHp, bossHp });
+  }
+  // Force outcome if capped (whoever has more HP% wins)
+  if (turns.length >= BATTLE_MAX_TURNS && petHp > 0 && bossHp > 0) {
+    const petPct  = petHp  / stats.hp;
+    const bossPct = bossHp / boss.hp;
+    if (petPct >= bossPct) bossHp = 0;
+    else                   petHp  = 0;
+    const last = turns[turns.length - 1];
+    last.petHp  = Math.max(0, petHp);
+    last.bossHp = Math.max(0, bossHp);
+  }
+  return turns;
+}
+
+const BATTLE_TURN_MS = 420; // ms per turn animation
+
+function animateBattleTurns(turns, maxPetHp, maxBossHp, idx) {
+  if (idx >= turns.length) {
+    const win = turns[turns.length - 1].bossHp <= 0;
+    showBattleResult(win);
+    return;
+  }
+
+  const t = turns[idx];
+  updateBattleHPBars(t.petHp, maxPetHp, t.bossHp, maxBossHp);
+
+  const tgt = t.actor === 'pet' ? 'battle-boss-img' : 'battle-pet-img';
+  showDamageFloat(t.actor === 'pet' ? 'battle-boss-side' : 'battle-pet-side', t.dmg, t.crit);
+  const el = document.getElementById(tgt);
+  el.classList.add('battle-hit');
+  setTimeout(() => el.classList.remove('battle-hit'), 280);
+
+  addBattleLog(t);
+
+  setTimeout(() => animateBattleTurns(turns, maxPetHp, maxBossHp, idx + 1), BATTLE_TURN_MS);
+}
+
+function updateBattleHPBars(petHp, maxPetHp, bossHp, maxBossHp) {
+  const pp = Math.max(0, Math.round(petHp  / maxPetHp  * 100));
+  const bp = Math.max(0, Math.round(bossHp / maxBossHp * 100));
+  document.getElementById('battle-pet-hp-bar').style.width  = `${pp}%`;
+  document.getElementById('battle-boss-hp-bar').style.width = `${bp}%`;
+  document.getElementById('battle-pet-hp-text').textContent  = `${Math.max(0,petHp)} / ${maxPetHp}`;
+  document.getElementById('battle-boss-hp-text').textContent = `${Math.max(0,bossHp)} / ${maxBossHp}`;
+}
+
+function showDamageFloat(sideId, dmg, crit) {
+  const side = document.getElementById(sideId);
+  if (!side) return;
+  const el = document.createElement('div');
+  el.className  = 'dmg-float' + (crit ? ' dmg-float--crit' : '');
+  el.textContent = (crit ? '暴擊! ' : '') + dmg;
+  side.appendChild(el);
+  setTimeout(() => el.remove(), 900);
+}
+
+function addBattleLog(t) {
+  const log = document.getElementById('battle-log');
+  const li  = document.createElement('div');
+  li.className = 'battle-log-entry' + (t.actor === 'pet' ? ' log-pet' : ' log-boss');
+  const who = t.actor === 'pet' ? '🐾 我方' : '👹 BOSS';
+  li.textContent = `${who} 使用 ${t.skillName}，造成 ${t.dmg}${t.crit ? '(暴擊!)' : ''} 傷害`;
+  log.appendChild(li);
+  log.scrollTop = log.scrollHeight;
+}
+
+function showBattleResult(win) {
+  const box = document.getElementById('battle-result-box');
+  box.classList.remove('hidden');
+
+  const showWheel = win && battleFirstWin;
+  if (win && battleFirstWin) {
+    // First defeat — save and show wheel
+    const defeated = loadDefeatedBosses();
+    if (!defeated.includes(battlePending.id)) {
+      defeated.push(battlePending.id);
+      saveDefeatedBosses(defeated);
+    }
+  }
+
+  document.getElementById('battle-result-title').textContent = win ? '🏆 勝利！' : '💀 戰敗';
+  document.getElementById('battle-result-desc').textContent  = win
+    ? (showWheel ? '精彩！繼續旋轉轉盤獲取獎勵！' : `${battlePending?.name || 'BOSS'} 已在記錄中！`)
+    : `${battlePending?.name || 'BOSS'} 太強大，繼續升等再挑戰！`;
+
+  const btn = document.getElementById('btn-battle-close');
+  btn.textContent  = showWheel ? '🎡 轉動轉盤！' : '確認';
+  btn.dataset.wheel = showWheel ? '1' : '0';
+}
+
+function closeBattleModal() {
+  const btn   = document.getElementById('btn-battle-close');
+  const wheel = btn?.dataset.wheel === '1';
+  const boss  = battlePending;
+  battlePending  = null;
+  battleFirstWin = false;
+  closeModal('modal-battle');
+  renderBossList();
+  if (wheel && boss) {
+    setTimeout(() => showWheelModal(boss), 200);
+  }
 }
 
 function initExploreCards() {

@@ -439,6 +439,50 @@
     </div>
   </div>
 
+  <!-- Battle Modal -->
+  <div id="modal-battle" class="modal hidden">
+    <div class="modal-box modal-battle-box">
+      <h2 class="battle-title">⚔️ 戰鬥！</h2>
+
+      <!-- Combatants -->
+      <div class="battle-combatants">
+        <div class="battle-side" id="battle-pet-side">
+          <img id="battle-pet-img" class="pixel-art battle-sprite" src="" alt="">
+          <div class="battle-name" id="battle-pet-name"></div>
+          <div class="battle-hp-wrap">
+            <div class="battle-hp-track">
+              <div class="battle-hp-bar battle-hp-bar--pet" id="battle-pet-hp-bar"></div>
+            </div>
+            <span class="battle-hp-text" id="battle-pet-hp-text"></span>
+          </div>
+        </div>
+
+        <div class="battle-vs">VS</div>
+
+        <div class="battle-side" id="battle-boss-side">
+          <img id="battle-boss-img" class="pixel-art battle-sprite" src="" alt="">
+          <div class="battle-name" id="battle-boss-name"></div>
+          <div class="battle-hp-wrap">
+            <div class="battle-hp-track">
+              <div class="battle-hp-bar battle-hp-bar--boss" id="battle-boss-hp-bar"></div>
+            </div>
+            <span class="battle-hp-text" id="battle-boss-hp-text"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Battle Log -->
+      <div id="battle-log" class="battle-log"></div>
+
+      <!-- Result -->
+      <div id="battle-result-box" class="battle-result-box hidden">
+        <div class="battle-result-title" id="battle-result-title"></div>
+        <div class="battle-result-desc"  id="battle-result-desc"></div>
+        <button id="btn-battle-close" class="btn-confirm" onclick="closeBattleModal()">確認</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Wheel Modal -->
   <div id="modal-wheel" class="modal hidden">
     <div class="modal-box modal-wheel-box">
