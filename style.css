@@ -1703,9 +1703,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 .boss-btn--disabled:hover  { opacity: .7; }
 .boss-btn--ticket {
-  background: linear-gradient(135deg, #f9a825, #ff8f00);
+  background: #ff6b35;
   color: #fff;
-  box-shadow: 0 2px 8px rgba(249,168,37,.45);
+  box-shadow: 0 2px 8px rgba(255,107,53,.4);
 }
 .boss-btn--ticket:hover  { opacity: .88; }
 .boss-btn--ticket:active { transform: scale(.94); }

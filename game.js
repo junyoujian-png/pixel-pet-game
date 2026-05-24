@@ -1370,26 +1370,22 @@ function renderBossList() {
   if (!container) return;
   const cleared     = loadClearedBosses();
   const ticketCount = state.items['boss_ticket'] ?? 0;
-  const level       = state.level;
 
   container.innerHTML = BOSSES.map((boss, idx) => {
-    const isCleared     = cleared.includes(boss.id);
-    const isLevelLocked = level < boss.level;
-    const isSeqLocked   = idx > 0 && !cleared.includes(BOSSES[idx - 1].id);
-    const hasTicket     = ticketCount > 0;
+    const isCleared   = cleared.includes(boss.id);
+    const isSeqLocked = idx > 0 && !cleared.includes(BOSSES[idx - 1].id);
+    const hasTicket   = ticketCount > 0;
 
     let actionHtml;
     if (isSeqLocked) {
       actionHtml = `<span class="boss-status boss-status--locked">🔒 未解鎖</span>`;
-    } else if (isLevelLocked) {
-      actionHtml = `<button class="boss-challenge-btn boss-btn--disabled" disabled>等級不足</button>`;
     } else if (!hasTicket) {
       actionHtml = `<button class="boss-challenge-btn boss-btn--disabled" disabled>🎫 需要挑戰卷</button>`;
     } else {
       actionHtml = `<button class="boss-challenge-btn boss-btn--ticket" data-boss-id="${boss.id}">🎫 使用挑戰卷挑戰</button>`;
     }
 
-    const lockedClass  = (isLevelLocked || isSeqLocked) ? ' boss-card--locked' : '';
+    const lockedClass  = isSeqLocked ? ' boss-card--locked' : '';
     const clearedClass = isCleared ? ' boss-card--defeated' : '';
 
     return `
