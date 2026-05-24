@@ -105,22 +105,22 @@ const EQUIP_DEFS = {
 };
 
 const BOSSES = [
-  { id: 'boss_01', name: '野兔霸王',   image: 'assets/boss/boss_01.png', level: 1,  hp: 200,  atk: 15,  def: 5,   reward: { coins: 50,   rarity: 'F'   }, desc: '看似可愛卻異常凶猛的野兔首領' },
-  { id: 'boss_02', name: '憤怒山豬',   image: 'assets/boss/boss_02.png', level: 3,  hp: 300,  atk: 20,  def: 8,   reward: { coins: 80,   rarity: 'F'   }, desc: '暴走的野山豬，衝撞力十足' },
-  { id: 'boss_03', name: '毒蜘蛛女王', image: 'assets/boss/boss_03.png', level: 5,  hp: 400,  atk: 28,  def: 12,  reward: { coins: 120,  rarity: 'R'   }, desc: '在暗處潛伏的蜘蛛女王' },
-  { id: 'boss_04', name: '狂暴猿猴',   image: 'assets/boss/boss_04.png', level: 8,  hp: 500,  atk: 35,  def: 15,  reward: { coins: 150,  rarity: 'R'   }, desc: '精力旺盛的猿猴王，力大無比' },
-  { id: 'boss_05', name: '沙漠蠍王',   image: 'assets/boss/boss_05.png', level: 10, hp: 650,  atk: 45,  def: 20,  reward: { coins: 200,  rarity: 'R'   }, desc: '沙漠中最危險的捕獵者' },
-  { id: 'boss_06', name: '深海章魚',   image: 'assets/boss/boss_06.png', level: 13, hp: 800,  atk: 55,  def: 25,  reward: { coins: 250,  rarity: 'R'   }, desc: '觸手遍布四方的神秘海洋生物' },
-  { id: 'boss_07', name: '雷霆之虎',   image: 'assets/boss/boss_07.png', level: 15, hp: 1000, atk: 65,  def: 30,  reward: { coins: 300,  rarity: 'SR'  }, desc: '閃電般迅速的猛虎，令人聞風喪膽' },
-  { id: 'boss_08', name: '熔岩犀牛',   image: 'assets/boss/boss_08.png', level: 18, hp: 1200, atk: 75,  def: 35,  reward: { coins: 380,  rarity: 'SR'  }, desc: '周身包覆熔岩的狂暴犀牛' },
-  { id: 'boss_09', name: '冰霜北極熊', image: 'assets/boss/boss_09.png', level: 20, hp: 1500, atk: 90,  def: 42,  reward: { coins: 450,  rarity: 'SR'  }, desc: '掌控冰雪風暴的極地霸主' },
-  { id: 'boss_10', name: '黑暗獅王',   image: 'assets/boss/boss_10.png', level: 23, hp: 1800, atk: 105, def: 50,  reward: { coins: 550,  rarity: 'SR'  }, desc: '在黑暗中統治一切的獅王' },
-  { id: 'boss_11', name: '風暴鷹王',   image: 'assets/boss/boss_11.png', level: 25, hp: 2200, atk: 120, def: 60,  reward: { coins: 650,  rarity: 'SR'  }, desc: '乘風破浪、統領天空的霸主' },
-  { id: 'boss_12', name: '混沌火龍',   image: 'assets/boss/boss_12.png', level: 28, hp: 2800, atk: 140, def: 70,  reward: { coins: 800,  rarity: 'SSR' }, desc: '燃燒萬物的遠古混沌火龍' },
-  { id: 'boss_13', name: '時空狼王',   image: 'assets/boss/boss_13.png', level: 30, hp: 3500, atk: 160, def: 85,  reward: { coins: 1000, rarity: 'SSR' }, desc: '能穿越時空的神秘狼王' },
-  { id: 'boss_14', name: '星際巨鯨',   image: 'assets/boss/boss_14.png', level: 35, hp: 4500, atk: 190, def: 100, reward: { coins: 1300, rarity: 'SSR' }, desc: '遨遊於星際之間的傳說生物' },
-  { id: 'boss_15', name: '神話鳳凰',   image: 'assets/boss/boss_15.png', level: 40, hp: 6000, atk: 220, def: 120, reward: { coins: 1800, rarity: 'SSR' }, desc: '從灰燼中涅槃重生的不死神鳥' },
-  { id: 'boss_16', name: '虛空神獸',   image: 'assets/boss/boss_16.png', level: 50, hp: 9999, atk: 300, def: 150, reward: { coins: 3000, rarity: 'SSR' }, desc: '宇宙誕生之初便存在的神秘存在，終極BOSS' },
+  { id: 'boss_01', name: '金剛鸚鵡', image: 'assets/boss/boss_01.png', level: 30,  hp: 1400, atk: 87,  def: 35, reward: { coins: 800,   rarity: 'SSR' }, desc: '以鋼鐵利喙和強力爪牙令對手喪膽' },
+  { id: 'boss_02', name: '蟒蛇',     image: 'assets/boss/boss_02.png', level: 35,  hp: 1550, atk: 94,  def: 38, reward: { coins: 1000,  rarity: 'SSR' }, desc: '能以驚人力道將獵物纏繞窒息的巨大蟒蛇' },
+  { id: 'boss_03', name: '鴕鳥',     image: 'assets/boss/boss_03.png', level: 40,  hp: 1700, atk: 102, def: 41, reward: { coins: 1200,  rarity: 'SSR' }, desc: '奔速如風、一踢可碎石的沙漠巨鳥' },
+  { id: 'boss_04', name: '狼',       image: 'assets/boss/boss_04.png', level: 45,  hp: 1750, atk: 110, def: 44, reward: { coins: 1500,  rarity: 'SSR' }, desc: '統領狼群、嗜血好鬥的孤狼首領' },
+  { id: 'boss_05', name: '袋鼠',     image: 'assets/boss/boss_05.png', level: 50,  hp: 1850, atk: 118, def: 47, reward: { coins: 1800,  rarity: 'SSR' }, desc: '後腿爆發力驚人的拳擊格鬥高手' },
+  { id: 'boss_06', name: '獵豹',     image: 'assets/boss/boss_06.png', level: 55,  hp: 2000, atk: 126, def: 50, reward: { coins: 2200,  rarity: 'SSR' }, desc: '地表最快的掠食者，無處可逃' },
+  { id: 'boss_07', name: '河馬',     image: 'assets/boss/boss_07.png', level: 60,  hp: 2000, atk: 134, def: 53, reward: { coins: 2700,  rarity: 'SSR' }, desc: '龐大體型與驚人咬合力的河中霸主' },
+  { id: 'boss_08', name: '犀牛',     image: 'assets/boss/boss_08.png', level: 65,  hp: 2150, atk: 142, def: 56, reward: { coins: 3300,  rarity: 'SSR' }, desc: '以鋼鐵犀角衝撞萬物的荒野壁壘' },
+  { id: 'boss_09', name: '棕熊',     image: 'assets/boss/boss_09.png', level: 70,  hp: 2300, atk: 150, def: 59, reward: { coins: 4000,  rarity: 'SSR' }, desc: '山林之王，爪力足以撕碎一切' },
+  { id: 'boss_10', name: '貓頭鷹',   image: 'assets/boss/boss_10.png', level: 75,  hp: 2400, atk: 158, def: 62, reward: { coins: 4800,  rarity: 'SSR' }, desc: '黑暗中的智慧獵手，神出鬼沒' },
+  { id: 'boss_11', name: '大猩猩',   image: 'assets/boss/boss_11.png', level: 80,  hp: 2400, atk: 166, def: 65, reward: { coins: 5800,  rarity: 'SSR' }, desc: '叢林之王，力量超群的巨型靈長類' },
+  { id: 'boss_12', name: '藏獒',     image: 'assets/boss/boss_12.png', level: 85,  hp: 2500, atk: 174, def: 68, reward: { coins: 7000,  rarity: 'SSR' }, desc: '高原守護神，忠誠又兇猛的藏地聖犬' },
+  { id: 'boss_13', name: '鱷魚',     image: 'assets/boss/boss_13.png', level: 90,  hp: 2650, atk: 182, def: 71, reward: { coins: 8500,  rarity: 'SSR' }, desc: '遠古爬行霸主，咬合力無與倫比' },
+  { id: 'boss_14', name: '老鷹',     image: 'assets/boss/boss_14.png', level: 95,  hp: 2800, atk: 190, def: 74, reward: { coins: 10000, rarity: 'SSR' }, desc: '統御天空的王者，俯衝速度令人窒息' },
+  { id: 'boss_15', name: '獅子',     image: 'assets/boss/boss_15.png', level: 100, hp: 2900, atk: 198, def: 77, reward: { coins: 12000, rarity: 'SSR' }, desc: '萬獸之王，吼聲震天的非洲草原霸主' },
+  { id: 'boss_16', name: '老虎',     image: 'assets/boss/boss_16.png', level: 105, hp: 3000, atk: 206, def: 80, reward: { coins: 15000, rarity: 'SSR' }, desc: '終極BOSS，山林中最強的孤獨王者' },
 ];
 
 const RARITY_BASE_STATS = {
