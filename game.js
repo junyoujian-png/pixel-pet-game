@@ -130,6 +130,22 @@ const RARITY_BASE_STATS = {
   SSR: { hp: 350, atk: 50, def: 30 },
 };
 
+const RARITY_MAX_LEVEL = {
+  F:   10,
+  R:   20,
+  SR:  30,
+  SSR: 50,
+};
+
+const RARITY_GROWTH = {
+  F:   { hp: 5,  atk: 1, def: 1 },
+  R:   { hp: 10, atk: 2, def: 1 },
+  SR:  { hp: 15, atk: 3, def: 2 },
+  SSR: { hp: 30, atk: 6, def: 3 },
+};
+
+const getMaxLevel = (rarity) => RARITY_MAX_LEVEL[rarity] || 10;
+
 const RARITY_SKILLS = {
   F: [
     { name: '普通攻擊', desc: '普通的一擊',             effect: 'atk', power: 10, icon: '⚔️', maxPP:  5 },
@@ -151,11 +167,12 @@ const RARITY_SKILLS = {
 };
 
 const calcStats = (pet, level) => {
-  const base = pet.baseStats || RARITY_BASE_STATS[pet.rarity] || RARITY_BASE_STATS.F;
+  const base   = pet.baseStats || RARITY_BASE_STATS[pet.rarity] || RARITY_BASE_STATS.F;
+  const growth = RARITY_GROWTH[pet.rarity] || RARITY_GROWTH.F;
   return {
-    hp:  base.hp  + (level - 1) * 10,
-    atk: base.atk + (level - 1) * 2,
-    def: base.def + (level - 1) * 1,
+    hp:  base.hp  + (level - 1) * growth.hp,
+    atk: base.atk + (level - 1) * growth.atk,
+    def: base.def + (level - 1) * growth.def,
   };
 };
 
@@ -310,7 +327,10 @@ function renderSelectScreen() {
         <img src="${pet.image}" alt="${pet.name}" class="pixel-art select-card__img" />
       </div>
       <span class="select-card__name">${pet.name}</span>
-      <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
+      <div class="select-card__footer">
+        <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
+        <span class="select-card__maxlv">上限 Lv.${getMaxLevel(pet.rarity)}</span>
+      </div>
     `;
     card.addEventListener('click', () => {
       if (locked) { showToast('前往扭蛋機解鎖！'); return; }
@@ -430,8 +450,14 @@ function showPetDetail() {
 
   document.getElementById('detail-pet-img').src = pet.image;
   document.getElementById('detail-pet-img').alt = pet.name;
-  document.getElementById('detail-pet-name').textContent  = pet.name;
-  document.getElementById('detail-pet-level').textContent = level;
+  document.getElementById('detail-pet-name').textContent = pet.name;
+
+  // 等級：Lv.X / MaxLv 或 Lv.X MAX（橘色）
+  const maxLevel  = getMaxLevel(pet.rarity);
+  const isMaxed   = level >= maxLevel;
+  const levelEl   = document.getElementById('detail-pet-level');
+  levelEl.textContent = isMaxed ? `${level} MAX` : `${level} / ${maxLevel}`;
+  levelEl.classList.toggle('level-max', isMaxed);
 
   const badge = document.getElementById('detail-pet-rarity');
   badge.textContent = pet.rarity;
@@ -492,15 +518,36 @@ function selectPet(id) {
 
 // ─── EXP / Level ─────────────────────────────────────────────────────────────
 function addExp(amount) {
+  const pet      = currentPet();
+  const maxLevel = getMaxLevel(pet.rarity);
+
+  // Already at max — silently skip
+  if (state.level >= maxLevel) {
+    state.exp = 0;
+    saveState();
+    renderAll();
+    return;
+  }
+
   state.exp += amount;
   let leveled = false;
-  while (state.exp >= EXP_PER_LEVEL) {
+
+  while (state.exp >= EXP_PER_LEVEL && state.level < maxLevel) {
     state.exp -= EXP_PER_LEVEL;
     state.level++;
     leveled = true;
+    if (state.level >= maxLevel) {
+      state.exp = 0; // 達到上限不再累積
+      break;
+    }
   }
+
   if (leveled) {
-    showToast(`🎉 升級了！現在是 Lv.${state.level}！`);
+    if (state.level >= maxLevel) {
+      showToast(`🎉 已達等級上限 Lv.${state.level} MAX！`);
+    } else {
+      showToast(`🎉 升級了！現在是 Lv.${state.level}！`);
+    }
     animateLevelUp();
     state.coins += 30;
   }
@@ -530,22 +577,34 @@ function renderAll() {
 }
 
 function renderPetCard() {
-  const pet = currentPet();
+  const pet      = currentPet();
+  const maxLevel = getMaxLevel(pet.rarity);
+  const isMaxed  = state.level >= maxLevel;
 
   const img = document.getElementById('pet-img');
   img.src = pet.image;
   img.alt = pet.name;
 
-  document.getElementById('pet-name').textContent  = pet.name;
-  document.getElementById('pet-level').textContent = state.level;
+  document.getElementById('pet-name').textContent = pet.name;
+
+  // 等級顯示：達上限加 MAX 樣式
+  const levelEl = document.getElementById('pet-level');
+  levelEl.textContent = state.level;
+  levelEl.classList.toggle('level-max', isMaxed);
 
   const badge = document.getElementById('pet-rarity-badge');
   badge.textContent = pet.rarity;
   badge.className   = `badge badge--${pet.rarity.toLowerCase()}`;
 
-  const pct = Math.floor((state.exp / EXP_PER_LEVEL) * 100);
-  document.getElementById('exp-fill').style.width = `${pct}%`;
-  document.getElementById('exp-text').textContent  = `${state.exp} / ${EXP_PER_LEVEL}`;
+  // EXP 條：達上限顯示 MAX
+  if (isMaxed) {
+    document.getElementById('exp-fill').style.width = '100%';
+    document.getElementById('exp-text').textContent  = 'MAX';
+  } else {
+    const pct = Math.floor((state.exp / EXP_PER_LEVEL) * 100);
+    document.getElementById('exp-fill').style.width = `${pct}%`;
+    document.getElementById('exp-text').textContent  = `${state.exp} / ${EXP_PER_LEVEL}`;
+  }
 }
 
 function renderStats() {

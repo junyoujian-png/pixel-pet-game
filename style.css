@@ -215,6 +215,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 .label { font-size: 12px; color: var(--text2); }
 .level-num { font-size: 24px; font-weight: 800; color: var(--accent); }
+.level-max  { color: #ff6b35 !important; }
 
 .exp-bar-wrap {
   display: flex;
@@ -661,6 +662,24 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   font-size: 15px;
   font-weight: 700;
   color: var(--text);
+}
+
+.select-card__footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.select-card__maxlv {
+  font-size: 10px;
+  color: var(--text2);
+  font-weight: 600;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1px 6px;
+  white-space: nowrap;
 }
 
 /* ─── Shop Lobby ─── */
