@@ -1695,6 +1695,68 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 .boss-challenge-btn:hover  { opacity: .85; }
 .boss-challenge-btn:active { transform: scale(.94); }
+.boss-btn--disabled {
+  background: #bdbdbd;
+  color: #fff;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.boss-btn--disabled:hover  { opacity: .7; }
+.boss-btn--ticket {
+  background: linear-gradient(135deg, #f9a825, #ff8f00);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(249,168,37,.45);
+}
+.boss-btn--ticket:hover  { opacity: .88; }
+.boss-btn--ticket:active { transform: scale(.94); }
+
+/* Boss Ticket Confirm Modal */
+.modal-ticket-confirm-box {
+  max-width: 320px;
+  text-align: center;
+  padding: 28px 24px 22px;
+}
+.ticket-confirm-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: var(--text);
+}
+.ticket-confirm-body {
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.7;
+  margin-bottom: 8px;
+}
+.ticket-confirm-boss-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: #E53935;
+}
+.ticket-confirm-remaining {
+  font-size: 13px;
+  color: var(--text2);
+  margin-bottom: 20px;
+}
+.ticket-confirm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.btn-confirm-ticket {
+  padding: 9px 26px;
+  background: linear-gradient(135deg, #f9a825, #ff8f00);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .2s;
+  font-family: inherit;
+}
+.btn-confirm-ticket:hover  { opacity: .88; }
+.btn-confirm-ticket:active { transform: scale(.96); }
 
 .boss-status {
   font-size: 11px;

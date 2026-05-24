@@ -290,6 +290,12 @@
                   <span class="item-desc">回復一個技能的 PP</span>
                   <button class="buy-btn" data-cost="100" data-type="item" data-id="pprestore">100💎</button>
                 </div>
+                <div class="shop-item">
+                  <span class="item-icon">🎫</span>
+                  <span class="item-name">BOSS 挑戰卷</span>
+                  <span class="item-desc">額外挑戰一次 BOSS</span>
+                  <button class="buy-btn" data-cost="2000" data-type="item" data-id="boss_ticket">2000💎</button>
+                </div>
               </div>
             </div>
           </div>
@@ -432,6 +438,22 @@
       <p id="pp-restore-count-display" class="pp-restore-count-display"></p>
       <div id="pp-restore-list" class="pp-restore-list"></div>
       <button class="btn-cancel" onclick="closeModal('modal-pp-restore')">取消</button>
+    </div>
+  </div>
+
+  <!-- Boss Ticket Confirm Modal -->
+  <div id="modal-ticket-confirm" class="modal hidden">
+    <div class="modal-box modal-ticket-confirm-box">
+      <h2 class="ticket-confirm-title">🎫 使用 BOSS 挑戰卷</h2>
+      <p class="ticket-confirm-body">
+        確定使用挑戰卷挑戰<br>
+        <span id="ticket-confirm-boss-name" class="ticket-confirm-boss-name"></span> 嗎？
+      </p>
+      <p class="ticket-confirm-remaining">剩餘挑戰卷：<span id="ticket-confirm-count">0</span> 張</p>
+      <div class="ticket-confirm-actions">
+        <button class="btn-cancel" onclick="closeModal('modal-ticket-confirm')">取消</button>
+        <button class="btn-confirm-ticket" onclick="confirmBossTicketUse()">確定</button>
+      </div>
     </div>
   </div>
 

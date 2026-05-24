@@ -110,10 +110,11 @@ const DRINKS = [
 ];
 
 const ITEM_DEFS = {
-  candy:     { icon: '🍬', name: '愛心糖',  desc: '+10心情' },
-  xpboost:   { icon: '⭐', name: '成長藥',   desc: '+20 EXP' },
-  pprestore: { icon: '💊', name: 'PP 回復',  desc: '回復一個技能的 PP' },
-  hp_potion: { icon: '🧪', name: '回復藥水', desc: '+50 HP' },
+  candy:       { icon: '🍬', name: '愛心糖',      desc: '+10心情' },
+  xpboost:     { icon: '⭐', name: '成長藥',       desc: '+20 EXP' },
+  pprestore:   { icon: '💊', name: 'PP 回復',      desc: '回復一個技能的 PP' },
+  hp_potion:   { icon: '🧪', name: '回復藥水',     desc: '+50 HP' },
+  boss_ticket: { icon: '🎫', name: 'BOSS 挑戰卷', desc: '可額外挑戰一次 BOSS' },
 };
 
 const BOSSES = [
@@ -720,9 +721,12 @@ function useItem(id) {
   if (!state.items[id] || state.items[id] <= 0) return;
 
   if (id === 'pprestore') {
-    // 先開技能選擇 modal，選完才扣道具
     showPPRestoreModal();
     return;
+  }
+  if (id === 'boss_ticket') {
+    showToast('🎫 請前往 BOSS 挑戰頁面使用挑戰卷！');
+    return; // 不扣除，在 BOSS 頁面才消耗
   }
 
   state.items[id]--;
@@ -1300,6 +1304,8 @@ function initShop() {
           showToast('💊 PP 回復已加入背包！');
         } else if (id === 'hp_potion') {
           showToast('🧪 回復藥水已加入背包！');
+        } else if (id === 'boss_ticket') {
+          showToast('🎫 BOSS 挑戰卷已加入背包！');
         } else {
           showToast(`購買成功：${ITEM_DEFS[id]?.name ?? id} ×1`);
         }
@@ -1341,11 +1347,35 @@ function initActions() {
 }
 
 // ─── Boss System ─────────────────────────────────────────────────────────────
-function loadDefeatedBosses() {
-  try { return JSON.parse(localStorage.getItem('defeatedBosses') || '[]'); } catch { return []; }
+function loadClearedBosses() {
+  try { return JSON.parse(localStorage.getItem('clearedBosses') || '[]'); } catch { return []; }
 }
-function saveDefeatedBosses(arr) {
-  localStorage.setItem('defeatedBosses', JSON.stringify(arr));
+function saveClearedBosses(arr) {
+  localStorage.setItem('clearedBosses', JSON.stringify(arr));
+}
+
+// 每日挑戰記錄（每 BOSS 每天限 1 次）
+function loadDailyChallenged() {
+  try {
+    const raw = localStorage.getItem('dailyBossChallenge');
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data.date === new Date().toDateString()) return data.bosses || [];
+    }
+  } catch {}
+  return [];
+}
+function saveDailyChallenged(bosses) {
+  localStorage.setItem('dailyBossChallenge', JSON.stringify({
+    date: new Date().toDateString(), bosses,
+  }));
+}
+function recordDailyChallenge(bossId) {
+  const list = loadDailyChallenged();
+  if (!list.includes(bossId)) { list.push(bossId); saveDailyChallenged(list); }
+}
+function hasChallengedToday(bossId) {
+  return loadDailyChallenged().includes(bossId);
 }
 
 function showBossPage() {
@@ -1359,21 +1389,42 @@ function hideBossPage() {
 }
 
 function renderBossList() {
-  const container = document.getElementById('boss-list-container');
+  const container   = document.getElementById('boss-list-container');
   if (!container) return;
-  const defeated = loadDefeatedBosses();
-  const level    = state.level;
+  const cleared     = loadClearedBosses();
+  const daily       = loadDailyChallenged();
+  const ticketCount = state.items['boss_ticket'] ?? 0;
+  const level       = state.level;
 
-  container.innerHTML = BOSSES.map(boss => {
-    const isDefeated = defeated.includes(boss.id);
-    const isLocked   = level < boss.level;
+  container.innerHTML = BOSSES.map((boss, idx) => {
+    const isCleared       = cleared.includes(boss.id);
+    const isLevelLocked   = level < boss.level;
+    const isSeqLocked     = idx > 0 && !cleared.includes(BOSSES[idx - 1].id);
+    const challengedToday = daily.includes(boss.id);
+
+    let actionHtml;
+    if (isLevelLocked) {
+      actionHtml = `<button class="boss-challenge-btn boss-btn--disabled" disabled>等級不足</button>`;
+    } else if (isSeqLocked) {
+      actionHtml = `<span class="boss-status boss-status--locked">🔒 未解鎖</span>`;
+    } else if (challengedToday && ticketCount > 0) {
+      actionHtml = `<button class="boss-challenge-btn boss-btn--ticket" data-boss-id="${boss.id}">🎫 使用挑戰卷</button>`;
+    } else if (challengedToday) {
+      actionHtml = `<button class="boss-challenge-btn boss-btn--disabled" disabled>今日已挑戰</button>`;
+    } else {
+      actionHtml = `<button class="boss-challenge-btn" data-boss-id="${boss.id}">挑戰</button>`;
+    }
+
+    const lockedClass  = (isLevelLocked || isSeqLocked) ? ' boss-card--locked' : '';
+    const clearedClass = isCleared ? ' boss-card--defeated' : '';
+
     return `
-      <div class="boss-card${isDefeated ? ' boss-card--defeated' : ''}${isLocked ? ' boss-card--locked' : ''}">
+      <div class="boss-card${clearedClass}${lockedClass}">
         <div class="boss-card__img-wrap">
           <img src="${boss.image}" class="boss-card__img" alt="${boss.name}"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="boss-card__img-fallback">⚔️</div>
-          ${isDefeated ? '<div class="boss-card__defeated-overlay">✓</div>' : ''}
+          ${isCleared ? '<div class="boss-card__defeated-overlay">✓</div>' : ''}
         </div>
         <div class="boss-card__info">
           <div class="boss-card__name-row">
@@ -1382,27 +1433,57 @@ function renderBossList() {
           </div>
           <div class="boss-card__desc">${boss.desc}</div>
         </div>
-        <div class="boss-card__action">
-          ${isDefeated
-            ? '<span class="boss-status boss-status--done">已打敗</span>'
-            : isLocked
-              ? `<span class="boss-status boss-status--locked">Lv.${boss.level}</span>`
-              : `<button class="boss-challenge-btn" data-boss-id="${boss.id}">挑戰</button>`}
-        </div>
+        <div class="boss-card__action">${actionHtml}</div>
       </div>`;
   }).join('');
 
-  container.querySelectorAll('.boss-challenge-btn').forEach(btn => {
+  container.querySelectorAll('.boss-challenge-btn:not(.boss-btn--ticket):not(.boss-btn--disabled)').forEach(btn => {
     btn.addEventListener('click', () => challengeBoss(btn.dataset.bossId));
+  });
+  container.querySelectorAll('.boss-btn--ticket').forEach(btn => {
+    btn.addEventListener('click', () => openBossTicketConfirm(btn.dataset.bossId));
   });
 }
 
-function challengeBoss(bossId) {
+function challengeBoss(bossId, useTicket = false) {
   const boss = BOSSES.find(b => b.id === bossId);
   if (!boss) return;
-  const defeated    = loadDefeatedBosses();
-  const isFirstTime = !defeated.includes(bossId);
+  const cleared     = loadClearedBosses();
+  const isFirstTime = !cleared.includes(bossId);
+
+  if (useTicket) {
+    state.items['boss_ticket']--;
+    if (state.items['boss_ticket'] === 0) delete state.items['boss_ticket'];
+    saveState();
+    const remaining = state.items['boss_ticket'] ?? 0;
+    showToast(`🎫 使用挑戰卷！剩餘 ${remaining} 張`);
+  } else {
+    recordDailyChallenge(bossId);
+  }
+
   startBattle(boss, isFirstTime);
+}
+
+// ─── Boss Ticket Confirm ──────────────────────────────────────────────────────
+let ticketTargetBossId = null;
+
+function openBossTicketConfirm(bossId) {
+  const boss  = BOSSES.find(b => b.id === bossId);
+  if (!boss) return;
+  const count = state.items['boss_ticket'] ?? 0;
+  ticketTargetBossId = bossId;
+  document.getElementById('ticket-confirm-boss-name').textContent = boss.name;
+  document.getElementById('ticket-confirm-count').textContent     = count;
+  openModal('modal-ticket-confirm');
+}
+
+function confirmBossTicketUse() {
+  closeModal('modal-ticket-confirm');
+  if (ticketTargetBossId) {
+    const id = ticketTargetBossId;
+    ticketTargetBossId = null;
+    challengeBoss(id, true);
+  }
 }
 
 // ─── Wheel Modal ─────────────────────────────────────────────────────────────
@@ -1672,11 +1753,11 @@ function showBattleResult(win) {
 
   const showWheel = win && battleFirstWin;
   if (win && battleFirstWin) {
-    // First defeat — save and show wheel
-    const defeated = loadDefeatedBosses();
-    if (!defeated.includes(battlePending.id)) {
-      defeated.push(battlePending.id);
-      saveDefeatedBosses(defeated);
+    // First clear — save and show wheel
+    const cleared = loadClearedBosses();
+    if (!cleared.includes(battlePending.id)) {
+      cleared.push(battlePending.id);
+      saveClearedBosses(cleared);
     }
   }
 
