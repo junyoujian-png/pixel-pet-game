@@ -1239,10 +1239,7 @@ function renderBossList() {
             <span class="boss-card__name">${boss.name}</span>
             <span class="badge badge--${boss.reward.rarity.toLowerCase()}">${boss.reward.rarity}</span>
           </div>
-          <div class="boss-card__level">需求 Lv.${boss.level}</div>
-          <div class="boss-card__stats">❤️ ${boss.hp} &nbsp;⚔️ ${boss.atk} &nbsp;🛡️ ${boss.def}</div>
           <div class="boss-card__desc">${boss.desc}</div>
-          <div class="boss-card__reward">獎勵 💎${boss.reward.coins}</div>
         </div>
         <div class="boss-card__action">
           ${isDefeated
