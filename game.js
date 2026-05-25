@@ -758,7 +758,6 @@ function useItem(id) {
     // 背包外使用：僅顯示提示，實際 HP 只在戰鬥中有效
     showToast('🧪 回復 50 HP！');
   }
-  renderItemBag();
 }
 
 // ─── PP Restore Modal ─────────────────────────────────────────────────────────
@@ -1061,7 +1060,7 @@ function renderFeedModal() {
     const f = FOODS.find(x => x.id === id);
     if (!f) return '';
     return `
-      <div class="modal-pick-row" onclick="useFoodFromModal('${id}')">
+      <div class="modal-pick-row">
         <div class="modal-pick-img-wrap">
           <img src="${f.image}" class="modal-pick-img" onerror="this.style.opacity='0.2'">
         </div>
@@ -1074,6 +1073,7 @@ function renderFeedModal() {
         </div>
         <div class="modal-pick-right">
           <span class="modal-pick-count">×${cnt}</span>
+          <button class="use-btn" onclick="useFoodFromModal('${id}')">使用</button>
         </div>
       </div>`;
   }).join('');
@@ -1244,7 +1244,7 @@ function renderDrinkModal() {
     const d = DRINKS.find(x => x.id === id);
     if (!d) return '';
     return `
-      <div class="modal-pick-row" onclick="useDrinkFromModal('${id}')">
+      <div class="modal-pick-row">
         <div class="modal-pick-img-wrap">
           <img src="${d.image}" class="modal-pick-img" onerror="this.style.opacity='0.2'">
         </div>
@@ -1257,6 +1257,7 @@ function renderDrinkModal() {
         </div>
         <div class="modal-pick-right">
           <span class="modal-pick-count">×${cnt}</span>
+          <button class="use-btn" onclick="useDrinkFromModal('${id}')">使用</button>
         </div>
       </div>`;
   }).join('');
@@ -1273,6 +1274,15 @@ function useDrinkFromModal(id) {
   if (e.exp) addExp(e.exp); else renderAll();
   closeModal('modal-drink');
   showToast(`使用 ${drink.name}！${drink.desc}`);
+}
+
+// ─── Bag Select Modal ────────────────────────────────────────────────────────
+function openBagModal(type) {
+  closeModal('modal-bag-select');
+  if      (type === 'food')  openFeedModal();
+  else if (type === 'drink') openDrinkModal();
+  else if (type === 'item')  openItemPickModal();
+  else if (type === 'pet')   openPetPickModal();
 }
 
 // ─── Item Pick Modal (main page 道具背包 button) ──────────────────────────────
@@ -1298,19 +1308,25 @@ function renderItemPickModal() {
     return;
   }
 
-  el.innerHTML = owned.map(({ id, def, cnt }) => `
-    <div class="modal-pick-row" onclick="useItemFromPickModal('${id}')">
-      <div class="modal-pick-img-wrap" style="display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0">
-        ${def.icon}
-      </div>
-      <div class="modal-pick-info">
-        <div class="modal-pick-name">${def.name}</div>
-        <div class="modal-pick-desc">${def.desc}</div>
-      </div>
-      <div class="modal-pick-right">
-        <span class="modal-pick-count">×${cnt}</span>
-      </div>
-    </div>`).join('');
+  el.innerHTML = owned.map(({ id, def, cnt }) => {
+    const isBoss = id === 'boss_ticket';
+    return `
+      <div class="modal-pick-row">
+        <div class="modal-pick-img-wrap" style="display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0">
+          ${def.icon}
+        </div>
+        <div class="modal-pick-info">
+          <div class="modal-pick-name">${def.name}</div>
+          <div class="modal-pick-desc">${def.desc}</div>
+        </div>
+        <div class="modal-pick-right">
+          <span class="modal-pick-count">×${cnt}</span>
+          <button class="use-btn${isBoss ? ' use-btn--boss' : ''}" onclick="useItemFromPickModal('${id}')">
+            ${isBoss ? '前往 BOSS' : '使用'}
+          </button>
+        </div>
+      </div>`;
+  }).join('');
 }
 
 function useItemFromPickModal(id) {
@@ -1363,10 +1379,11 @@ function renderPetPickModal() {
     return;
   }
 
+  const teamFull = !team.some(slot => slot === null);
   el.innerHTML = bagPets.map(pet => {
     const ps = loadPetState(pet.id);
     return `
-      <div class="modal-pick-row" onclick="addPetFromPickModal('${pet.id}')">
+      <div class="modal-pick-row">
         <div class="modal-pick-img-wrap">
           <img src="${pet.image}" class="modal-pick-img" onerror="this.style.opacity='0.2'">
         </div>
@@ -1376,6 +1393,12 @@ function renderPetPickModal() {
             <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
           </div>
           <div class="modal-pick-desc">Lv.${ps.level}</div>
+        </div>
+        <div class="modal-pick-right">
+          <button class="use-btn${teamFull ? ' use-btn--disabled' : ''}"
+                  ${teamFull ? 'disabled' : `onclick="addPetFromPickModal('${pet.id}')"`}>
+            ${teamFull ? '隊伍已滿' : '加入隊伍'}
+          </button>
         </div>
       </div>`;
   }).join('');
@@ -1647,9 +1670,13 @@ function initModals() {
 function initBottomNav() {
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
+      const nav = btn.dataset.nav;
+      if (nav === 'bag') {
+        openModal('modal-bag-select');
+        return; // 不切換 tab，不改變 active 狀態
+      }
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      const nav = btn.dataset.nav;
       if (nav === 'shop') {
         document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'shop'));
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-shop'));

@@ -231,33 +231,6 @@
 
       </section>
 
-      <!-- Bag Tab -->
-      <section class="tab-panel" id="tab-bag">
-        <!-- Sub-tab bar (4 tabs) -->
-        <div class="bag-tabs">
-          <button class="bag-tab bag-tab--active" data-bag-tab="food"  onclick="switchBagTab('food')">🍖 食物</button>
-          <button class="bag-tab"                 data-bag-tab="drink" onclick="switchBagTab('drink')">🥤 飲料</button>
-          <button class="bag-tab"                 data-bag-tab="item"  onclick="switchBagTab('item')">🎒 道具</button>
-          <button class="bag-tab"                 data-bag-tab="pet"   onclick="switchBagTab('pet')">🐾 寵物</button>
-        </div>
-        <!-- Food content -->
-        <div class="bag-content" id="bag-food-content">
-          <div id="foodbag-list" class="bag-item-grid"></div>
-        </div>
-        <!-- Drink content -->
-        <div class="bag-content hidden" id="bag-drink-content">
-          <div id="drinkbag-list" class="bag-item-grid"></div>
-        </div>
-        <!-- Item content -->
-        <div class="bag-content hidden" id="bag-item-content">
-          <div id="itembag-list" class="bag-item-grid"></div>
-        </div>
-        <!-- Pet Bag content -->
-        <div class="bag-content hidden" id="bag-pet-content">
-          <div id="petbag-grid" class="petbag-tab-grid"></div>
-        </div>
-      </section>
-
       <!-- Shop Tab -->
       <section class="tab-panel" id="tab-shop">
 
@@ -381,9 +354,9 @@
         <span class="nav-icon">🏠</span>
         <span class="nav-label">首頁</span>
       </button>
-      <button class="nav-btn" data-nav="quest">
-        <span class="nav-icon">📋</span>
-        <span class="nav-label">任務</span>
+      <button class="nav-btn" data-nav="bag">
+        <span class="nav-icon">🎒</span>
+        <span class="nav-label">背包</span>
       </button>
       <button class="nav-btn" data-nav="explore">
         <span class="nav-icon">🗺️</span>
@@ -460,34 +433,60 @@
   </div>
 
   <!-- Modals -->
-  <!-- Feed Modal (dynamic from inventory) -->
+  <!-- Bag Select Modal (bottom nav 背包 button) -->
+  <div id="modal-bag-select" class="modal hidden">
+    <div class="modal-box modal-bag-select-box">
+      <h2 class="bag-select-title">🎒 背包</h2>
+      <div class="bag-select-list">
+        <button class="bag-select-btn" onclick="openBagModal('food')">
+          <span class="bag-select-icon">🍖</span>
+          <span>食物背包</span>
+        </button>
+        <button class="bag-select-btn" onclick="openBagModal('drink')">
+          <span class="bag-select-icon">🥤</span>
+          <span>飲料背包</span>
+        </button>
+        <button class="bag-select-btn" onclick="openBagModal('item')">
+          <span class="bag-select-icon">🎒</span>
+          <span>道具背包</span>
+        </button>
+        <button class="bag-select-btn" onclick="openBagModal('pet')">
+          <span class="bag-select-icon">🐾</span>
+          <span>寵物背包</span>
+        </button>
+      </div>
+      <button class="btn-cancel" onclick="closeModal('modal-bag-select')">取消</button>
+    </div>
+  </div>
+
+  <!-- Food Bag Modal -->
   <div id="modal-feed" class="modal hidden">
     <div class="modal-box modal-pick-box">
-      <h2 class="modal-pick-title">🍖 選擇食物</h2>
+      <h2 class="modal-pick-title">🍖 食物背包</h2>
       <div id="feed-pick-list" class="modal-pick-list"></div>
       <button class="btn-cancel" onclick="closeModal('modal-feed')">取消</button>
     </div>
   </div>
 
-  <!-- Drink Modal (dynamic from inventory) -->
+  <!-- Drink Bag Modal -->
   <div id="modal-drink" class="modal hidden">
     <div class="modal-box modal-pick-box">
-      <h2 class="modal-pick-title">🥤 選擇飲料</h2>
+      <h2 class="modal-pick-title">🥤 飲料背包</h2>
       <div id="drink-pick-list" class="modal-pick-list"></div>
       <button class="btn-cancel" onclick="closeModal('modal-drink')">取消</button>
     </div>
   </div>
 
-  <!-- Item Pick Modal (main page 道具背包 button) -->
+  <!-- Item Bag Modal -->
   <div id="modal-item-pick" class="modal hidden">
     <div class="modal-box modal-pick-box">
-      <h2 class="modal-pick-title">🎒 選擇道具</h2>
+      <h2 class="modal-pick-title">🎒 道具背包</h2>
       <div id="item-pick-list" class="modal-pick-list"></div>
       <button class="btn-cancel" onclick="closeModal('modal-item-pick')">取消</button>
     </div>
   </div>
 
-  <!-- Pet Pick Modal (main page 寵物背包 button) -->
+  <!-- Pet Bag Modal -->
   <div id="modal-pet-pick" class="modal hidden">
     <div class="modal-box modal-pick-box">
       <h2 class="modal-pick-title">🐾 寵物背包</h2>

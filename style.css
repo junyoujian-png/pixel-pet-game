@@ -542,8 +542,19 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   cursor: pointer;
   flex-shrink: 0;
   transition: opacity .2s;
+  white-space: nowrap;
 }
 .use-btn:hover { opacity: .85; }
+.use-btn:disabled,
+.use-btn--disabled {
+  background: #aaa;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.use-btn--boss {
+  background: #ff8c42;
+  font-size: 11px;
+}
 
 /* Pet Bag Tab */
 .petbag-item {
@@ -2538,11 +2549,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   background: var(--surface2);
   border-radius: var(--radius);
   border: 1px solid var(--border);
-  cursor: pointer;
-  transition: background 0.12s;
-  -webkit-tap-highlight-color: transparent;
 }
-.modal-pick-row:active { background: var(--border); }
 .modal-pick-img-wrap {
   width: 48px;
   height: 48px;
@@ -2579,7 +2586,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   color: var(--text2);
   margin-top: 2px;
 }
-.modal-pick-right { flex-shrink: 0; }
+.modal-pick-right {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
 .modal-pick-count {
   font-size: 15px;
   font-weight: 800;
@@ -2626,3 +2639,45 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .petbag-empty span {
   font-size: 12px;
 }
+
+/* ─── Bag Select Modal ──────────────────────────────────────────────────────── */
+.modal-bag-select-box {
+  max-width: 300px;
+  padding: 24px 20px 18px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bag-select-title {
+  font-size: 20px;
+  font-weight: 800;
+  text-align: center;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.bag-select-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+.bag-select-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  width: 100%;
+  transition: background 0.15s, border-color 0.15s;
+  font-family: inherit;
+}
+.bag-select-btn:hover  { background: var(--surface); border-color: var(--accent); }
+.bag-select-btn:active { transform: scale(0.97); }
+.bag-select-icon { font-size: 26px; flex-shrink: 0; }
