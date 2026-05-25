@@ -460,30 +460,21 @@
   </div>
 
   <!-- Modals -->
+  <!-- Feed Modal (dynamic from inventory) -->
+  <div id="modal-feed" class="modal hidden">
+    <div class="modal-box modal-pick-box">
+      <h2 class="modal-pick-title">🍖 選擇食物</h2>
+      <div id="feed-pick-list" class="modal-pick-list"></div>
+      <button class="btn-cancel" onclick="closeModal('modal-feed')">取消</button>
+    </div>
+  </div>
+
+  <!-- Drink Modal (dynamic from inventory) -->
   <div id="modal-drink" class="modal hidden">
-    <div class="modal-box">
-      <h2>選擇飲料</h2>
-      <div class="drink-grid">
-        <button class="drink-option" data-id="water">
-          <span class="drink-icon">💧</span>
-          <span class="drink-name">清水</span>
-          <span class="drink-stat">+25 💧</span>
-          <span class="drink-cost">5💎</span>
-        </button>
-        <button class="drink-option" data-id="juice">
-          <span class="drink-icon">🧃</span>
-          <span class="drink-name">果汁</span>
-          <span class="drink-stat">+40 💧 +3 😄</span>
-          <span class="drink-cost">15💎</span>
-        </button>
-        <button class="drink-option" data-id="milk">
-          <span class="drink-icon">🥛</span>
-          <span class="drink-name">牛奶</span>
-          <span class="drink-stat">+60 💧 +5 😄</span>
-          <span class="drink-cost">30💎</span>
-        </button>
-      </div>
-      <button class="modal-close" data-modal="modal-drink">✕</button>
+    <div class="modal-box modal-pick-box">
+      <h2 class="modal-pick-title">🥤 選擇飲料</h2>
+      <div id="drink-pick-list" class="modal-pick-list"></div>
+      <button class="btn-cancel" onclick="closeModal('modal-drink')">取消</button>
     </div>
   </div>
 

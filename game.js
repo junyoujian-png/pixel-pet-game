@@ -1029,6 +1029,60 @@ function useFood(id) {
   renderFoodBag();
 }
 
+// ─── Feed from Bag Modal ──────────────────────────────────────────────────────
+function openFeedModal() {
+  renderFeedModal();
+  openModal('modal-feed');
+}
+
+function renderFeedModal() {
+  const el = document.getElementById('feed-pick-list');
+  if (!el) return;
+  const inv   = loadInventory();
+  const owned = Object.entries(inv).filter(([id, cnt]) => cnt > 0 && id.startsWith('food_'));
+  if (!owned.length) {
+    el.innerHTML = `
+      <div class="modal-pick-empty">
+        <p>背包沒有食物</p>
+        <p class="modal-pick-empty-hint">去商店購買吧！</p>
+      </div>`;
+    return;
+  }
+  el.innerHTML = owned.map(([id, cnt]) => {
+    const f = FOODS.find(x => x.id === id);
+    if (!f) return '';
+    return `
+      <div class="modal-pick-row" onclick="useFoodFromModal('${id}')">
+        <div class="modal-pick-img-wrap">
+          <img src="${f.image}" class="modal-pick-img" onerror="this.style.opacity='0.2'">
+        </div>
+        <div class="modal-pick-info">
+          <div class="modal-pick-name">
+            ${f.name}
+            <span class="badge badge--${f.rarity.toLowerCase()}">${f.rarity}</span>
+          </div>
+          <div class="modal-pick-desc">${f.desc}</div>
+        </div>
+        <div class="modal-pick-right">
+          <span class="modal-pick-count">×${cnt}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function useFoodFromModal(id) {
+  const food = FOODS.find(f => f.id === id);
+  if (!food || !consumeItem(id)) return;
+  const e = food.effect;
+  if (e.water)  state.water  = Math.min(100, state.water  + e.water);
+  if (e.hunger) state.hunger = Math.min(100, state.hunger + e.hunger);
+  if (e.mood)   state.mood   = Math.min(100, state.mood   + e.mood);
+  saveState();
+  if (e.exp) addExp(e.exp); else renderAll();
+  closeModal('modal-feed');
+  showToast(`使用 ${food.name}！${food.desc}`);
+}
+
 function renderFoodShop() {
   const panel = document.getElementById('shop-food');
   if (!panel) return;
@@ -1156,6 +1210,60 @@ function useDrink(id) {
   if (e.exp) addExp(e.exp); else renderAll();
   showToast(`使用 ${drink.name}！${drink.desc}`);
   renderDrinkBag();
+}
+
+// ─── Drink from Bag Modal ─────────────────────────────────────────────────────
+function openDrinkModal() {
+  renderDrinkModal();
+  openModal('modal-drink');
+}
+
+function renderDrinkModal() {
+  const el = document.getElementById('drink-pick-list');
+  if (!el) return;
+  const inv   = loadInventory();
+  const owned = Object.entries(inv).filter(([id, cnt]) => cnt > 0 && id.startsWith('drink_'));
+  if (!owned.length) {
+    el.innerHTML = `
+      <div class="modal-pick-empty">
+        <p>背包沒有飲料</p>
+        <p class="modal-pick-empty-hint">去商店購買吧！</p>
+      </div>`;
+    return;
+  }
+  el.innerHTML = owned.map(([id, cnt]) => {
+    const d = DRINKS.find(x => x.id === id);
+    if (!d) return '';
+    return `
+      <div class="modal-pick-row" onclick="useDrinkFromModal('${id}')">
+        <div class="modal-pick-img-wrap">
+          <img src="${d.image}" class="modal-pick-img" onerror="this.style.opacity='0.2'">
+        </div>
+        <div class="modal-pick-info">
+          <div class="modal-pick-name">
+            ${d.name}
+            <span class="badge badge--${d.rarity.toLowerCase()}">${d.rarity}</span>
+          </div>
+          <div class="modal-pick-desc">${d.desc}</div>
+        </div>
+        <div class="modal-pick-right">
+          <span class="modal-pick-count">×${cnt}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function useDrinkFromModal(id) {
+  const drink = DRINKS.find(d => d.id === id);
+  if (!drink || !consumeItem(id)) return;
+  const e = drink.effect;
+  if (e.water)  state.water  = Math.min(100, state.water  + e.water);
+  if (e.hunger) state.hunger = Math.min(100, state.hunger + e.hunger);
+  if (e.mood)   state.mood   = Math.min(100, state.mood   + e.mood);
+  saveState();
+  if (e.exp) addExp(e.exp); else renderAll();
+  closeModal('modal-drink');
+  showToast(`使用 ${drink.name}！${drink.desc}`);
 }
 
 function renderDrinkShop() {
@@ -1430,24 +1538,7 @@ function initShop() {
       const type = btn.dataset.type;
       const id   = btn.dataset.id;
       if (!spendCoins(cost)) { showToast('能量石不足！'); return; }
-      if (type === 'food') {
-        const hungerG = FEED_HUNGER[id] ?? 20;
-        const expG    = FEED_EXP[id]    ?? 5;
-        state.hunger  = Math.min(100, state.hunger + hungerG);
-        state.mood    = Math.min(100, state.mood + 5);
-        saveState();
-        addExp(expG);
-        showToast(`餵食成功！+${expG} EXP`);
-      } else if (type === 'drink') {
-        const waterG = DRINK_WATER[id] ?? 25;
-        const moodG  = DRINK_MOOD[id]  ?? 0;
-        const expG   = DRINK_EXP[id]   ?? 3;
-        state.water  = Math.min(100, state.water + waterG);
-        if (moodG > 0) state.mood = Math.min(100, state.mood + moodG);
-        saveState();
-        addExp(expG);
-        showToast(`補水成功！+${waterG} 💧 +${expG} EXP`);
-      } else if (type === 'item') {
+      if (type === 'item') {
         addItem(id);
         if (id === 'pprestore') {
           showToast('💊 PP 回復已加入背包！');
@@ -1465,13 +1556,9 @@ function initShop() {
 
 // ─── Action Buttons ──────────────────────────────────────────────────────────
 function initActions() {
-  document.getElementById('btn-feed').addEventListener('click', () => feedPet('fish'));
+  document.getElementById('btn-feed').addEventListener('click', openFeedModal);
 
-  document.getElementById('btn-drink').addEventListener('click', () => openModal('modal-drink'));
-
-  document.querySelectorAll('.drink-option').forEach(btn => {
-    btn.addEventListener('click', () => giveDrink(btn.dataset.id));
-  });
+  document.getElementById('btn-drink').addEventListener('click', openDrinkModal);
 
   document.getElementById('btn-itembag').addEventListener('click', () => {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-bag'));

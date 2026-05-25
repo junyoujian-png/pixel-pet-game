@@ -2505,3 +2505,96 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   font-weight: 800;
   color: var(--accent);
 }
+
+/* ─── Pick Modal (feed / drink from bag) ────────────────────────────────── */
+.modal-pick-box {
+  max-height: 82dvh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 20px 16px;
+}
+.modal-pick-title {
+  font-size: 17px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 14px;
+  color: var(--text);
+}
+.modal-pick-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+  max-height: 56dvh;
+}
+.modal-pick-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface2);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.modal-pick-row:active { background: var(--border); }
+.modal-pick-img-wrap {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.modal-pick-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.modal-pick-info {
+  flex: 1;
+  min-width: 0;
+}
+.modal-pick-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.modal-pick-desc {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 2px;
+}
+.modal-pick-right { flex-shrink: 0; }
+.modal-pick-count {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--accent);
+}
+.modal-pick-empty {
+  padding: 32px 16px;
+  text-align: center;
+}
+.modal-pick-empty p:first-child {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.modal-pick-empty-hint {
+  font-size: 13px;
+  color: var(--text2);
+}
