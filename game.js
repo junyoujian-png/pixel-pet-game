@@ -1275,6 +1275,129 @@ function useDrinkFromModal(id) {
   showToast(`使用 ${drink.name}！${drink.desc}`);
 }
 
+// ─── Item Pick Modal (main page 道具背包 button) ──────────────────────────────
+function openItemPickModal() {
+  renderItemPickModal();
+  openModal('modal-item-pick');
+}
+
+function renderItemPickModal() {
+  const el = document.getElementById('item-pick-list');
+  if (!el) return;
+  const inv   = loadInventory();
+  const owned = Object.entries(ITEM_DEFS)
+    .filter(([id]) => (inv[id] || 0) > 0)
+    .map(([id, def]) => ({ id, def, cnt: inv[id] }));
+
+  if (!owned.length) {
+    el.innerHTML = `
+      <div class="modal-pick-empty">
+        <p>背包沒有道具</p>
+        <p class="modal-pick-empty-hint">去商店購買吧！</p>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = owned.map(({ id, def, cnt }) => `
+    <div class="modal-pick-row" onclick="useItemFromPickModal('${id}')">
+      <div class="modal-pick-img-wrap" style="display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0">
+        ${def.icon}
+      </div>
+      <div class="modal-pick-info">
+        <div class="modal-pick-name">${def.name}</div>
+        <div class="modal-pick-desc">${def.desc}</div>
+      </div>
+      <div class="modal-pick-right">
+        <span class="modal-pick-count">×${cnt}</span>
+      </div>
+    </div>`).join('');
+}
+
+function useItemFromPickModal(id) {
+  if (id === 'boss_ticket') {
+    showToast('🎫 請前往 BOSS 挑戰頁面使用挑戰卷！');
+    return; // keep modal open so user can cancel
+  }
+  if (id === 'pprestore') {
+    closeModal('modal-item-pick');
+    showPPRestoreModal();
+    return;
+  }
+  if (getItem(id) <= 0) return;
+  consumeItem(id);
+  if (id === 'candy') {
+    state.mood = Math.min(100, state.mood + 10);
+    saveState(); renderStats();
+    showToast('使用愛心糖！+10心情 😄');
+  } else if (id === 'xpboost') {
+    saveState();
+    addExp(20);
+    showToast('使用成長藥！+20 EXP ⭐');
+  } else if (id === 'hp_potion') {
+    showToast('🧪 回復 50 HP！');
+  }
+  closeModal('modal-item-pick');
+}
+
+// ─── Pet Pick Modal (main page 寵物背包 button) ───────────────────────────────
+function openPetPickModal() {
+  renderPetPickModal();
+  openModal('modal-pet-pick');
+}
+
+function renderPetPickModal() {
+  const el = document.getElementById('pet-pick-list');
+  if (!el) return;
+  const team      = loadTeam();
+  const inTeamSet = new Set(team.filter(Boolean));
+  const bagPets   = unlockedPets
+    .map(id => PETS.find(p => p.id === id))
+    .filter(p => p && !inTeamSet.has(p.id));
+
+  if (!bagPets.length) {
+    el.innerHTML = `
+      <div class="modal-pick-empty">
+        <p>背包沒有寵物</p>
+        <p class="modal-pick-empty-hint">去扭蛋機抽吧！</p>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = bagPets.map(pet => {
+    const ps = loadPetState(pet.id);
+    return `
+      <div class="modal-pick-row" onclick="addPetFromPickModal('${pet.id}')">
+        <div class="modal-pick-img-wrap">
+          <img src="${pet.image}" class="modal-pick-img" onerror="this.style.opacity='0.2'">
+        </div>
+        <div class="modal-pick-info">
+          <div class="modal-pick-name">
+            ${pet.name}
+            <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
+          </div>
+          <div class="modal-pick-desc">Lv.${ps.level}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function addPetFromPickModal(petId) {
+  const team    = loadTeam();
+  const slotIdx = team.indexOf(null);
+  if (slotIdx === -1) {
+    showToast('隊伍已滿，請先移除一隻寵物');
+    return;
+  }
+  team[slotIdx] = petId;
+  saveTeam(team);
+  if (slotIdx === 0) refreshDisplayPetState();
+  renderTeam();
+  renderAll();
+  closeModal('modal-pet-pick');
+  const pet = PETS.find(p => p.id === petId);
+  showToast(`✅ ${pet?.name ?? '寵物'} 加入隊伍！`);
+}
+
 function renderDrinkShop() {
   const panel = document.getElementById('shop-drink');
   if (!panel) return;
@@ -1570,15 +1693,9 @@ function initActions() {
 
   document.getElementById('btn-drink').addEventListener('click', openDrinkModal);
 
-  document.getElementById('btn-itembag').addEventListener('click', () => {
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-bag'));
-    switchBagTab('item');
-  });
+  document.getElementById('btn-itembag').addEventListener('click', openItemPickModal);
 
-  document.getElementById('btn-petbag').addEventListener('click', () => {
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-bag'));
-    switchBagTab('pet');
-  });
+  document.getElementById('btn-petbag').addEventListener('click', openPetPickModal);
 
   document.getElementById('btn-petbag-join-team')?.addEventListener('click', addBagPetToTeam);
   document.getElementById('btn-petbag-view-detail')?.addEventListener('click', viewBagPetDetail);
