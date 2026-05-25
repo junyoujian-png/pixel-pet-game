@@ -515,9 +515,10 @@ function hideSelectScreen() {
 }
 
 // ─── Pet Detail Screen ────────────────────────────────────────────────────────
-function showPetDetail() {
-  const pet    = currentPet();
-  const level  = state.level;
+function showPetDetail(petIdOverride = null) {
+  const pet    = petIdOverride ? (PETS.find(p => p.id === petIdOverride) ?? currentPet()) : currentPet();
+  const ps     = petIdOverride ? loadPetState(petIdOverride) : null;
+  const level  = ps ? ps.level : state.level;
   const stats  = calcStats(pet, level);
   const skills = getSkillsWithPP(pet);
 
@@ -934,20 +935,20 @@ function renderItemBag() {
 function renderPetBag() {
   const grid = document.getElementById('petbag-grid');
   if (!grid) return;
-  const team        = loadTeam();
-  const inTeamSet   = new Set(team.filter(Boolean));
-  const bagPets     = unlockedPets
+  const team      = loadTeam();
+  const inTeamSet = new Set(team.filter(Boolean));
+  const bagPets   = unlockedPets
     .map(id => PETS.find(p => p.id === id))
     .filter(p => p && !inTeamSet.has(p.id));
 
   if (bagPets.length === 0) {
-    grid.innerHTML = '<div class="empty-hint">背包裡沒有寵物（全部在隊伍中）</div>';
+    grid.innerHTML = '<div class="petbag-empty">背包裡沒有寵物<br><span>（全部已在隊伍中）</span></div>';
     return;
   }
   grid.innerHTML = bagPets.map(pet => {
     const ps = loadPetState(pet.id);
     return `
-      <div class="petbag-card">
+      <div class="petbag-card petbag-card--tab" onclick="openPetBagOptions('${pet.id}')">
         <div class="petbag-card__img-wrap">
           <img src="${pet.image}" class="petbag-card__img" alt="${pet.name}"
                onerror="this.style.opacity='.3'">
@@ -955,9 +956,56 @@ function renderPetBag() {
         <div class="petbag-card__name">${pet.name}</div>
         <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
         <div class="petbag-card__lv">Lv.${ps.level}</div>
-        <div class="petbag-card__frozen">❄️ 屬性凍結</div>
       </div>`;
   }).join('');
+}
+
+// ─── Pet Bag Options Modal ────────────────────────────────────────────────────
+let pendingBagPetId = null;
+
+function openPetBagOptions(petId) {
+  const pet = PETS.find(p => p.id === petId);
+  if (!pet) return;
+  pendingBagPetId = petId;
+
+  document.getElementById('petbag-opts-img').src         = pet.image;
+  document.getElementById('petbag-opts-name').textContent = pet.name;
+
+  const team     = loadTeam();
+  const hasSpace = team.some(slot => slot === null);
+  const joinBtn  = document.getElementById('btn-petbag-join-team');
+  joinBtn.disabled = !hasSpace;
+  joinBtn.classList.toggle('team-options-btn--danger', false);
+  joinBtn.textContent = hasSpace ? '⚔️ 加入隊伍' : '⚔️ 隊伍已滿';
+  joinBtn.style.opacity = hasSpace ? '' : '0.45';
+
+  openModal('modal-petbag-options');
+}
+
+function addBagPetToTeam() {
+  if (!pendingBagPetId) return;
+  const team    = loadTeam();
+  const slotIdx = team.indexOf(null);
+  if (slotIdx === -1) { showToast('隊伍已滿！'); return; }
+
+  const petId = pendingBagPetId;
+  team[slotIdx] = petId;
+  saveTeam(team);
+  if (slotIdx === 0) refreshDisplayPetState();
+  renderTeam();
+  renderAll();
+  closeModal('modal-petbag-options');
+  renderPetBag(); // refresh after joining
+  const pet = PETS.find(p => p.id === petId);
+  showToast(`✅ ${pet?.name ?? '寵物'} 加入隊伍！`);
+  pendingBagPetId = null;
+}
+
+function viewBagPetDetail() {
+  const petId = pendingBagPetId;
+  pendingBagPetId = null;
+  closeModal('modal-petbag-options');
+  showPetDetail(petId);
 }
 
 // ─── Food System ─────────────────────────────────────────────────────────────
@@ -1298,9 +1346,10 @@ function switchBagTab(tab) {
   document.querySelectorAll('.bag-content').forEach(c => c.classList.add('hidden'));
   const content = document.getElementById(`bag-${tab}-content`);
   if (content) content.classList.remove('hidden');
-  if (tab === 'food')  renderFoodBag();
+  if      (tab === 'food')  renderFoodBag();
   else if (tab === 'drink') renderDrinkBag();
   else if (tab === 'item')  renderItemBag();
+  else if (tab === 'pet')   renderPetBag();
 }
 
 // ─── Decay ───────────────────────────────────────────────────────────────────
@@ -1523,15 +1572,16 @@ function initActions() {
 
   document.getElementById('btn-itembag').addEventListener('click', () => {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-bag'));
-    renderPetBag();
     switchBagTab('item');
   });
 
   document.getElementById('btn-petbag').addEventListener('click', () => {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-bag'));
-    renderPetBag();
-    switchBagTab('food');
+    switchBagTab('pet');
   });
+
+  document.getElementById('btn-petbag-join-team')?.addEventListener('click', addBagPetToTeam);
+  document.getElementById('btn-petbag-view-detail')?.addEventListener('click', viewBagPetDetail);
 
   document.getElementById('btn-pokedex').addEventListener('click', openPokedex);
 
