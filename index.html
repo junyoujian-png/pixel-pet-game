@@ -144,6 +144,19 @@
           </button>
         </div>
 
+        <!-- Team Section -->
+        <div class="card team-card">
+          <h3 class="section-title">⚔️ 出戰隊伍</h3>
+          <div class="team-scroll-wrap">
+            <div class="team-container" id="team-container"></div>
+          </div>
+          <div class="team-dots" id="team-dots">
+            <span class="team-dot team-dot--active"></span>
+            <span class="team-dot"></span>
+            <span class="team-dot"></span>
+          </div>
+        </div>
+
       </section>
 
       <!-- Explore Tab -->
@@ -497,6 +510,27 @@
       <div class="ticket-confirm-actions">
         <button class="btn-cancel" onclick="closeModal('modal-ticket-confirm')">取消</button>
         <button class="btn-confirm-ticket" onclick="confirmBossTicketUse()">確定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team Add Modal -->
+  <div id="modal-team-add" class="modal hidden">
+    <div class="modal-box modal-team-add-box">
+      <h2 class="team-modal-title">🐾 選擇寵物加入隊伍</h2>
+      <div id="team-add-list" class="team-add-list"></div>
+      <button class="btn-cancel" onclick="closeModal('modal-team-add')">取消</button>
+    </div>
+  </div>
+
+  <!-- Team Remove Modal -->
+  <div id="modal-team-remove" class="modal hidden">
+    <div class="modal-box modal-team-remove-box">
+      <h2 class="team-modal-title">移除隊伍成員</h2>
+      <p class="team-remove-body">確定將 <span id="team-remove-pet-name" class="team-remove-name"></span> 從隊伍移除嗎？</p>
+      <div class="team-remove-actions">
+        <button class="btn-cancel" onclick="closeModal('modal-team-remove')">取消</button>
+        <button class="btn-team-remove-confirm" onclick="confirmRemoveFromTeam()">移除</button>
       </div>
     </div>
   </div>

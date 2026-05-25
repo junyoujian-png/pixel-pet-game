@@ -617,6 +617,7 @@ function renderAll() {
   renderPetCard();
   renderStats();
   renderCoins();
+  renderTeam();
 }
 
 function renderPetCard() {
@@ -1346,6 +1347,150 @@ function initActions() {
   document.getElementById('btn-wheel-close')?.addEventListener('click', closeWheelModal);
 }
 
+// ─── Team System ─────────────────────────────────────────────────────────────
+function loadTeam() {
+  try {
+    const raw = localStorage.getItem('team');
+    if (raw) {
+      const arr = JSON.parse(raw);
+      while (arr.length < 3) arr.push(null);
+      return arr.slice(0, 3);
+    }
+  } catch {}
+  return [null, null, null];
+}
+
+function saveTeam(arr) {
+  localStorage.setItem('team', JSON.stringify(arr));
+}
+
+function getTeamPets() {
+  return loadTeam()
+    .filter(id => id !== null)
+    .map(id => PETS.find(p => p.id === id))
+    .filter(Boolean);
+}
+
+let pendingTeamSlot = null;
+let teamScrollBound = false;
+
+function renderTeam() {
+  const team      = loadTeam();
+  const container = document.getElementById('team-container');
+  if (!container) return;
+
+  container.innerHTML = team.map((petId, idx) => {
+    if (petId) {
+      const pet = PETS.find(p => p.id === petId);
+      if (pet) return `
+        <div class="team-slot" data-slot="${idx}">
+          <div class="team-slot__filled" data-slot="${idx}">
+            <div class="team-slot__pet-wrap">
+              <img src="${pet.image}" class="team-slot__img" alt="${pet.name}"
+                   onerror="this.style.opacity='.4'">
+            </div>
+            <div class="team-slot__pet-info">
+              <span class="team-slot__pet-name">${pet.name}</span>
+              <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
+              <span class="team-slot__pet-level">Lv.${state.level}</span>
+            </div>
+            <button class="team-slot__remove-btn" data-slot="${idx}">✕</button>
+          </div>
+        </div>`;
+    }
+    return `
+      <div class="team-slot" data-slot="${idx}">
+        <div class="team-slot__empty" data-slot="${idx}">
+          <div class="team-slot__plus">+</div>
+          <div class="team-slot__add-text">加入隊伍</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  container.querySelectorAll('.team-slot__empty').forEach(el => {
+    el.addEventListener('click', () => openTeamAddModal(parseInt(el.dataset.slot)));
+  });
+  container.querySelectorAll('.team-slot__remove-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      openTeamRemoveModal(parseInt(btn.dataset.slot));
+    });
+  });
+
+  // Scroll → dots
+  if (!teamScrollBound) {
+    teamScrollBound = true;
+    container.addEventListener('scroll', () => {
+      const w   = container.offsetWidth || 1;
+      const idx = Math.min(2, Math.round(container.scrollLeft / w));
+      updateTeamDots(idx);
+    }, { passive: true });
+  }
+  updateTeamDots(0);
+  container.scrollLeft = 0;
+}
+
+function updateTeamDots(activeIdx = 0) {
+  document.querySelectorAll('#team-dots .team-dot').forEach((dot, i) => {
+    dot.classList.toggle('team-dot--active', i === activeIdx);
+  });
+}
+
+function openTeamAddModal(slotIdx) {
+  pendingTeamSlot  = slotIdx;
+  const team       = loadTeam();
+  const inTeam     = new Set(team.filter(Boolean));
+  const choices    = unlockedPets
+    .map(id => PETS.find(p => p.id === id))
+    .filter(p => p && !inTeam.has(p.id));
+
+  const list = document.getElementById('team-add-list');
+  if (!list) return;
+
+  list.innerHTML = choices.length === 0
+    ? '<p class="empty-hint">沒有其他可加入的寵物</p>'
+    : choices.map(pet => `
+        <div class="team-add-item" data-pet-id="${pet.id}">
+          <img src="${pet.image}" class="team-add-item__img" alt="${pet.name}"
+               onerror="this.style.opacity='.35'">
+          <div class="team-add-item__info">
+            <span class="team-add-item__name">${pet.name}</span>
+            <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
+          </div>
+        </div>`).join('');
+
+  list.querySelectorAll('.team-add-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const team = loadTeam();
+      team[pendingTeamSlot] = el.dataset.petId;
+      saveTeam(team);
+      renderTeam();
+      closeModal('modal-team-add');
+      showToast(`✅ ${PETS.find(p => p.id === el.dataset.petId)?.name} 加入隊伍！`);
+    });
+  });
+
+  openModal('modal-team-add');
+}
+
+function openTeamRemoveModal(slotIdx) {
+  pendingTeamSlot = slotIdx;
+  const team = loadTeam();
+  const pet  = PETS.find(p => p.id === team[slotIdx]);
+  if (!pet) return;
+  document.getElementById('team-remove-pet-name').textContent = pet.name;
+  openModal('modal-team-remove');
+}
+
+function confirmRemoveFromTeam() {
+  const team = loadTeam();
+  team[pendingTeamSlot] = null;
+  saveTeam(team);
+  renderTeam();
+  closeModal('modal-team-remove');
+  showToast('已從隊伍移除');
+}
+
 // ─── Boss System ─────────────────────────────────────────────────────────────
 function loadClearedBosses() {
   try { return JSON.parse(localStorage.getItem('clearedBosses') || '[]'); } catch { return []; }
@@ -1583,74 +1728,100 @@ let battleAnimMaxBossHp = 0;
 let battleAnimIdx       = 0;    // index of next turn to process
 
 function startBattle(boss, isFirstTime) {
-  const pet       = currentPet();
-  const stats     = calcStats(pet, state.level);
+  const teamPets = getTeamPets();
+  if (teamPets.length === 0) {
+    showToast('隊伍裡沒有寵物！請先在主頁加入隊伍成員');
+    return;
+  }
+
   const bossLevel = boss.level;
   const bossStats = calcBossStats(boss, bossLevel);
-  const crit      = SKILL_CRIT_RATE[pet.rarity] || 0.05;
-  const skills    = getPetSkills(pet);
+
+  const teamData = teamPets.map(pet => ({
+    pet,
+    stats:    calcStats(pet, state.level),
+    skills:   getPetSkills(pet),
+    critRate: SKILL_CRIT_RATE[pet.rarity] || 0.05,
+  }));
+
+  const combinedMaxHp = teamData.reduce((sum, t) => sum + t.stats.hp, 0);
+  const firstPet      = teamPets[0];
+  const displayName   = teamPets.length > 1 ? `隊伍 (${teamPets.length} 隻)` : firstPet.name;
+
   battleLog      = [];
   battlePending  = boss;
   battleFirstWin = isFirstTime;
 
-  // Simulate full battle turn by turn
-  const turns = simulateBattle(pet, stats, skills, crit, boss, bossStats);
+  const turns = simulateBattle(teamData, boss, bossStats);
 
-  // Show modal
-  document.getElementById('battle-pet-img').src   = pet.image;
-  document.getElementById('battle-pet-name').textContent  = pet.name;
-  document.getElementById('battle-boss-img').src  = boss.image;
-  document.getElementById('battle-boss-name').textContent = boss.name;
-  document.getElementById('battle-log').innerHTML  = '';
+  document.getElementById('battle-pet-img').src             = firstPet.image;
+  document.getElementById('battle-pet-name').textContent    = displayName;
+  document.getElementById('battle-boss-img').src            = boss.image;
+  document.getElementById('battle-boss-name').textContent   = boss.name;
+  document.getElementById('battle-log').innerHTML           = '';
   document.getElementById('battle-result-box').classList.add('hidden');
   document.getElementById('battle-pet-hp-bar').style.width  = '100%';
   document.getElementById('battle-boss-hp-bar').style.width = '100%';
-  document.getElementById('battle-pet-hp-text').textContent  = `${stats.hp} / ${stats.hp}`;
+  document.getElementById('battle-pet-hp-text').textContent  = `${combinedMaxHp} / ${combinedMaxHp}`;
   document.getElementById('battle-boss-hp-text').textContent = `${bossStats.hp} / ${bossStats.hp}`;
   openModal('modal-battle');
 
-  // Init module-level animation state
   battleActiveTurns   = turns;
-  battleAnimMaxPetHp  = stats.hp;
+  battleAnimMaxPetHp  = combinedMaxHp;
   battleAnimMaxBossHp = bossStats.hp;
   battleAnimIdx       = 0;
 
-  // Hide item panel on new battle
   document.getElementById('battle-item-panel')?.classList.add('hidden');
-
-  // Animate turns
   animateBattleTurns();
 }
 
 const BATTLE_MAX_TURNS = 40; // cap total turn entries to keep animation under 16s
 
-function simulateBattle(pet, stats, skills, critRate, boss, bossStats) {
-  const turns = [];
-  let petHp  = stats.hp;
-  let bossHp = bossStats.hp;
+// teamData = [{ pet, stats, skills, critRate }, ...]
+function simulateBattle(teamData, boss, bossStats) {
+  const turns   = [];
+  let bossHp    = bossStats.hp;
+  const alive   = teamData.map(t => ({ ...t, hp: t.stats.hp }));
+  const totalHp = alive.reduce((s, a) => s + a.stats.hp, 0);
+  const combHp  = () => alive.reduce((s, a) => s + Math.max(0, a.hp), 0);
 
-  while (petHp > 0 && bossHp > 0 && turns.length < BATTLE_MAX_TURNS) {
-    // Pet attacks — use highest-power skill
-    const skill  = skills.reduce((best, s) => s.power > best.power ? s : best, skills[0]);
-    const petAtk = calcDamage(stats.atk, skill.power, bossStats.def, critRate);
-    bossHp = Math.max(0, bossHp - petAtk.dmg);
-    turns.push({ actor: 'pet', skillName: skill.name, dmg: petAtk.dmg, crit: petAtk.crit, petHp, bossHp });
+  while (bossHp > 0 && alive.some(a => a.hp > 0) && turns.length < BATTLE_MAX_TURNS) {
+    // Each alive pet attacks once per round
+    for (const a of alive) {
+      if (a.hp <= 0 || bossHp <= 0) continue;
+      const skill  = a.skills.reduce((best, s) => s.power > best.power ? s : best, a.skills[0]);
+      const petAtk = calcDamage(a.stats.atk, skill.power, bossStats.def, a.critRate);
+      bossHp = Math.max(0, bossHp - petAtk.dmg);
+      turns.push({
+        actor: 'pet', petImage: a.pet.image, petName: a.pet.name,
+        skillName: skill.name, dmg: petAtk.dmg, crit: petAtk.crit,
+        petHp: combHp(), bossHp,
+      });
+      if (bossHp <= 0) break;
+    }
     if (bossHp <= 0) break;
 
-    // Boss attacks back
-    const bossAtk = calcDamage(bossStats.atk, 1.0, stats.def, 0.05);
-    petHp = Math.max(0, petHp - bossAtk.dmg);
-    turns.push({ actor: 'boss', skillName: '攻擊', dmg: bossAtk.dmg, crit: bossAtk.crit, petHp, bossHp });
+    // Boss attacks a random alive pet
+    const alivePets = alive.filter(a => a.hp > 0);
+    if (!alivePets.length) break;
+    const target  = alivePets[Math.floor(Math.random() * alivePets.length)];
+    const bossAtk = calcDamage(bossStats.atk, 1.0, target.stats.def, 0.05);
+    target.hp     = Math.max(0, target.hp - bossAtk.dmg);
+    turns.push({
+      actor: 'boss', skillName: '攻擊', targetName: target.pet.name,
+      dmg: bossAtk.dmg, crit: bossAtk.crit, petHp: combHp(), bossHp,
+    });
   }
-  // Force outcome if capped (whoever has more HP% wins)
-  if (turns.length >= BATTLE_MAX_TURNS && petHp > 0 && bossHp > 0) {
-    const petPct  = petHp  / stats.hp;
+
+  // Force outcome if turn cap reached
+  if (turns.length >= BATTLE_MAX_TURNS) {
+    const petPct  = combHp() / totalHp;
     const bossPct = bossHp / bossStats.hp;
     if (petPct >= bossPct) bossHp = 0;
-    else                   petHp  = 0;
+    else                   alive.forEach(a => a.hp = 0);
     const last = turns[turns.length - 1];
-    last.petHp  = Math.max(0, petHp);
-    last.bossHp = Math.max(0, bossHp);
+    last.petHp  = combHp();
+    last.bossHp = bossHp;
   }
   return turns;
 }
@@ -1668,6 +1839,11 @@ function animateBattleTurns() {
   battleAnimIdx++;
   const t = battleActiveTurns[idx];
   updateBattleHPBars(t.petHp, battleAnimMaxPetHp, t.bossHp, battleAnimMaxBossHp);
+
+  // Multi-pet: swap portrait when a different pet attacks
+  if (t.actor === 'pet' && t.petImage) {
+    document.getElementById('battle-pet-img').src = t.petImage;
+  }
 
   const tgt = t.actor === 'pet' ? 'battle-boss-img' : 'battle-pet-img';
   showDamageFloat(t.actor === 'pet' ? 'battle-boss-side' : 'battle-pet-side', t.dmg, t.crit);
@@ -1705,8 +1881,13 @@ function addBattleLog(t) {
   const log = document.getElementById('battle-log');
   const li  = document.createElement('div');
   li.className = 'battle-log-entry' + (t.actor === 'pet' ? ' log-pet' : ' log-boss');
-  const who = t.actor === 'pet' ? '🐾 我方' : '👹 BOSS';
-  li.textContent = `${who} 使用 ${t.skillName}，造成 ${t.dmg}${t.crit ? '(暴擊!)' : ''} 傷害`;
+  if (t.actor === 'pet') {
+    const who = t.petName ? `🐾 ${t.petName}` : '🐾 我方';
+    li.textContent = `${who} 使用 ${t.skillName}，造成 ${t.dmg}${t.crit ? '(暴擊!)' : ''} 傷害`;
+  } else {
+    const target = t.targetName ? ` → ${t.targetName}` : '';
+    li.textContent = `👹 BOSS 攻擊${target}，造成 ${t.dmg}${t.crit ? '(暴擊!)' : ''} 傷害`;
+  }
   log.appendChild(li);
   log.scrollTop = log.scrollHeight;
 }
