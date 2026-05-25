@@ -2393,3 +2393,115 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   font-weight: 600;
   margin-top: 2px;
 }
+
+/* ─── Bag Sub-tabs ──────────────────────────────────────────────────────── */
+.bag-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--border);
+  margin: -4px 0 0;
+  background: var(--surface);
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+}
+.bag-tab {
+  flex: 1;
+  padding: 10px 4px;
+  border: none;
+  background: transparent;
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 600;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.bag-tab--active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  background: var(--surface2);
+}
+.bag-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bag-content.hidden { display: none; }
+
+/* ─── Bag Item Grid & Cards ─────────────────────────────────────────────── */
+.bag-item-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bag-item-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface2);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+.bag-item-card__img-wrap {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.bag-item-card__img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.bag-item-card__icon-wrap {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  background: var(--surface);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.bag-item-card__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.bag-item-card__name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.bag-item-card__desc {
+  font-size: 11px;
+  color: var(--text2);
+  line-height: 1.4;
+}
+.bag-item-card__right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.bag-item-card__count {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--accent);
+}

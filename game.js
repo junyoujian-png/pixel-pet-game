@@ -771,7 +771,7 @@ function giveDrink(type = 'water') {
 
 // ─── Item Bag ─────────────────────────────────────────────────────────────────
 function useItem(id) {
-  if (!state.items[id] || state.items[id] <= 0) return;
+  if (getItem(id) <= 0) return;
 
   if (id === 'pprestore') {
     showPPRestoreModal();
@@ -782,8 +782,7 @@ function useItem(id) {
     return; // 不扣除，在 BOSS 頁面才消耗
   }
 
-  state.items[id]--;
-  if (state.items[id] === 0) delete state.items[id];
+  consumeItem(id);
 
   if (id === 'candy') {
     state.mood = Math.min(100, state.mood + 10);
@@ -804,7 +803,7 @@ function useItem(id) {
 let ppRestoreFromBattle = false; // 記錄是否從戰鬥中開啟
 
 function showPPRestoreModal(fromBattle = false) {
-  const count = state.items['pprestore'] ?? 0;
+  const count = getItem('pprestore');
   if (count <= 0) { showToast('背包裡沒有 PP 回復道具！'); return; }
 
   ppRestoreFromBattle = fromBattle;
@@ -844,9 +843,7 @@ function confirmPPRestore(skillIndex) {
   saveSkillPP(pet.id, saved);
 
   // 扣道具
-  state.items['pprestore']--;
-  if (state.items['pprestore'] === 0) delete state.items['pprestore'];
-  saveState();
+  consumeItem('pprestore');
 
   const skillName = skills[skillIndex].name;
   closeModal('modal-pp-restore');
@@ -862,7 +859,7 @@ function confirmPPRestore(skillIndex) {
 
 // ─── HP Potion In-Battle ─────────────────────────────────────────────────────
 function useHpPotionInBattle() {
-  const count = state.items['hp_potion'] ?? 0;
+  const count = getItem('hp_potion');
   if (count <= 0) { showToast('背包裡沒有回復藥水！'); return; }
 
   const HEAL = 50;
@@ -886,9 +883,7 @@ function useHpPotionInBattle() {
   showDamageFloat('battle-pet-side', HEAL, false, true);
 
   // Deduct item
-  state.items['hp_potion']--;
-  if (state.items['hp_potion'] === 0) delete state.items['hp_potion'];
-  saveState();
+  consumeItem('hp_potion');
 
   showToast('🧪 回復 50 HP！');
   renderBattleItemPanel();
@@ -908,8 +903,8 @@ function toggleBattleItemPanel() {
 
 function renderBattleItemPanel() {
   const panel    = document.getElementById('battle-item-panel');
-  const ppCount  = state.items['pprestore']  ?? 0;
-  const hpCount  = state.items['hp_potion']  ?? 0;
+  const ppCount  = getItem('pprestore');
+  const hpCount  = getItem('hp_potion');
 
   const rows = [];
 
@@ -939,32 +934,39 @@ function renderBattleItemPanel() {
 }
 
 function renderItemBag() {
-  const list  = document.getElementById('itembag-list');
-  const owned = Object.entries(state.items).filter(([, cnt]) => cnt > 0);
-  if (owned.length === 0) {
-    list.innerHTML = '<p class="empty-hint" style="padding:16px 0">道具背包是空的</p>';
+  const el = document.getElementById('itembag-list');
+  if (!el) return;
+  const inv   = loadInventory();
+  const owned = Object.entries(ITEM_DEFS)
+    .filter(([id]) => (inv[id] || 0) > 0)
+    .map(([id, def]) => ({ id, def, cnt: inv[id] }));
+
+  if (!owned.length) {
+    el.innerHTML = '<p class="empty-hint" style="padding:20px 0;text-align:center">道具背包是空的</p>';
     return;
   }
-  list.innerHTML = '';
-  owned.forEach(([id, cnt]) => {
-    const def = ITEM_DEFS[id];
-    if (!def) return;
-    const row = document.createElement('div');
-    row.className = 'itembag-row';
-    row.innerHTML = `
-      <span class="itembag-icon">${def.icon}</span>
-      <div class="itembag-info">
-        <span class="itembag-name">${def.name}</span>
-        <span class="itembag-desc">${def.desc}</span>
-      </div>
-      <span class="itembag-count">×${cnt}</span>
-      <button class="use-btn" data-id="${id}">使用</button>
-    `;
-    list.appendChild(row);
-  });
-  list.querySelectorAll('.use-btn').forEach(btn => {
-    btn.addEventListener('click', () => useItem(btn.dataset.id));
-  });
+
+  el.innerHTML = owned.map(({ id, def, cnt }) => {
+    const isBossTicket = id === 'boss_ticket';
+    const btnLabel  = isBossTicket ? '⚔️ BOSS' : '使用';
+    const btnAction = isBossTicket
+      ? `showToast('🎫 請前往 BOSS 挑戰頁面！')`
+      : `useItem('${id}')`;
+    return `
+      <div class="bag-item-card">
+        <div class="bag-item-card__icon-wrap">
+          <span>${def.icon}</span>
+        </div>
+        <div class="bag-item-card__info">
+          <div class="bag-item-card__name">${def.name}</div>
+          <div class="bag-item-card__desc">${def.desc}</div>
+        </div>
+        <div class="bag-item-card__right">
+          <span class="bag-item-card__count">×${cnt}</span>
+          <button class="use-btn" onclick="${btnAction}">${btnLabel}</button>
+        </div>
+      </div>`;
+  }).join('');
 }
 
 // ─── Pet Bag ──────────────────────────────────────────────────────────────────
@@ -1057,26 +1059,34 @@ function renderFoodShop() {
 }
 
 function renderFoodBag() {
-  const list = document.getElementById('foodbag-list');
-  if (!list) return;
-  const inv = loadInventory();
+  const el = document.getElementById('foodbag-list');
+  if (!el) return;
+  const inv   = loadInventory();
   const owned = Object.entries(inv).filter(([id, cnt]) => cnt > 0 && id.startsWith('food_'));
   if (!owned.length) {
-    list.innerHTML = '<p class="empty-hint" style="padding:12px 0">食物背包是空的</p>';
+    el.innerHTML = '<p class="empty-hint" style="padding:20px 0;text-align:center">食物背包是空的</p>';
     return;
   }
-  list.innerHTML = owned.map(([id, cnt]) => {
+  el.innerHTML = owned.map(([id, cnt]) => {
     const f = FOODS.find(x => x.id === id);
     if (!f) return '';
-    return `<div class="itembag-row">
-      <img src="${f.image}" style="width:32px;height:32px;object-fit:contain;image-rendering:pixelated;flex-shrink:0" onerror="this.style.opacity='0.15'">
-      <div class="itembag-info">
-        <span class="itembag-name">${f.name}</span>
-        <span class="itembag-desc">${f.desc}</span>
-      </div>
-      <span class="itembag-count">×${cnt}</span>
-      <button class="use-btn" onclick="useFood('${id}')">使用</button>
-    </div>`;
+    return `
+      <div class="bag-item-card">
+        <div class="bag-item-card__img-wrap">
+          <img src="${f.image}" class="bag-item-card__img" onerror="this.style.opacity='0.2'">
+        </div>
+        <div class="bag-item-card__info">
+          <div class="bag-item-card__name">
+            ${f.name}
+            <span class="badge badge--${f.rarity.toLowerCase()}">${f.rarity}</span>
+          </div>
+          <div class="bag-item-card__desc">${f.desc}</div>
+        </div>
+        <div class="bag-item-card__right">
+          <span class="bag-item-card__count">×${cnt}</span>
+          <button class="use-btn" onclick="useFood('${id}')">使用</button>
+        </div>
+      </div>`;
   }).join('');
 }
 
@@ -1086,6 +1096,37 @@ function loadInventory() {
 }
 function saveInventory(inv) {
   localStorage.setItem('inventory', JSON.stringify(inv));
+}
+
+// ─── Unified Item Helpers (read/write all items via `inventory`) ──────────────
+function getItem(id)  { return loadInventory()[id] || 0; }
+
+function addItem(id, count = 1) {
+  const inv = loadInventory();
+  inv[id] = (inv[id] || 0) + count;
+  saveInventory(inv);
+}
+
+function consumeItem(id) {
+  const inv = loadInventory();
+  if (!inv[id] || inv[id] <= 0) return false;
+  inv[id]--;
+  if (inv[id] <= 0) delete inv[id];
+  saveInventory(inv);
+  return true;
+}
+
+// Migrate old state.items into unified inventory (one-time on load)
+function migrateItemsToInventory() {
+  const old = state.items;
+  if (!old || Object.keys(old).length === 0) return;
+  const inv = loadInventory();
+  for (const [id, cnt] of Object.entries(old)) {
+    if (cnt > 0) inv[id] = (inv[id] || 0) + cnt;
+  }
+  saveInventory(inv);
+  state.items = {};
+  saveState();
 }
 
 function buyDrink(id) {
@@ -1149,27 +1190,48 @@ function renderDrinkShop() {
 }
 
 function renderDrinkBag() {
-  const list = document.getElementById('drinkbag-list');
-  if (!list) return;
-  const inv = loadInventory();
-  const owned = Object.entries(inv).filter(([, cnt]) => cnt > 0);
+  const el = document.getElementById('drinkbag-list');
+  if (!el) return;
+  const inv   = loadInventory();
+  const owned = Object.entries(inv).filter(([id, cnt]) => cnt > 0 && id.startsWith('drink_'));
   if (!owned.length) {
-    list.innerHTML = '<p class="empty-hint" style="padding:12px 0">飲料背包是空的</p>';
+    el.innerHTML = '<p class="empty-hint" style="padding:20px 0;text-align:center">飲料背包是空的</p>';
     return;
   }
-  list.innerHTML = owned.map(([id, cnt]) => {
+  el.innerHTML = owned.map(([id, cnt]) => {
     const d = DRINKS.find(x => x.id === id);
     if (!d) return '';
-    return `<div class="itembag-row">
-      <img src="${d.image}" style="width:32px;height:32px;object-fit:contain;image-rendering:pixelated;flex-shrink:0" onerror="this.style.opacity='0.15'">
-      <div class="itembag-info">
-        <span class="itembag-name">${d.name}</span>
-        <span class="itembag-desc">${d.desc}</span>
-      </div>
-      <span class="itembag-count">×${cnt}</span>
-      <button class="use-btn" onclick="useDrink('${id}')">使用</button>
-    </div>`;
+    return `
+      <div class="bag-item-card">
+        <div class="bag-item-card__img-wrap">
+          <img src="${d.image}" class="bag-item-card__img" onerror="this.style.opacity='0.2'">
+        </div>
+        <div class="bag-item-card__info">
+          <div class="bag-item-card__name">
+            ${d.name}
+            <span class="badge badge--${d.rarity.toLowerCase()}">${d.rarity}</span>
+          </div>
+          <div class="bag-item-card__desc">${d.desc}</div>
+        </div>
+        <div class="bag-item-card__right">
+          <span class="bag-item-card__count">×${cnt}</span>
+          <button class="use-btn" onclick="useDrink('${id}')">使用</button>
+        </div>
+      </div>`;
   }).join('');
+}
+
+// ─── Bag Sub-tab Switching ────────────────────────────────────────────────────
+function switchBagTab(tab) {
+  document.querySelectorAll('.bag-tab').forEach(t => {
+    t.classList.toggle('bag-tab--active', t.dataset.bagTab === tab);
+  });
+  document.querySelectorAll('.bag-content').forEach(c => c.classList.add('hidden'));
+  const content = document.getElementById(`bag-${tab}-content`);
+  if (content) content.classList.remove('hidden');
+  if (tab === 'food')  renderFoodBag();
+  else if (tab === 'drink') renderDrinkBag();
+  else if (tab === 'item')  renderItemBag();
 }
 
 // ─── Decay ───────────────────────────────────────────────────────────────────
@@ -1386,8 +1448,7 @@ function initShop() {
         addExp(expG);
         showToast(`補水成功！+${waterG} 💧 +${expG} EXP`);
       } else if (type === 'item') {
-        state.items[id] = (state.items[id] ?? 0) + 1;
-        saveState();
+        addItem(id);
         if (id === 'pprestore') {
           showToast('💊 PP 回復已加入背包！');
         } else if (id === 'hp_potion') {
@@ -1413,16 +1474,15 @@ function initActions() {
   });
 
   document.getElementById('btn-itembag').addEventListener('click', () => {
-    renderItemBag();
-    openModal('modal-itembag');
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-bag'));
+    renderPetBag();
+    switchBagTab('item');
   });
 
   document.getElementById('btn-petbag').addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'bag'));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-bag'));
     renderPetBag();
-    renderFoodBag();
-    renderDrinkBag();
+    switchBagTab('food');
   });
 
   document.getElementById('btn-pokedex').addEventListener('click', openPokedex);
@@ -1645,7 +1705,7 @@ function renderBossList() {
   const container   = document.getElementById('boss-list-container');
   if (!container) return;
   const cleared     = loadClearedBosses();
-  const ticketCount = state.items['boss_ticket'] ?? 0;
+  const ticketCount = getItem('boss_ticket');
 
   container.innerHTML = BOSSES.map((boss, idx) => {
     const isCleared   = cleared.includes(boss.id);
@@ -1695,10 +1755,8 @@ function challengeBoss(bossId) {
   const isFirstTime = !cleared.includes(bossId);
 
   // 消耗一張挑戰卷
-  state.items['boss_ticket']--;
-  if (state.items['boss_ticket'] === 0) delete state.items['boss_ticket'];
-  saveState();
-  const remaining = state.items['boss_ticket'] ?? 0;
+  consumeItem('boss_ticket');
+  const remaining = getItem('boss_ticket');
   showToast(`🎫 使用挑戰卷！剩餘 ${remaining} 張`);
 
   startBattle(boss, isFirstTime);
@@ -1710,7 +1768,7 @@ let ticketTargetBossId = null;
 function openBossTicketConfirm(bossId) {
   const boss  = BOSSES.find(b => b.id === bossId);
   if (!boss) return;
-  const count = state.items['boss_ticket'] ?? 0;
+  const count = getItem('boss_ticket');
   ticketTargetBossId = bossId;
   document.getElementById('ticket-confirm-boss-name').textContent = boss.name;
   document.getElementById('ticket-confirm-count').textContent     = count;
@@ -2330,6 +2388,7 @@ function init() {
     localStorage.setItem('selectedPetId', selectedPetId);
   }
   state = loadState(); // always reload to pick up correct display pet
+  migrateItemsToInventory();  // one-time: move state.items → inventory
   renderAll();
   initTabs();
   initModals();

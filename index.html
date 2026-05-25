@@ -233,19 +233,28 @@
 
       <!-- Bag Tab -->
       <section class="tab-panel" id="tab-bag">
-        <div class="card">
-          <h3 class="section-title">🍖 食物背包</h3>
-          <div id="foodbag-list" class="itembag-list"></div>
+        <!-- Sub-tab bar -->
+        <div class="bag-tabs">
+          <button class="bag-tab bag-tab--active" data-bag-tab="food" onclick="switchBagTab('food')">🍖 食物</button>
+          <button class="bag-tab" data-bag-tab="drink" onclick="switchBagTab('drink')">🥤 飲料</button>
+          <button class="bag-tab" data-bag-tab="item" onclick="switchBagTab('item')">🎒 道具</button>
         </div>
-        <div class="card">
-          <h3 class="section-title">🥤 飲料背包</h3>
-          <div id="drinkbag-list" class="itembag-list"></div>
+        <!-- Food content -->
+        <div class="bag-content" id="bag-food-content">
+          <div id="foodbag-list" class="bag-item-grid"></div>
         </div>
+        <!-- Drink content -->
+        <div class="bag-content hidden" id="bag-drink-content">
+          <div id="drinkbag-list" class="bag-item-grid"></div>
+        </div>
+        <!-- Item content -->
+        <div class="bag-content hidden" id="bag-item-content">
+          <div id="itembag-list" class="bag-item-grid"></div>
+        </div>
+        <!-- Pet Bag -->
         <div class="card">
           <h3 class="section-title">🐾 寵物背包</h3>
-          <div id="petbag-grid" class="item-grid">
-            <div class="empty-hint">還沒有任何裝備</div>
-          </div>
+          <div id="petbag-grid" class="item-grid"></div>
         </div>
       </section>
 
@@ -478,14 +487,6 @@
     </div>
   </div>
 
-  <div id="modal-itembag" class="modal hidden">
-    <div class="modal-box">
-      <h2>🎒 道具背包</h2>
-      <div id="itembag-list" class="itembag-list"></div>
-      <p class="modal-hint">到食物頁面購買道具</p>
-      <button class="modal-close" data-modal="modal-itembag">✕</button>
-    </div>
-  </div>
 
   <!-- PP Restore Modal -->
   <div id="modal-pp-restore" class="modal hidden">
