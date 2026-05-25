@@ -2,13 +2,6 @@
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const EXP_PER_LEVEL  = 100;
-const FEED_COSTS     = { fish: 10, meat: 25, cake: 50 };
-const FEED_HUNGER    = { fish: 20, meat: 35, cake: 50 };
-const FEED_EXP       = { fish: 5,  meat: 10, cake: 20 };
-const DRINK_COSTS    = { water: 5, juice: 15, milk: 30 };
-const DRINK_WATER    = { water: 25, juice: 40, milk: 60 };
-const DRINK_MOOD     = { water: 0,  juice: 3,  milk: 5  };
-const DRINK_EXP      = { water: 3,  juice: 8,  milk: 15 };
 const DECAY_INTERVAL = 60_000;
 
 const PETS = [
@@ -735,38 +728,6 @@ function showToast(msg) {
   el.classList.remove('hidden');
   clearTimeout(toastTimeout);
   toastTimeout = setTimeout(() => el.classList.add('hidden'), 2500);
-}
-
-// ─── Feed ─────────────────────────────────────────────────────────────────────
-function feedPet(type = 'fish') {
-  const cost    = FEED_COSTS[type]  ?? 10;
-  const hungerG = FEED_HUNGER[type] ?? 20;
-  const expG    = FEED_EXP[type]    ?? 5;
-
-  if (!spendCoins(cost)) { showToast('能量石不足！'); return; }
-
-  state.hunger = Math.min(100, state.hunger + hungerG);
-  state.mood   = Math.min(100, state.mood + 5);
-  saveState();
-  addExp(expG);
-  showToast(`餵食成功！+${expG} EXP`);
-}
-
-// ─── Drink ────────────────────────────────────────────────────────────────────
-function giveDrink(type = 'water') {
-  const cost   = DRINK_COSTS[type] ?? 5;
-  const waterG = DRINK_WATER[type] ?? 25;
-  const moodG  = DRINK_MOOD[type]  ?? 0;
-  const expG   = DRINK_EXP[type]   ?? 3;
-
-  if (!spendCoins(cost)) { showToast('能量石不足！'); return; }
-
-  state.water = Math.min(100, state.water + waterG);
-  if (moodG > 0) state.mood = Math.min(100, state.mood + moodG);
-  saveState();
-  addExp(expG);
-  closeModal('modal-drink');
-  showToast(`補水成功！+${waterG} 💧 +${expG} EXP`);
 }
 
 // ─── Item Bag ─────────────────────────────────────────────────────────────────
