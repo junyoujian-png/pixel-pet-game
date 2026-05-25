@@ -273,17 +273,35 @@ const MOOD_MOODS = [
   [80, '😄'], [60, '😊'], [40, '😐'], [20, '😟'], [0, '😢']
 ];
 
+// ─── Per-pet state helpers (function declarations = hoisted) ─────────────────
+function loadPetState(petId) {
+  const defaults = { ...DEFAULT_PET_STATE };
+  if (!petId) return defaults;
+  try {
+    const raw = localStorage.getItem(`petState_${petId}`);
+    if (raw) return { ...defaults, ...JSON.parse(raw) };
+  } catch {}
+  return defaults;
+}
+function savePetState(petId, data) {
+  if (!petId) return;
+  localStorage.setItem(`petState_${petId}`, JSON.stringify(data));
+}
+function getDisplayPetId() {
+  const team = loadTeam(); // hoisted function declaration
+  return team.find(id => id !== null) || null;
+}
+
 // ─── State ───────────────────────────────────────────────────────────────────
-const DEFAULT_GLOBAL = {
-  coins: 50, hunger: 60, mood: 80, water: 70, items: {}, equips: [],
-};
-const DEFAULT_PET_STATE = { level: 1, exp: 0 };
+const DEFAULT_GLOBAL = { coins: 50, items: {}, equips: [] };
+const DEFAULT_PET_STATE = { level: 1, exp: 0, hunger: 60, water: 70, mood: 80 };
 
 let selectedPetId = localStorage.getItem('selectedPetId') || null;
 let state = loadState();
 
 function currentPet() {
-  return PETS.find(p => p.id === selectedPetId) || PETS[0];
+  const displayId = getDisplayPetId();
+  return PETS.find(p => p.id === (displayId || selectedPetId)) || PETS[0];
 }
 
 // ─── Persistence ─────────────────────────────────────────────────────────────
@@ -291,32 +309,50 @@ function loadState() {
   let global = { ...DEFAULT_GLOBAL };
   try {
     const raw = localStorage.getItem('pixelPet');
-    if (raw) global = { ...DEFAULT_GLOBAL, ...JSON.parse(raw) };
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      global = { ...DEFAULT_GLOBAL, ...parsed };
+      // Migrate: move old global hunger/water/mood into display pet's store
+      if ((parsed.hunger ?? parsed.water ?? parsed.mood) !== undefined) {
+        const migId = getDisplayPetId() || selectedPetId;
+        if (migId) {
+          const existing = loadPetState(migId);
+          savePetState(migId, {
+            ...existing,
+            hunger: parsed.hunger ?? existing.hunger,
+            water:  parsed.water  ?? existing.water,
+            mood:   parsed.mood   ?? existing.mood,
+          });
+        }
+        delete global.hunger; delete global.water; delete global.mood;
+        localStorage.setItem('pixelPet', JSON.stringify(global));
+      }
+    }
   } catch {}
 
-  let petSt = { ...DEFAULT_PET_STATE };
-  if (selectedPetId) {
-    try {
-      const raw = localStorage.getItem(`petState_${selectedPetId}`);
-      if (raw) petSt = { ...DEFAULT_PET_STATE, ...JSON.parse(raw) };
-    } catch {}
-  }
-
+  const displayId = getDisplayPetId();
+  const petSt     = loadPetState(displayId || selectedPetId);
   return { ...global, ...petSt };
 }
 
 function saveState() {
-  const global = {
-    coins: state.coins, hunger: state.hunger, mood: state.mood,
-    water: state.water, items: state.items, equips: state.equips,
-  };
+  const global = { coins: state.coins, items: state.items, equips: state.equips };
   localStorage.setItem('pixelPet', JSON.stringify(global));
 
-  if (selectedPetId) {
-    localStorage.setItem(`petState_${selectedPetId}`, JSON.stringify({
+  const displayId = getDisplayPetId() || selectedPetId;
+  if (displayId) {
+    savePetState(displayId, {
       level: state.level, exp: state.exp,
-    }));
+      hunger: state.hunger, water: state.water, mood: state.mood,
+    });
   }
+}
+
+function refreshDisplayPetState() {
+  const displayId = getDisplayPetId() || selectedPetId;
+  const ps = loadPetState(displayId);
+  state.level  = ps.level;  state.exp    = ps.exp;
+  state.hunger = ps.hunger; state.water  = ps.water; state.mood = ps.mood;
 }
 
 const RARITY_ORDER = { 'F': 0, 'R': 1, 'SR': 2, 'SSR': 3 };
@@ -536,24 +572,22 @@ function hidePetDetail() {
 }
 
 function selectPet(id) {
-  if (selectedPetId) {
-    localStorage.setItem(`petState_${selectedPetId}`, JSON.stringify({
+  // Save current display pet's state before switching
+  const curDisplayId = getDisplayPetId() || selectedPetId;
+  if (curDisplayId) {
+    savePetState(curDisplayId, {
       level: state.level, exp: state.exp,
-    }));
+      hunger: state.hunger, water: state.water, mood: state.mood,
+    });
   }
 
   selectedPetId = id;
   localStorage.setItem('selectedPetId', id);
 
-  try {
-    const raw = localStorage.getItem(`petState_${id}`);
-    const petSt = raw ? { ...DEFAULT_PET_STATE, ...JSON.parse(raw) } : { ...DEFAULT_PET_STATE };
-    state.level = petSt.level;
-    state.exp   = petSt.exp;
-  } catch {
-    state.level = DEFAULT_PET_STATE.level;
-    state.exp   = DEFAULT_PET_STATE.exp;
-  }
+  // Load the new pet's state
+  const ps = loadPetState(id);
+  state.level  = ps.level;  state.exp    = ps.exp;
+  state.hunger = ps.hunger; state.water  = ps.water; state.mood = ps.mood;
 
   hideSelectScreen();
   renderAll();
@@ -621,17 +655,36 @@ function renderAll() {
 }
 
 function renderPetCard() {
+  const displayId = getDisplayPetId();
+
+  if (!displayId) {
+    // No pet in first team slot — show placeholder
+    const img = document.getElementById('pet-img');
+    img.src = 'assets/pets/fox.png';
+    img.alt = '';
+    img.style.opacity = '0.25';
+    document.getElementById('pet-name').textContent   = '請加入寵物到隊伍';
+    document.getElementById('pet-level').textContent  = '—';
+    document.getElementById('pet-level').classList.remove('level-max');
+    document.getElementById('pet-rarity-badge').textContent = '';
+    document.getElementById('pet-rarity-badge').className   = 'badge';
+    document.getElementById('exp-fill').style.width  = '0%';
+    document.getElementById('exp-text').textContent  = '';
+    document.getElementById('pet-mood-emoji').textContent = '😶';
+    return;
+  }
+
+  const img = document.getElementById('pet-img');
+  img.style.opacity = '';
   const pet      = currentPet();
   const maxLevel = getMaxLevel(pet.rarity);
   const isMaxed  = state.level >= maxLevel;
 
-  const img = document.getElementById('pet-img');
   img.src = pet.image;
   img.alt = pet.name;
 
   document.getElementById('pet-name').textContent = pet.name;
 
-  // 等級顯示：達上限加 MAX 樣式
   const levelEl = document.getElementById('pet-level');
   levelEl.textContent = state.level;
   levelEl.classList.toggle('level-max', isMaxed);
@@ -640,7 +693,6 @@ function renderPetCard() {
   badge.textContent = pet.rarity;
   badge.className   = `badge badge--${pet.rarity.toLowerCase()}`;
 
-  // EXP 條：達上限顯示 MAX
   if (isMaxed) {
     document.getElementById('exp-fill').style.width = '100%';
     document.getElementById('exp-text').textContent  = 'MAX';
@@ -918,21 +970,31 @@ function renderItemBag() {
 // ─── Pet Bag ──────────────────────────────────────────────────────────────────
 function renderPetBag() {
   const grid = document.getElementById('petbag-grid');
-  if (state.equips.length === 0) {
-    grid.innerHTML = '<div class="empty-hint">還沒有任何裝備</div>';
+  if (!grid) return;
+  const team        = loadTeam();
+  const inTeamSet   = new Set(team.filter(Boolean));
+  const bagPets     = unlockedPets
+    .map(id => PETS.find(p => p.id === id))
+    .filter(p => p && !inTeamSet.has(p.id));
+
+  if (bagPets.length === 0) {
+    grid.innerHTML = '<div class="empty-hint">背包裡沒有寵物（全部在隊伍中）</div>';
     return;
   }
-  grid.innerHTML = '';
-  state.equips.forEach(id => {
-    const cell = document.createElement('div');
-    cell.className = 'petbag-item';
-    cell.innerHTML = `
-      <span class="item-icon">📦</span>
-      <span class="item-name">${id}</span>
-      <span class="petbag-owned">已擁有</span>
-    `;
-    grid.appendChild(cell);
-  });
+  grid.innerHTML = bagPets.map(pet => {
+    const ps = loadPetState(pet.id);
+    return `
+      <div class="petbag-card">
+        <div class="petbag-card__img-wrap">
+          <img src="${pet.image}" class="petbag-card__img" alt="${pet.name}"
+               onerror="this.style.opacity='.3'">
+        </div>
+        <div class="petbag-card__name">${pet.name}</div>
+        <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
+        <div class="petbag-card__lv">Lv.${ps.level}</div>
+        <div class="petbag-card__frozen">❄️ 屬性凍結</div>
+      </div>`;
+  }).join('');
 }
 
 // ─── Food System ─────────────────────────────────────────────────────────────
@@ -1112,11 +1174,36 @@ function renderDrinkBag() {
 
 // ─── Decay ───────────────────────────────────────────────────────────────────
 function decayStats() {
-  state.hunger = Math.max(0, state.hunger - 2);
-  state.water  = Math.max(0, state.water  - 3);
-  const moodPenalty = (state.hunger < 20 ? 2 : 0) + (state.water < 20 ? 2 : 0) + 1;
-  state.mood   = Math.max(0, state.mood - moodPenalty);
-  saveState();
+  const teamIds = loadTeam().filter(id => id !== null);
+  if (teamIds.length === 0) return;
+
+  for (const petId of teamIds) {
+    const ps  = loadPetState(petId);
+    const pet = PETS.find(p => p.id === petId);
+
+    const wasHungry = ps.hunger === 0;
+    const wasThirty = ps.water  === 0;
+
+    ps.hunger = Math.max(0, ps.hunger - 1);
+    ps.water  = Math.max(0, ps.water  - 1);
+
+    let moodDec = 1;
+    if (ps.hunger < 20) moodDec += 1;
+    if (ps.water  < 20) moodDec += 1;
+    if (ps.hunger === 0) moodDec += 1; // extra penalty at 0
+    if (ps.water  === 0) moodDec += 1;
+    ps.mood = Math.max(0, ps.mood - moodDec);
+
+    savePetState(petId, ps);
+
+    if (pet) {
+      if (!wasHungry && ps.hunger === 0) showToast(`🍖 ${pet.name} 餓了！`);
+      if (!wasThirty && ps.water  === 0) showToast(`💧 ${pet.name} 渴了！`);
+    }
+  }
+
+  // Refresh in-memory state from display pet
+  refreshDisplayPetState();
   renderStats();
 }
 
@@ -1338,13 +1425,47 @@ function initActions() {
     renderDrinkBag();
   });
 
-  document.getElementById('btn-change-pet').addEventListener('click', () => showSelectScreen());
+  document.getElementById('btn-pokedex').addEventListener('click', openPokedex);
 
   document.getElementById('btn-pet-detail').addEventListener('click', () => showPetDetail());
   document.getElementById('btn-detail-back').addEventListener('click', () => hidePetDetail());
 
+  document.getElementById('btn-team-view-detail')?.addEventListener('click', viewTeamPetDetail);
+  document.getElementById('btn-team-send-back')?.addEventListener('click', sendTeamPetBack);
+
   document.getElementById('btn-spin')?.addEventListener('click', doSpin);
   document.getElementById('btn-wheel-close')?.addEventListener('click', closeWheelModal);
+}
+
+// ─── Pokedex ──────────────────────────────────────────────────────────────────
+function openPokedex() {
+  renderPokedex();
+  openModal('modal-pokedex');
+}
+
+function renderPokedex() {
+  const grid = document.getElementById('pokedex-grid');
+  if (!grid) return;
+  const sorted = [...PETS].sort((a, b) => {
+    const ro = { F: 0, R: 1, SR: 2, SSR: 3 };
+    return (ro[a.rarity] ?? 0) - (ro[b.rarity] ?? 0);
+  });
+  grid.innerHTML = sorted.map(pet => {
+    const unlocked = isUnlocked(pet.id);
+    const ps       = unlocked ? loadPetState(pet.id) : null;
+    return `
+      <div class="pokedex-card${unlocked ? '' : ' pokedex-card--locked'}">
+        <div class="pokedex-card__img-wrap">
+          ${unlocked
+            ? `<img src="${pet.image}" class="pokedex-card__img" alt="${pet.name}"
+                    onerror="this.style.opacity='.3'">`
+            : `<div class="pokedex-card__lock">🔒</div>`}
+        </div>
+        <div class="pokedex-card__name">${unlocked ? pet.name : '???'}</div>
+        <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
+        ${unlocked && ps ? `<div class="pokedex-card__lv">Lv.${ps.level}</div>` : ''}
+      </div>`;
+  }).join('');
 }
 
 // ─── Team System ─────────────────────────────────────────────────────────────
@@ -1394,7 +1515,6 @@ function renderTeam() {
               <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
               <span class="team-slot__pet-level">Lv.${state.level}</span>
             </div>
-            <button class="team-slot__remove-btn" data-slot="${idx}">✕</button>
           </div>
         </div>`;
     }
@@ -1410,11 +1530,8 @@ function renderTeam() {
   container.querySelectorAll('.team-slot__empty').forEach(el => {
     el.addEventListener('click', () => openTeamAddModal(parseInt(el.dataset.slot)));
   });
-  container.querySelectorAll('.team-slot__remove-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      openTeamRemoveModal(parseInt(btn.dataset.slot));
-    });
+  container.querySelectorAll('.team-slot__filled').forEach(el => {
+    el.addEventListener('click', () => openTeamOptionsModal(parseInt(el.dataset.slot)));
   });
 
   // Scroll → dots
@@ -1464,7 +1581,11 @@ function openTeamAddModal(slotIdx) {
       const team = loadTeam();
       team[pendingTeamSlot] = el.dataset.petId;
       saveTeam(team);
+      if (pendingTeamSlot === 0 || team.indexOf(el.dataset.petId) === 0) {
+        refreshDisplayPetState();
+      }
       renderTeam();
+      renderAll();
       closeModal('modal-team-add');
       showToast(`✅ ${PETS.find(p => p.id === el.dataset.petId)?.name} 加入隊伍！`);
     });
@@ -1473,22 +1594,32 @@ function openTeamAddModal(slotIdx) {
   openModal('modal-team-add');
 }
 
-function openTeamRemoveModal(slotIdx) {
+function openTeamOptionsModal(slotIdx) {
   pendingTeamSlot = slotIdx;
   const team = loadTeam();
   const pet  = PETS.find(p => p.id === team[slotIdx]);
   if (!pet) return;
-  document.getElementById('team-remove-pet-name').textContent = pet.name;
-  openModal('modal-team-remove');
+  document.getElementById('team-options-pet-img').src         = pet.image;
+  document.getElementById('team-options-pet-img').alt         = pet.name;
+  document.getElementById('team-options-pet-name').textContent = pet.name;
+  openModal('modal-team-options');
 }
 
-function confirmRemoveFromTeam() {
+function sendTeamPetBack() {
   const team = loadTeam();
+  const pet  = PETS.find(p => p.id === team[pendingTeamSlot]);
   team[pendingTeamSlot] = null;
   saveTeam(team);
+  if (pendingTeamSlot === 0) refreshDisplayPetState();
   renderTeam();
-  closeModal('modal-team-remove');
-  showToast('已從隊伍移除');
+  renderAll();
+  closeModal('modal-team-options');
+  showToast(`📦 ${pet?.name ?? '寵物'} 已移回背包`);
+}
+
+function viewTeamPetDetail() {
+  closeModal('modal-team-options');
+  showPetDetail();
 }
 
 // ─── Boss System ─────────────────────────────────────────────────────────────
@@ -2197,8 +2328,8 @@ function init() {
   if (!selectedPetId) {
     selectedPetId = 'pet1';
     localStorage.setItem('selectedPetId', selectedPetId);
-    state = loadState();
   }
+  state = loadState(); // always reload to pick up correct display pet
   renderAll();
   initTabs();
   initModals();

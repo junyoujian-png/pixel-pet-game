@@ -2238,3 +2238,158 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   font-family: inherit;
 }
 .btn-team-remove-confirm:hover { opacity: .88; }
+
+/* ─── Pokedex Modal ──────────────────────────────────────────────────────── */
+.modal-pokedex-box {
+  max-width: 380px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+.pokedex-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+.pokedex-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  overflow-y: auto;
+  flex: 1;
+  margin-bottom: 14px;
+}
+.pokedex-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 12px 8px 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.pokedex-card--locked {
+  opacity: 0.45;
+  filter: grayscale(0.6);
+}
+.pokedex-card__img-wrap {
+  width: 64px;
+  height: 64px;
+  background: var(--surface);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.pokedex-card__img {
+  width: 56px;
+  height: 56px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  object-fit: contain;
+}
+.pokedex-card__lock { font-size: 28px; }
+.pokedex-card__name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+}
+.pokedex-card__lv {
+  font-size: 11px;
+  color: var(--text2);
+  font-weight: 600;
+}
+
+/* ─── Team Options Modal ─────────────────────────────────────────────────── */
+.modal-team-options-box {
+  max-width: 300px;
+  text-align: center;
+}
+.team-options-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.team-options-img {
+  width: 72px;
+  height: 72px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  object-fit: contain;
+  background: var(--surface2);
+  border-radius: 12px;
+}
+.team-options-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+.team-options-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.team-options-btn {
+  width: 100%;
+  padding: 11px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color .15s, background .15s;
+}
+.team-options-btn:hover { border-color: var(--accent); background: var(--surface); }
+.team-options-btn--danger {
+  border-color: #f4433622;
+  color: #f44336;
+}
+.team-options-btn--danger:hover { border-color: #f44336; background: #fff3f3; }
+
+/* ─── Pet Bag Card (unlocked pets) ──────────────────────────────────────── */
+.petbag-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  text-align: center;
+}
+.petbag-card__img-wrap {
+  width: 56px;
+  height: 56px;
+  background: var(--surface);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.petbag-card__img {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  object-fit: contain;
+}
+.petbag-card__name { font-size: 12px; font-weight: 700; color: var(--text); }
+.petbag-card__lv   { font-size: 11px; color: var(--text2); }
+.petbag-card__frozen {
+  font-size: 10px;
+  color: #42a5f5;
+  font-weight: 600;
+  margin-top: 2px;
+}
