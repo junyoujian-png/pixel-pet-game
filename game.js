@@ -1752,11 +1752,262 @@ function initExploreCards() {
   document.querySelectorAll('.shop-card[data-explore] .shop-card__btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const type = btn.closest('.shop-card')?.dataset.explore;
-      if (type === 'boss') showBossPage();
-      else showToast('🚧 敬請期待...');
+      if      (type === 'boss')  showBossPage();
+      else if (type === 'world') showWorldPage();
     });
   });
   document.getElementById('btn-explore-boss-back')?.addEventListener('click', hideBossPage);
+  document.getElementById('btn-world-back')?.addEventListener('click',   hideWorldPage);
+  document.getElementById('btn-world-locate')?.addEventListener('click', () => {
+    if (worldPlayerLat !== null && worldMap) worldMap.setView([worldPlayerLat, worldPlayerLng], 16);
+  });
+  document.getElementById('btn-world-manual')?.addEventListener('click', () => {
+    document.getElementById('world-manual-location')?.classList.remove('hidden');
+  });
+  document.getElementById('btn-world-manual-cancel')?.addEventListener('click', () => {
+    document.getElementById('world-manual-location')?.classList.add('hidden');
+  });
+  document.getElementById('btn-world-manual-confirm')?.addEventListener('click', () => {
+    const lat = parseFloat(document.getElementById('world-lat-input')?.value);
+    const lng = parseFloat(document.getElementById('world-lng-input')?.value);
+    if (!isNaN(lat) && !isNaN(lng)) {
+      document.getElementById('world-manual-location')?.classList.add('hidden');
+      document.getElementById('world-gps-denied')?.classList.add('hidden');
+      updateWorldPlayerPos(lat, lng);
+      const existing = loadWorldChests();
+      placeWorldChestMarkers(existing || generateWorldChests(lat, lng));
+    } else {
+      showToast('請輸入有效的緯度和經度');
+    }
+  });
+}
+
+// ─── World Map ────────────────────────────────────────────────────────────────
+let worldMap            = null;
+let worldPlayerMarker   = null;
+let worldPlayerLat      = null;
+let worldPlayerLng      = null;
+let worldWatchId        = null;
+let worldChestMarkers   = [];   // [{ marker, chest }]
+
+const WORLD_GLOW_DIST   = 50;   // metres — show glow + allow collect
+const WORLD_MIN_DIST    = 100;  // metres — min spawn distance from player
+const WORLD_MAX_DIST    = 500;  // metres — max spawn distance
+const WORLD_MIN_CHESTS  = 3;
+const WORLD_MAX_CHESTS  = 5;
+const WORLD_RESPAWN_MS  = 30 * 60 * 1000;  // 30 minutes
+
+// Haversine distance (metres)
+function worldDist(lat1, lng1, lat2, lng2) {
+  const R  = 6371000;
+  const φ1 = lat1 * Math.PI / 180;
+  const φ2 = lat2 * Math.PI / 180;
+  const Δφ = (lat2 - lat1) * Math.PI / 180;
+  const Δλ = (lng2 - lng1) * Math.PI / 180;
+  const a  = Math.sin(Δφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// Random point dist metres away from lat/lng
+function randomNearbyPoint(lat, lng, minM, maxM) {
+  const dist    = minM + Math.random() * (maxM - minM);
+  const bearing = Math.random() * 2 * Math.PI;
+  const R       = 6371000;
+  const δ       = dist / R;
+  const φ1      = lat * Math.PI / 180;
+  const λ1      = lng * Math.PI / 180;
+  const φ2      = Math.asin(Math.sin(φ1)*Math.cos(δ) + Math.cos(φ1)*Math.sin(δ)*Math.cos(bearing));
+  const λ2      = λ1 + Math.atan2(Math.sin(bearing)*Math.sin(δ)*Math.cos(φ1), Math.cos(δ) - Math.sin(φ1)*Math.sin(φ2));
+  return { lat: φ2 * 180 / Math.PI, lng: λ2 * 180 / Math.PI };
+}
+
+function loadWorldChests() {
+  try {
+    const raw = localStorage.getItem('worldChests');
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    const allDone = data.chests.every(c => c.collected);
+    if (allDone && Date.now() - data.generatedAt >= WORLD_RESPAWN_MS) return null;
+    return data;
+  } catch { return null; }
+}
+
+function saveWorldChests(data) {
+  localStorage.setItem('worldChests', JSON.stringify(data));
+}
+
+function generateWorldChests(lat, lng) {
+  const count  = WORLD_MIN_CHESTS + Math.floor(Math.random() * (WORLD_MAX_CHESTS - WORLD_MIN_CHESTS + 1));
+  const chests = Array.from({ length: count }, (_, i) => {
+    const pt = randomNearbyPoint(lat, lng, WORLD_MIN_DIST, WORLD_MAX_DIST);
+    return { id: `chest_${Date.now()}_${i}`, lat: pt.lat, lng: pt.lng, collected: false };
+  });
+  const data = { chests, generatedAt: Date.now() };
+  saveWorldChests(data);
+  return data;
+}
+
+function createPlayerIcon() {
+  return L.divIcon({
+    className: '',
+    html: '<div class="world-player-dot"></div>',
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+  });
+}
+
+function createChestIcon(glowing) {
+  return L.divIcon({
+    className: '',
+    html: `<div class="world-chest-icon${glowing ? ' world-chest-icon--glow' : ''}">🎁</div>`,
+    iconSize: [36, 36],
+    iconAnchor: [18, 18],
+  });
+}
+
+function updateWorldHUD() {
+  const remaining = worldChestMarkers.filter(cm => !cm.chest.collected).length;
+  const gemEl   = document.getElementById('world-hud-gems');
+  const chestEl = document.getElementById('world-hud-chests');
+  if (gemEl)   gemEl.textContent   = state.coins ?? 0;
+  if (chestEl) chestEl.textContent = remaining;
+}
+
+function placeWorldChestMarkers(data) {
+  // Clear existing
+  worldChestMarkers.forEach(cm => { try { worldMap.removeLayer(cm.marker); } catch {} });
+  worldChestMarkers = [];
+  data.chests.filter(c => !c.collected).forEach(chest => {
+    const marker = L.marker([chest.lat, chest.lng], { icon: createChestIcon(false) }).addTo(worldMap);
+    const cm = { marker, chest };
+    marker.on('click', () => tryCollectChest(cm));
+    worldChestMarkers.push(cm);
+  });
+  updateWorldHUD();
+}
+
+function tryCollectChest(cm) {
+  if (worldPlayerLat === null || cm.chest.collected) return;
+  const dist = worldDist(worldPlayerLat, worldPlayerLng, cm.chest.lat, cm.chest.lng);
+  if (dist > WORLD_GLOW_DIST) { showToast('🎁 走近一點才能收取！'); return; }
+  collectWorldChest(cm);
+}
+
+function collectWorldChest(cm) {
+  cm.chest.collected = true;
+  try { worldMap.removeLayer(cm.marker); } catch {}
+  worldChestMarkers = worldChestMarkers.filter(x => x !== cm);
+
+  const reward = 50 + Math.floor(Math.random() * 51);
+  state.coins = (state.coins || 0) + reward;
+  saveState();
+  showWorldGemFloat(reward);
+  showToast(`💎 獲得 ${reward} 能量石！`);
+  updateWorldHUD();
+  renderCoins();
+
+  // Persist collected state
+  const raw = localStorage.getItem('worldChests');
+  if (raw) {
+    const data = JSON.parse(raw);
+    const idx  = data.chests.findIndex(c => c.id === cm.chest.id);
+    if (idx >= 0) { data.chests[idx].collected = true; saveWorldChests(data); }
+  }
+
+  if (worldChestMarkers.length === 0) {
+    showToast('🎉 所有寶箱都收集完了！30 分鐘後重新生成');
+  }
+}
+
+function showWorldGemFloat(amount) {
+  const container = document.getElementById('world-map');
+  if (!container) return;
+  const el = document.createElement('div');
+  el.className   = 'world-gem-float';
+  el.textContent = `+${amount} 💎`;
+  el.style.left  = `${20 + Math.random() * 60}%`;
+  el.style.top   = '45%';
+  container.appendChild(el);
+  setTimeout(() => el.remove(), 1300);
+}
+
+function updateWorldPlayerPos(lat, lng) {
+  worldPlayerLat = lat;
+  worldPlayerLng = lng;
+  if (!worldPlayerMarker) {
+    worldPlayerMarker = L.marker([lat, lng], {
+      icon: createPlayerIcon(), zIndexOffset: 1000,
+    }).addTo(worldMap);
+    worldMap.setView([lat, lng], 16);
+  } else {
+    worldPlayerMarker.setLatLng([lat, lng]);
+  }
+  // Update chest glow state
+  worldChestMarkers.forEach(cm => {
+    if (cm.chest.collected) return;
+    const dist   = worldDist(lat, lng, cm.chest.lat, cm.chest.lng);
+    const glowing = dist <= WORLD_GLOW_DIST;
+    cm.marker.setIcon(createChestIcon(glowing));
+  });
+}
+
+function onWorldGPSPosition(pos) {
+  const lat = pos.coords.latitude;
+  const lng = pos.coords.longitude;
+  document.getElementById('world-gps-denied')?.classList.add('hidden');
+  updateWorldPlayerPos(lat, lng);
+  // Generate chests if first time or all respawned
+  const existing = loadWorldChests();
+  if (!existing) {
+    placeWorldChestMarkers(generateWorldChests(lat, lng));
+  } else if (worldChestMarkers.length === 0) {
+    placeWorldChestMarkers(existing);
+  }
+}
+
+function startWorldGPS() {
+  if (!navigator.geolocation) {
+    document.getElementById('world-gps-denied')?.classList.remove('hidden');
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    onWorldGPSPosition,
+    () => document.getElementById('world-gps-denied')?.classList.remove('hidden'),
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+  worldWatchId = navigator.geolocation.watchPosition(
+    onWorldGPSPosition,
+    () => {},
+    { enableHighAccuracy: true, maximumAge: 10000 }
+  );
+}
+
+function showWorldPage() {
+  document.getElementById('tab-explore')?.classList.add('map-active');
+  document.getElementById('explore-lobby').style.display      = 'none';
+  document.getElementById('explore-world-sub').style.display  = 'flex';
+  updateWorldHUD();
+  if (!worldMap) {
+    worldMap = L.map('world-map', { zoomControl: false, attributionControl: false });
+    L.control.zoom({ position: 'bottomright' }).addTo(worldMap);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(worldMap);
+    worldMap.setView([25.0330, 121.5654], 14);
+    // Load cached chests if any (non-GPS preview)
+    const existing = loadWorldChests();
+    if (existing) placeWorldChestMarkers(existing);
+  }
+  setTimeout(() => worldMap.invalidateSize(), 150);
+  startWorldGPS();
+}
+
+function hideWorldPage() {
+  document.getElementById('tab-explore')?.classList.remove('map-active');
+  document.getElementById('explore-world-sub').style.display = 'none';
+  document.getElementById('explore-lobby').style.display     = 'flex';
+  if (worldWatchId !== null) {
+    navigator.geolocation?.clearWatch(worldWatchId);
+    worldWatchId = null;
+  }
 }
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────

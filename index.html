@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pixel Pet</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     #app {
       display: flex;
@@ -24,6 +25,13 @@
       height: 100% !important;
       overflow-y: auto !important;
       box-sizing: border-box !important;
+    }
+
+    /* World map mode: strip padding and prevent scroll */
+    #tab-explore.map-active {
+      padding: 0 !important;
+      gap: 0 !important;
+      overflow: hidden !important;
     }
 
   </style>
@@ -149,8 +157,8 @@
             <div class="shop-card" style="background:#4CAF78" data-explore="world">
               <span class="shop-card__number">01</span>
               <span class="shop-card__icon">🗺️</span>
-              <span class="shop-card__name">探索世界</span>
-              <span class="shop-card__desc">前往不同地區冒險探索</span>
+              <span class="shop-card__name">出去玩</span>
+              <span class="shop-card__desc">在真實地圖上收集寶箱</span>
               <button class="shop-card__btn">查看</button>
             </div>
             <div class="shop-card" style="background:#E53935" data-explore="boss">
@@ -159,6 +167,42 @@
               <span class="shop-card__name">BOSS 挑戰</span>
               <span class="shop-card__desc">挑戰強大 BOSS 獲得稀有獎勵</span>
               <button class="shop-card__btn">查看</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- World Map Sub-page -->
+        <div id="explore-world-sub" class="explore-world-sub">
+          <!-- HUD bar (in-flow) -->
+          <div class="world-hud">
+            <button id="btn-world-back" class="world-hud__back">← 返回</button>
+            <div class="world-hud__title">🗺️ 出去玩</div>
+            <div class="world-hud__right">
+              <span>💎 <span id="world-hud-gems">0</span></span>
+              <span>🎁 <span id="world-hud-chests">0</span></span>
+            </div>
+          </div>
+          <!-- Map -->
+          <div id="world-map"></div>
+          <!-- Locate button -->
+          <button id="btn-world-locate" class="world-locate-btn" title="回到目前位置">➤</button>
+          <!-- GPS denied overlay -->
+          <div id="world-gps-denied" class="world-gps-denied hidden">
+            <div class="world-gps-denied__box">
+              <p>📍 請開啟定位權限才能出去玩！</p>
+              <button id="btn-world-manual">手動輸入位置</button>
+            </div>
+          </div>
+          <!-- Manual location modal -->
+          <div id="world-manual-location" class="world-manual-location hidden">
+            <div class="world-manual-box">
+              <h3>📍 手動輸入位置</h3>
+              <input type="number" id="world-lat-input" placeholder="緯度 (e.g. 25.0330)" step="0.0001" />
+              <input type="number" id="world-lng-input" placeholder="經度 (e.g. 121.5654)" step="0.0001" />
+              <div class="world-manual-actions">
+                <button id="btn-world-manual-cancel">取消</button>
+                <button id="btn-world-manual-confirm">確定</button>
+              </div>
             </div>
           </div>
         </div>
@@ -541,6 +585,7 @@
   <!-- Toast -->
   <div id="toast" class="toast hidden"></div>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="game.js"></script>
 </body>
 </html>
