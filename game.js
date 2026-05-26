@@ -1443,10 +1443,6 @@ function initBottomNav() {
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const nav = btn.dataset.nav;
-      if (nav === 'bag') {
-        openModal('modal-bag-select');
-        return; // 不切換 tab，不改變 active 狀態
-      }
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       if (nav === 'shop') {
