@@ -813,7 +813,6 @@ function confirmPPRestore(skillIndex) {
   if (ppRestoreFromBattle) {
     renderBattleItemPanel(); // 戰鬥中：重繪道具欄
   } else {
-    renderItemBag();
     showPetDetail(); // 背包中：重繪技能頁
   }
 }
@@ -894,119 +893,6 @@ function renderBattleItemPanel() {
     : '<div class="battle-item-empty">背包沒有道具</div>';
 }
 
-function renderItemBag() {
-  const el = document.getElementById('itembag-list');
-  if (!el) return;
-  const inv   = loadInventory();
-  const owned = Object.entries(ITEM_DEFS)
-    .filter(([id]) => (inv[id] || 0) > 0)
-    .map(([id, def]) => ({ id, def, cnt: inv[id] }));
-
-  if (!owned.length) {
-    el.innerHTML = '<p class="empty-hint" style="padding:20px 0;text-align:center">道具背包是空的</p>';
-    return;
-  }
-
-  el.innerHTML = owned.map(({ id, def, cnt }) => {
-    const isBossTicket = id === 'boss_ticket';
-    const btnLabel  = isBossTicket ? '⚔️ BOSS' : '使用';
-    const btnAction = isBossTicket
-      ? `showToast('🎫 請前往 BOSS 挑戰頁面！')`
-      : `useItem('${id}')`;
-    return `
-      <div class="bag-item-card">
-        <div class="bag-item-card__icon-wrap">
-          <span>${def.icon}</span>
-        </div>
-        <div class="bag-item-card__info">
-          <div class="bag-item-card__name">${def.name}</div>
-          <div class="bag-item-card__desc">${def.desc}</div>
-        </div>
-        <div class="bag-item-card__right">
-          <span class="bag-item-card__count">×${cnt}</span>
-          <button class="use-btn" onclick="${btnAction}">${btnLabel}</button>
-        </div>
-      </div>`;
-  }).join('');
-}
-
-// ─── Pet Bag ──────────────────────────────────────────────────────────────────
-function renderPetBag() {
-  const grid = document.getElementById('petbag-grid');
-  if (!grid) return;
-  const team      = loadTeam();
-  const inTeamSet = new Set(team.filter(Boolean));
-  const bagPets   = unlockedPets
-    .map(id => PETS.find(p => p.id === id))
-    .filter(p => p && !inTeamSet.has(p.id));
-
-  if (bagPets.length === 0) {
-    grid.innerHTML = '<div class="petbag-empty">背包裡沒有寵物<br><span>（全部已在隊伍中）</span></div>';
-    return;
-  }
-  grid.innerHTML = bagPets.map(pet => {
-    const ps = loadPetState(pet.id);
-    return `
-      <div class="petbag-card petbag-card--tab" onclick="openPetBagOptions('${pet.id}')">
-        <div class="petbag-card__img-wrap">
-          <img src="${pet.image}" class="petbag-card__img" alt="${pet.name}"
-               onerror="this.style.opacity='.3'">
-        </div>
-        <div class="petbag-card__name">${pet.name}</div>
-        <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
-        <div class="petbag-card__lv">Lv.${ps.level}</div>
-      </div>`;
-  }).join('');
-}
-
-// ─── Pet Bag Options Modal ────────────────────────────────────────────────────
-let pendingBagPetId = null;
-
-function openPetBagOptions(petId) {
-  const pet = PETS.find(p => p.id === petId);
-  if (!pet) return;
-  pendingBagPetId = petId;
-
-  document.getElementById('petbag-opts-img').src         = pet.image;
-  document.getElementById('petbag-opts-name').textContent = pet.name;
-
-  const team     = loadTeam();
-  const hasSpace = team.some(slot => slot === null);
-  const joinBtn  = document.getElementById('btn-petbag-join-team');
-  joinBtn.disabled = !hasSpace;
-  joinBtn.classList.toggle('team-options-btn--danger', false);
-  joinBtn.textContent = hasSpace ? '⚔️ 加入隊伍' : '⚔️ 隊伍已滿';
-  joinBtn.style.opacity = hasSpace ? '' : '0.45';
-
-  openModal('modal-petbag-options');
-}
-
-function addBagPetToTeam() {
-  if (!pendingBagPetId) return;
-  const team    = loadTeam();
-  const slotIdx = team.indexOf(null);
-  if (slotIdx === -1) { showToast('隊伍已滿！'); return; }
-
-  const petId = pendingBagPetId;
-  team[slotIdx] = petId;
-  saveTeam(team);
-  if (slotIdx === 0) refreshDisplayPetState();
-  renderTeam();
-  renderAll();
-  closeModal('modal-petbag-options');
-  renderPetBag(); // refresh after joining
-  const pet = PETS.find(p => p.id === petId);
-  showToast(`✅ ${pet?.name ?? '寵物'} 加入隊伍！`);
-  pendingBagPetId = null;
-}
-
-function viewBagPetDetail() {
-  const petId = pendingBagPetId;
-  pendingBagPetId = null;
-  closeModal('modal-petbag-options');
-  showPetDetail(petId);
-}
-
 // ─── Food System ─────────────────────────────────────────────────────────────
 function buyFood(id) {
   const food = FOODS.find(f => f.id === id);
@@ -1017,24 +903,6 @@ function buyFood(id) {
   saveInventory(inv);
   showToast(`購買成功：${food.name} ×1`);
   renderFoodShop();
-}
-
-function useFood(id) {
-  const food = FOODS.find(f => f.id === id);
-  if (!food) return;
-  const inv = loadInventory();
-  if (!inv[id] || inv[id] <= 0) return;
-  inv[id]--;
-  if (inv[id] === 0) delete inv[id];
-  saveInventory(inv);
-  const e = food.effect;
-  if (e.water)  state.water  = Math.min(100, state.water  + e.water);
-  if (e.hunger) state.hunger = Math.min(100, state.hunger + e.hunger);
-  if (e.mood)   state.mood   = Math.min(100, state.mood   + e.mood);
-  saveState();
-  if (e.exp) addExp(e.exp); else renderAll();
-  showToast(`使用 ${food.name}！${food.desc}`);
-  renderFoodBag();
 }
 
 // ─── Feed from Bag Modal ──────────────────────────────────────────────────────
@@ -1121,38 +989,6 @@ function renderFoodShop() {
   panel.innerHTML = `<div class="card" style="display:flex;flex-direction:column;gap:10px">${html}</div>`;
 }
 
-function renderFoodBag() {
-  const el = document.getElementById('foodbag-list');
-  if (!el) return;
-  const inv   = loadInventory();
-  const owned = Object.entries(inv).filter(([id, cnt]) => cnt > 0 && id.startsWith('food_'));
-  if (!owned.length) {
-    el.innerHTML = '<p class="empty-hint" style="padding:20px 0;text-align:center">食物背包是空的</p>';
-    return;
-  }
-  el.innerHTML = owned.map(([id, cnt]) => {
-    const f = FOODS.find(x => x.id === id);
-    if (!f) return '';
-    return `
-      <div class="bag-item-card">
-        <div class="bag-item-card__img-wrap">
-          <img src="${f.image}" class="bag-item-card__img" onerror="this.style.opacity='0.2'">
-        </div>
-        <div class="bag-item-card__info">
-          <div class="bag-item-card__name">
-            ${f.name}
-            <span class="badge badge--${f.rarity.toLowerCase()}">${f.rarity}</span>
-          </div>
-          <div class="bag-item-card__desc">${f.desc}</div>
-        </div>
-        <div class="bag-item-card__right">
-          <span class="bag-item-card__count">×${cnt}</span>
-          <button class="use-btn" onclick="useFood('${id}')">使用</button>
-        </div>
-      </div>`;
-  }).join('');
-}
-
 // ─── Drink Inventory ─────────────────────────────────────────────────────────
 function loadInventory() {
   try { const r = localStorage.getItem('inventory'); return r ? JSON.parse(r) : {}; } catch { return {}; }
@@ -1201,24 +1037,6 @@ function buyDrink(id) {
   saveInventory(inv);
   showToast(`購買成功：${drink.name} ×1`);
   renderDrinkShop();
-}
-
-function useDrink(id) {
-  const drink = DRINKS.find(d => d.id === id);
-  if (!drink) return;
-  const inv = loadInventory();
-  if (!inv[id] || inv[id] <= 0) return;
-  inv[id]--;
-  if (inv[id] === 0) delete inv[id];
-  saveInventory(inv);
-  const e = drink.effect;
-  if (e.water)  state.water  = Math.min(100, state.water  + e.water);
-  if (e.hunger) state.hunger = Math.min(100, state.hunger + e.hunger);
-  if (e.mood)   state.mood   = Math.min(100, state.mood   + e.mood);
-  saveState();
-  if (e.exp) addExp(e.exp); else renderAll();
-  showToast(`使用 ${drink.name}！${drink.desc}`);
-  renderDrinkBag();
 }
 
 // ─── Drink from Bag Modal ─────────────────────────────────────────────────────
@@ -1452,52 +1270,6 @@ function renderDrinkShop() {
   panel.innerHTML = `<div class="card" style="display:flex;flex-direction:column;gap:10px">${html}</div>`;
 }
 
-function renderDrinkBag() {
-  const el = document.getElementById('drinkbag-list');
-  if (!el) return;
-  const inv   = loadInventory();
-  const owned = Object.entries(inv).filter(([id, cnt]) => cnt > 0 && id.startsWith('drink_'));
-  if (!owned.length) {
-    el.innerHTML = '<p class="empty-hint" style="padding:20px 0;text-align:center">飲料背包是空的</p>';
-    return;
-  }
-  el.innerHTML = owned.map(([id, cnt]) => {
-    const d = DRINKS.find(x => x.id === id);
-    if (!d) return '';
-    return `
-      <div class="bag-item-card">
-        <div class="bag-item-card__img-wrap">
-          <img src="${d.image}" class="bag-item-card__img" onerror="this.style.opacity='0.2'">
-        </div>
-        <div class="bag-item-card__info">
-          <div class="bag-item-card__name">
-            ${d.name}
-            <span class="badge badge--${d.rarity.toLowerCase()}">${d.rarity}</span>
-          </div>
-          <div class="bag-item-card__desc">${d.desc}</div>
-        </div>
-        <div class="bag-item-card__right">
-          <span class="bag-item-card__count">×${cnt}</span>
-          <button class="use-btn" onclick="useDrink('${id}')">使用</button>
-        </div>
-      </div>`;
-  }).join('');
-}
-
-// ─── Bag Sub-tab Switching ────────────────────────────────────────────────────
-function switchBagTab(tab) {
-  document.querySelectorAll('.bag-tab').forEach(t => {
-    t.classList.toggle('bag-tab--active', t.dataset.bagTab === tab);
-  });
-  document.querySelectorAll('.bag-content').forEach(c => c.classList.add('hidden'));
-  const content = document.getElementById(`bag-${tab}-content`);
-  if (content) content.classList.remove('hidden');
-  if      (tab === 'food')  renderFoodBag();
-  else if (tab === 'drink') renderDrinkBag();
-  else if (tab === 'item')  renderItemBag();
-  else if (tab === 'pet')   renderPetBag();
-}
-
 // ─── Decay ───────────────────────────────────────────────────────────────────
 function decayStats() {
   const teamIds = loadTeam().filter(id => id !== null);
@@ -1723,9 +1495,6 @@ function initActions() {
   document.getElementById('btn-itembag').addEventListener('click', openItemPickModal);
 
   document.getElementById('btn-petbag').addEventListener('click', openPetPickModal);
-
-  document.getElementById('btn-petbag-join-team')?.addEventListener('click', addBagPetToTeam);
-  document.getElementById('btn-petbag-view-detail')?.addEventListener('click', viewBagPetDetail);
 
   document.getElementById('btn-pokedex').addEventListener('click', openPokedex);
 
