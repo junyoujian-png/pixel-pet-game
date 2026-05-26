@@ -266,6 +266,22 @@ const MOOD_MOODS = [
   [80, '😄'], [60, '😊'], [40, '😐'], [20, '😟'], [0, '😢']
 ];
 
+// ─── Slot System ─────────────────────────────────────────────────────────────
+function loadSlots() {
+  try {
+    const raw = localStorage.getItem('petSlots');
+    if (raw) {
+      const arr = JSON.parse(raw);
+      while (arr.length < 3) arr.push(null);
+      return arr.slice(0, 3);
+    }
+  } catch {}
+  return [null, null, null];
+}
+function saveSlots(arr) {
+  localStorage.setItem('petSlots', JSON.stringify(arr));
+}
+
 // ─── Per-pet state helpers (function declarations = hoisted) ─────────────────
 function loadPetState(petId) {
   const defaults = { ...DEFAULT_PET_STATE };
@@ -281,15 +297,18 @@ function savePetState(petId, data) {
   localStorage.setItem(`petState_${petId}`, JSON.stringify(data));
 }
 function getDisplayPetId() {
-  const team = loadTeam(); // hoisted function declaration
-  return team.find(id => id !== null) || null;
+  return loadSlots()[currentSlotIdx] || null;
 }
 
 // ─── State ───────────────────────────────────────────────────────────────────
 const DEFAULT_GLOBAL = { coins: 50, items: {}, equips: [] };
 const DEFAULT_PET_STATE = { level: 1, exp: 0, hunger: 60, water: 70, mood: 80 };
 
-let selectedPetId = localStorage.getItem('selectedPetId') || null;
+let selectedPetId    = localStorage.getItem('selectedPetId') || null;
+let currentSlotIdx   = 0;    // currently visible slot page (0–2)
+let pendingSlotIdx   = null; // slot being managed via options modal
+let pendingAddSlotIdx = null; // target slot for pet-pick modal
+let slotScrollBound  = false;
 let state = loadState();
 
 function currentPet() {
@@ -642,80 +661,19 @@ function spendCoins(n) {
 
 // ─── Rendering ───────────────────────────────────────────────────────────────
 function renderAll() {
-  renderPetCard();
-  renderStats();
+  renderPetSlots();
   renderCoins();
-  renderTeam();
 }
 
-function renderPetCard() {
-  const displayId = getDisplayPetId();
-
-  if (!displayId) {
-    // No pet in first team slot — show placeholder
-    const img = document.getElementById('pet-img');
-    img.src = 'assets/pets/fox.png';
-    img.alt = '';
-    img.style.opacity = '0.25';
-    document.getElementById('pet-name').textContent   = '請加入寵物到隊伍';
-    document.getElementById('pet-level').textContent  = '—';
-    document.getElementById('pet-level').classList.remove('level-max');
-    document.getElementById('pet-rarity-badge').textContent = '';
-    document.getElementById('pet-rarity-badge').className   = 'badge';
-    document.getElementById('exp-fill').style.width  = '0%';
-    document.getElementById('exp-text').textContent  = '';
-    document.getElementById('pet-mood-emoji').textContent = '😶';
-    return;
-  }
-
-  const img = document.getElementById('pet-img');
-  img.style.opacity = '';
-  const pet      = currentPet();
-  const maxLevel = getMaxLevel(pet.rarity);
-  const isMaxed  = state.level >= maxLevel;
-
-  img.src = pet.image;
-  img.alt = pet.name;
-
-  document.getElementById('pet-name').textContent = pet.name;
-
-  const levelEl = document.getElementById('pet-level');
-  levelEl.textContent = state.level;
-  levelEl.classList.toggle('level-max', isMaxed);
-
-  const badge = document.getElementById('pet-rarity-badge');
-  badge.textContent = pet.rarity;
-  badge.className   = `badge badge--${pet.rarity.toLowerCase()}`;
-
-  if (isMaxed) {
-    document.getElementById('exp-fill').style.width = '100%';
-    document.getElementById('exp-text').textContent  = 'MAX';
-  } else {
-    const pct = Math.floor((state.exp / EXP_PER_LEVEL) * 100);
-    document.getElementById('exp-fill').style.width = `${pct}%`;
-    document.getElementById('exp-text').textContent  = `${state.exp} / ${EXP_PER_LEVEL}`;
-  }
-}
-
-function renderStats() {
-  document.getElementById('stat-mood').textContent   = Math.round(state.mood);
-  document.getElementById('stat-hunger').textContent = Math.round(state.hunger);
-  document.getElementById('stat-water').textContent  = Math.round(state.water);
-
-  document.getElementById('mood-fill').style.width   = `${state.mood}%`;
-  document.getElementById('hunger-fill').style.width = `${state.hunger}%`;
-  document.getElementById('water-fill').style.width  = `${state.water}%`;
-
-  const moodEntry = MOOD_MOODS.find(([min]) => state.mood >= min) || MOOD_MOODS.at(-1);
-  document.getElementById('pet-mood-emoji').textContent = moodEntry[1];
-}
 
 function renderCoins() {
   document.getElementById('coin-count').textContent = state.coins;
 }
 
 function animateLevelUp() {
-  const el = document.getElementById('pet-level');
+  const page = document.getElementById(`slot-page-${currentSlotIdx}`);
+  const el   = page?.querySelector('.slot-level-num');
+  if (!el) return;
   el.classList.remove('level-up-anim');
   void el.offsetWidth;
   el.classList.add('level-up-anim');
@@ -748,7 +706,7 @@ function useItem(id) {
 
   if (id === 'candy') {
     state.mood = Math.min(100, state.mood + 10);
-    saveState(); renderStats();
+    saveState(); renderSlotPage(currentSlotIdx);
     showToast('使用愛心糖！+10心情 😄');
   } else if (id === 'xpboost') {
     saveState();
@@ -1161,7 +1119,7 @@ function useItemFromPickModal(id) {
   consumeItem(id);
   if (id === 'candy') {
     state.mood = Math.min(100, state.mood + 10);
-    saveState(); renderStats();
+    saveState(); renderSlotPage(currentSlotIdx);
     showToast('使用愛心糖！+10心情 😄');
   } else if (id === 'xpboost') {
     saveState();
@@ -1182,11 +1140,11 @@ function openPetPickModal() {
 function renderPetPickModal() {
   const el = document.getElementById('pet-pick-list');
   if (!el) return;
-  const team      = loadTeam();
-  const inTeamSet = new Set(team.filter(Boolean));
-  const bagPets   = unlockedPets
+  const slots      = loadSlots();
+  const inSlotSet  = new Set(slots.filter(Boolean));
+  const bagPets    = unlockedPets
     .map(id => PETS.find(p => p.id === id))
-    .filter(p => p && !inTeamSet.has(p.id));
+    .filter(p => p && !inSlotSet.has(p.id));
 
   if (!bagPets.length) {
     el.innerHTML = `
@@ -1197,7 +1155,7 @@ function renderPetPickModal() {
     return;
   }
 
-  const teamFull = !team.some(slot => slot === null);
+  const slotsFull = !slots.some(slot => slot === null);
   el.innerHTML = bagPets.map(pet => {
     const ps = loadPetState(pet.id);
     return `
@@ -1213,9 +1171,9 @@ function renderPetPickModal() {
           <div class="modal-pick-desc">Lv.${ps.level}</div>
         </div>
         <div class="modal-pick-right">
-          <button class="use-btn${teamFull ? ' use-btn--disabled' : ''}"
-                  ${teamFull ? 'disabled' : `onclick="addPetFromPickModal('${pet.id}')"`}>
-            ${teamFull ? '隊伍已滿' : '加入隊伍'}
+          <button class="use-btn${slotsFull ? ' use-btn--disabled' : ''}"
+                  ${slotsFull ? 'disabled' : `onclick="addPetFromPickModal('${pet.id}')"`}>
+            ${slotsFull ? '巢位已滿' : '加入巢位'}
           </button>
         </div>
       </div>`;
@@ -1223,20 +1181,21 @@ function renderPetPickModal() {
 }
 
 function addPetFromPickModal(petId) {
-  const team    = loadTeam();
-  const slotIdx = team.indexOf(null);
-  if (slotIdx === -1) {
-    showToast('隊伍已滿，請先移除一隻寵物');
-    return;
+  const slots = loadSlots();
+  let slotIdx;
+  if (pendingAddSlotIdx !== null && slots[pendingAddSlotIdx] === null) {
+    slotIdx = pendingAddSlotIdx;
+  } else {
+    slotIdx = slots.indexOf(null);
   }
-  team[slotIdx] = petId;
-  saveTeam(team);
-  if (slotIdx === 0) refreshDisplayPetState();
-  renderTeam();
+  pendingAddSlotIdx = null;
+  if (slotIdx === -1) { showToast('所有巢位已滿！'); return; }
+  slots[slotIdx] = petId;
+  saveSlots(slots);
   renderAll();
   closeModal('modal-pet-pick');
   const pet = PETS.find(p => p.id === petId);
-  showToast(`✅ ${pet?.name ?? '寵物'} 加入隊伍！`);
+  showToast(`✅ ${pet?.name ?? '寵物'} 加入巢位！`);
 }
 
 function renderDrinkShop() {
@@ -1272,10 +1231,10 @@ function renderDrinkShop() {
 
 // ─── Decay ───────────────────────────────────────────────────────────────────
 function decayStats() {
-  const teamIds = loadTeam().filter(id => id !== null);
-  if (teamIds.length === 0) return;
+  const slotIds = loadSlots().filter(id => id !== null);
+  if (slotIds.length === 0) return;
 
-  for (const petId of teamIds) {
+  for (const petId of slotIds) {
     const ps  = loadPetState(petId);
     const pet = PETS.find(p => p.id === petId);
 
@@ -1288,7 +1247,7 @@ function decayStats() {
     let moodDec = 1;
     if (ps.hunger < 20) moodDec += 1;
     if (ps.water  < 20) moodDec += 1;
-    if (ps.hunger === 0) moodDec += 1; // extra penalty at 0
+    if (ps.hunger === 0) moodDec += 1;
     if (ps.water  === 0) moodDec += 1;
     ps.mood = Math.max(0, ps.mood - moodDec);
 
@@ -1300,9 +1259,8 @@ function decayStats() {
     }
   }
 
-  // Refresh in-memory state from display pet
   refreshDisplayPetState();
-  renderStats();
+  renderPetSlots();
 }
 
 // ─── Shop Cards ───────────────────────────────────────────────────────────────
@@ -1484,22 +1442,9 @@ function initShop() {
 
 // ─── Action Buttons ──────────────────────────────────────────────────────────
 function initActions() {
-  document.getElementById('btn-feed').addEventListener('click', openFeedModal);
-
-  document.getElementById('btn-drink').addEventListener('click', openDrinkModal);
-
-  document.getElementById('btn-itembag').addEventListener('click', openItemPickModal);
-
-  document.getElementById('btn-petbag').addEventListener('click', openPetPickModal);
-
-  document.getElementById('btn-pokedex').addEventListener('click', openPokedex);
-
-  document.getElementById('btn-pet-detail').addEventListener('click', () => showPetDetail());
   document.getElementById('btn-detail-back').addEventListener('click', () => hidePetDetail());
-
-  document.getElementById('btn-team-view-detail')?.addEventListener('click', viewTeamPetDetail);
-  document.getElementById('btn-team-send-back')?.addEventListener('click', sendTeamPetBack);
-
+  document.getElementById('btn-slot-view-detail')?.addEventListener('click', viewSlotPetDetail);
+  document.getElementById('btn-slot-send-back')?.addEventListener('click', sendSlotPetBack);
   document.getElementById('btn-spin')?.addEventListener('click', doSpin);
   document.getElementById('btn-wheel-close')?.addEventListener('click', closeWheelModal);
 }
@@ -1535,158 +1480,197 @@ function renderPokedex() {
   }).join('');
 }
 
-// ─── Team System ─────────────────────────────────────────────────────────────
-function loadTeam() {
-  try {
-    const raw = localStorage.getItem('team');
-    if (raw) {
-      const arr = JSON.parse(raw);
-      while (arr.length < 3) arr.push(null);
-      return arr.slice(0, 3);
+// ─── Slot System Rendering ────────────────────────────────────────────────────
+function renderPetSlots() {
+  for (let i = 0; i < 3; i++) renderSlotPage(i);
+  updateSlotDots(currentSlotIdx);
+  initSlotScroll();
+}
+
+function renderSlotPage(slotIdx) {
+  const slots = loadSlots();
+  const petId = slots[slotIdx];
+  const page  = document.getElementById(`slot-page-${slotIdx}`);
+  if (!page) return;
+
+  if (!petId) {
+    page.innerHTML = `
+      <div class="slot-empty-box">
+        <div class="slot-empty-icon">🐾</div>
+        <div class="slot-empty-text">空的巢位</div>
+        <button class="slot-add-btn" onclick="openPetPickForSlot(${slotIdx})">＋ 加入寵物</button>
+      </div>`;
+    return;
+  }
+
+  const pet = PETS.find(p => p.id === petId);
+  if (!pet) { slots[slotIdx] = null; saveSlots(slots); renderSlotPage(slotIdx); return; }
+
+  const ps        = loadPetState(petId);
+  const maxLevel  = getMaxLevel(pet.rarity);
+  const isMaxed   = ps.level >= maxLevel;
+  const pct       = isMaxed ? 100 : Math.floor((ps.exp / EXP_PER_LEVEL) * 100);
+  const moodEntry = MOOD_MOODS.find(([min]) => ps.mood >= min) || MOOD_MOODS.at(-1);
+
+  page.innerHTML = `
+    <div class="card pet-card">
+      <div class="pet-card__left">
+        <div class="pet-avatar">
+          <img src="${pet.image}" alt="${pet.name}" class="pixel-art" />
+        </div>
+        <div class="mood-emoji">${moodEntry[1]}</div>
+      </div>
+      <div class="pet-card__right">
+        <div class="pet-name-row">
+          <span class="pet-name">${pet.name}</span>
+          <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
+        </div>
+        <div class="pet-level-row">
+          <span class="label">Lv.</span>
+          <span class="level-num slot-level-num${isMaxed ? ' level-max' : ''}">${ps.level}${isMaxed ? ' MAX' : ''}</span>
+        </div>
+        <div class="exp-bar-wrap">
+          <div class="exp-bar"><div class="exp-bar__fill" style="width:${pct}%"></div></div>
+          <span class="exp-text">${isMaxed ? 'MAX' : `${ps.exp} / ${EXP_PER_LEVEL}`}</span>
+        </div>
+      </div>
+    </div>
+    <div class="card stats-card">
+      <div class="stat-row">
+        <span class="stat-label">😄 心情</span>
+        <div class="stat-bar-wrap">
+          <div class="stat-bar"><div class="stat-bar__fill mood-fill" style="width:${Math.min(100,ps.mood)}%"></div></div>
+          <span class="stat-value">${Math.round(ps.mood)}</span>
+        </div>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">🍖 飽食</span>
+        <div class="stat-bar-wrap">
+          <div class="stat-bar"><div class="stat-bar__fill hunger-fill" style="width:${Math.min(100,ps.hunger)}%"></div></div>
+          <span class="stat-value">${Math.round(ps.hunger)}</span>
+        </div>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">💧 水份</span>
+        <div class="stat-bar-wrap">
+          <div class="stat-bar"><div class="stat-bar__fill water-fill" style="width:${Math.min(100,ps.water)}%"></div></div>
+          <span class="stat-value">${Math.round(ps.water)}</span>
+        </div>
+      </div>
+    </div>
+    <div class="action-grid">
+      <button class="action-btn" onclick="slotFeed(${slotIdx})">
+        <span class="action-icon">🍖</span><span>餵食</span>
+      </button>
+      <button class="action-btn" onclick="slotDrink(${slotIdx})">
+        <span class="action-icon">🥤</span><span>飲料</span>
+      </button>
+      <button class="action-btn" onclick="slotItemBag(${slotIdx})">
+        <span class="action-icon">🎒</span><span>道具背包</span>
+      </button>
+      <button class="action-btn" onclick="openPetPickModal()">
+        <span class="action-icon">🐾</span><span>寵物背包</span>
+      </button>
+    </div>
+    <div class="small-btn-row">
+      <button class="small-btn" onclick="showPetDetail('${petId}')">
+        <span>ℹ️</span><span class="small-btn-label">資訊</span>
+      </button>
+      <button class="small-btn" onclick="openPokedex()">
+        <span>📖</span><span class="small-btn-label">圖鑑</span>
+      </button>
+      <button class="small-btn" onclick="openSlotOptionsModal(${slotIdx})">
+        <span>⚙️</span><span class="small-btn-label">管理</span>
+      </button>
+    </div>
+  `;
+}
+
+function updateSlotDots(activeIdx) {
+  document.querySelectorAll('#slot-dots .team-dot').forEach((dot, i) => {
+    dot.classList.toggle('team-dot--active', i === activeIdx);
+  });
+}
+
+function initSlotScroll() {
+  if (slotScrollBound) return;
+  const container = document.getElementById('slot-scroll');
+  if (!container) return;
+  slotScrollBound = true;
+  container.addEventListener('scroll', () => {
+    const w   = container.offsetWidth || 1;
+    const idx = Math.min(2, Math.round(container.scrollLeft / w));
+    if (idx !== currentSlotIdx) {
+      currentSlotIdx = idx;
+      refreshDisplayPetState();
+      updateSlotDots(idx);
     }
-  } catch {}
-  return [null, null, null];
+  }, { passive: true });
 }
 
-function saveTeam(arr) {
-  localStorage.setItem('team', JSON.stringify(arr));
+// ─── Slot Action Helpers ──────────────────────────────────────────────────────
+function setActiveSlot(slotIdx) {
+  if (currentSlotIdx !== slotIdx) {
+    currentSlotIdx = slotIdx;
+    refreshDisplayPetState();
+  }
+}
+function slotFeed(slotIdx)    { setActiveSlot(slotIdx); openFeedModal(); }
+function slotDrink(slotIdx)   { setActiveSlot(slotIdx); openDrinkModal(); }
+function slotItemBag(slotIdx) { setActiveSlot(slotIdx); openItemPickModal(); }
+
+function openPetPickForSlot(slotIdx) {
+  pendingAddSlotIdx = slotIdx;
+  openPetPickModal();
 }
 
-function getTeamPets() {
-  return loadTeam()
+// ─── Slot Options Modal ───────────────────────────────────────────────────────
+function openSlotOptionsModal(slotIdx) {
+  const slots = loadSlots();
+  const pet   = PETS.find(p => p.id === slots[slotIdx]);
+  if (!pet) return;
+  pendingSlotIdx = slotIdx;
+  document.getElementById('slot-options-pet-img').src          = pet.image;
+  document.getElementById('slot-options-pet-img').alt          = pet.name;
+  document.getElementById('slot-options-pet-name').textContent = pet.name;
+  openModal('modal-slot-options');
+}
+
+function sendSlotPetBack() {
+  const slots = loadSlots();
+  const pet   = PETS.find(p => p.id === slots[pendingSlotIdx]);
+  slots[pendingSlotIdx] = null;
+  saveSlots(slots);
+  if (currentSlotIdx === pendingSlotIdx) {
+    const next = slots.findIndex(id => id !== null);
+    currentSlotIdx = next >= 0 ? next : 0;
+    refreshDisplayPetState();
+  }
+  renderAll();
+  closeModal('modal-slot-options');
+  showToast(`📦 ${pet?.name ?? '寵物'} 已移回背包`);
+}
+
+function viewSlotPetDetail() {
+  const slots = loadSlots();
+  const petId = slots[pendingSlotIdx];
+  closeModal('modal-slot-options');
+  showPetDetail(petId);
+}
+
+// ─── getSlotPets (for battle) ─────────────────────────────────────────────────
+function getSlotPets() {
+  return loadSlots()
     .filter(id => id !== null)
     .map(id => PETS.find(p => p.id === id))
     .filter(Boolean);
 }
 
-let pendingTeamSlot = null;
-let teamScrollBound = false;
-
-function renderTeam() {
-  const team      = loadTeam();
-  const container = document.getElementById('team-container');
-  if (!container) return;
-
-  container.innerHTML = team.map((petId, idx) => {
-    if (petId) {
-      const pet = PETS.find(p => p.id === petId);
-      if (pet) return `
-        <div class="team-slot" data-slot="${idx}">
-          <div class="team-slot__filled" data-slot="${idx}">
-            <div class="team-slot__pet-wrap">
-              <img src="${pet.image}" class="team-slot__img" alt="${pet.name}"
-                   onerror="this.style.opacity='.4'">
-            </div>
-            <div class="team-slot__pet-info">
-              <span class="team-slot__pet-name">${pet.name}</span>
-              <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
-              <span class="team-slot__pet-level">Lv.${state.level}</span>
-            </div>
-          </div>
-        </div>`;
-    }
-    return `
-      <div class="team-slot" data-slot="${idx}">
-        <div class="team-slot__empty" data-slot="${idx}">
-          <div class="team-slot__plus">+</div>
-          <div class="team-slot__add-text">加入隊伍</div>
-        </div>
-      </div>`;
-  }).join('');
-
-  container.querySelectorAll('.team-slot__empty').forEach(el => {
-    el.addEventListener('click', () => openTeamAddModal(parseInt(el.dataset.slot)));
-  });
-  container.querySelectorAll('.team-slot__filled').forEach(el => {
-    el.addEventListener('click', () => openTeamOptionsModal(parseInt(el.dataset.slot)));
-  });
-
-  // Scroll → dots
-  if (!teamScrollBound) {
-    teamScrollBound = true;
-    container.addEventListener('scroll', () => {
-      const w   = container.offsetWidth || 1;
-      const idx = Math.min(2, Math.round(container.scrollLeft / w));
-      updateTeamDots(idx);
-    }, { passive: true });
-  }
-  updateTeamDots(0);
-  container.scrollLeft = 0;
-}
-
-function updateTeamDots(activeIdx = 0) {
-  document.querySelectorAll('#team-dots .team-dot').forEach((dot, i) => {
-    dot.classList.toggle('team-dot--active', i === activeIdx);
-  });
-}
-
-function openTeamAddModal(slotIdx) {
-  pendingTeamSlot  = slotIdx;
-  const team       = loadTeam();
-  const inTeam     = new Set(team.filter(Boolean));
-  const choices    = unlockedPets
-    .map(id => PETS.find(p => p.id === id))
-    .filter(p => p && !inTeam.has(p.id));
-
-  const list = document.getElementById('team-add-list');
-  if (!list) return;
-
-  list.innerHTML = choices.length === 0
-    ? '<p class="empty-hint">沒有其他可加入的寵物</p>'
-    : choices.map(pet => `
-        <div class="team-add-item" data-pet-id="${pet.id}">
-          <img src="${pet.image}" class="team-add-item__img" alt="${pet.name}"
-               onerror="this.style.opacity='.35'">
-          <div class="team-add-item__info">
-            <span class="team-add-item__name">${pet.name}</span>
-            <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
-          </div>
-        </div>`).join('');
-
-  list.querySelectorAll('.team-add-item').forEach(el => {
-    el.addEventListener('click', () => {
-      const team = loadTeam();
-      team[pendingTeamSlot] = el.dataset.petId;
-      saveTeam(team);
-      if (pendingTeamSlot === 0 || team.indexOf(el.dataset.petId) === 0) {
-        refreshDisplayPetState();
-      }
-      renderTeam();
-      renderAll();
-      closeModal('modal-team-add');
-      showToast(`✅ ${PETS.find(p => p.id === el.dataset.petId)?.name} 加入隊伍！`);
-    });
-  });
-
-  openModal('modal-team-add');
-}
-
-function openTeamOptionsModal(slotIdx) {
-  pendingTeamSlot = slotIdx;
-  const team = loadTeam();
-  const pet  = PETS.find(p => p.id === team[slotIdx]);
-  if (!pet) return;
-  document.getElementById('team-options-pet-img').src         = pet.image;
-  document.getElementById('team-options-pet-img').alt         = pet.name;
-  document.getElementById('team-options-pet-name').textContent = pet.name;
-  openModal('modal-team-options');
-}
-
-function sendTeamPetBack() {
-  const team = loadTeam();
-  const pet  = PETS.find(p => p.id === team[pendingTeamSlot]);
-  team[pendingTeamSlot] = null;
-  saveTeam(team);
-  if (pendingTeamSlot === 0) refreshDisplayPetState();
-  renderTeam();
-  renderAll();
-  closeModal('modal-team-options');
-  showToast(`📦 ${pet?.name ?? '寵物'} 已移回背包`);
-}
-
-function viewTeamPetDetail() {
-  closeModal('modal-team-options');
-  showPetDetail();
+// ─── Migration: team → petSlots ───────────────────────────────────────────────
+function migrateTeamToSlots() {
+  if (localStorage.getItem('petSlots')) return;
+  const teamRaw = localStorage.getItem('team');
+  if (teamRaw) localStorage.setItem('petSlots', teamRaw);
 }
 
 // ─── Boss System ─────────────────────────────────────────────────────────────
@@ -1924,9 +1908,9 @@ let battleAnimMaxBossHp = 0;
 let battleAnimIdx       = 0;    // index of next turn to process
 
 function startBattle(boss, isFirstTime) {
-  const teamPets = getTeamPets();
+  const teamPets = getSlotPets();
   if (teamPets.length === 0) {
-    showToast('隊伍裡沒有寵物！請先在主頁加入隊伍成員');
+    showToast('巢位裡沒有寵物！請先在主頁加入寵物');
     return;
   }
 
@@ -2394,9 +2378,11 @@ function init() {
     selectedPetId = 'pet1';
     localStorage.setItem('selectedPetId', selectedPetId);
   }
-  state = loadState(); // always reload to pick up correct display pet
-  migrateItemsToInventory();  // one-time: move state.items → inventory
+  migrateTeamToSlots();         // one-time: copy team → petSlots if needed
+  state = loadState();          // always reload to pick up correct display pet
+  migrateItemsToInventory();    // one-time: move state.items → inventory
   renderAll();
+  initSlotScroll();
   initTabs();
   initModals();
   initBottomNav();

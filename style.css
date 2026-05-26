@@ -2016,7 +2016,83 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   100% { transform: translateY(-90px); opacity: 0; }
 }
 
-/* ─── Team Section ───────────────────────────────────────────────────────── */
+/* ─── Pet Slot Pages ─────────────────────────────────────────────────────── */
+#tab-pet.active {
+  padding: 0 !important;
+  gap: 0 !important;
+  overflow: hidden !important;
+}
+
+.slot-scroll {
+  flex: 1;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
+}
+.slot-scroll::-webkit-scrollbar { display: none; }
+
+.slot-page {
+  flex-shrink: 0;
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: start;
+  overflow-y: auto;
+  padding: 12px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.slot-dots-bar {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 0 10px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+
+/* Empty slot */
+.slot-empty-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 220px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--surface2);
+  margin: 4px 0;
+}
+.slot-empty-icon { font-size: 52px; opacity: 0.35; }
+.slot-empty-text {
+  font-size: 14px;
+  color: var(--text2);
+  font-weight: 600;
+}
+.slot-add-btn {
+  padding: 10px 28px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity .2s, transform .1s;
+}
+.slot-add-btn:hover  { opacity: .88; }
+.slot-add-btn:active { transform: scale(.96); }
+
+/* ─── Team Section (legacy — kept for dot CSS reuse) ─────────────────────── */
 .team-card { padding: 14px 14px 10px; }
 .team-card .section-title { margin-bottom: 12px; }
 

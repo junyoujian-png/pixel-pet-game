@@ -60,103 +60,18 @@
 
       <!-- Pet Tab -->
       <section class="tab-panel active" id="tab-pet">
-
-        <!-- Info Card -->
-        <div class="card pet-card">
-          <div class="pet-card__left">
-            <div class="pet-avatar">
-              <img id="pet-img" src="assets/pets/fox.png" alt="fox" class="pixel-art" />
-            </div>
-            <div id="pet-mood-emoji" class="mood-emoji">😊</div>
-          </div>
-          <div class="pet-card__right">
-            <div class="pet-name-row">
-              <span id="pet-name" class="pet-name">小狐</span>
-              <span id="pet-rarity-badge" class="badge badge--r">R</span>
-            </div>
-            <div class="pet-level-row">
-              <span class="label">Lv.</span>
-              <span id="pet-level" class="level-num">1</span>
-            </div>
-            <div class="exp-bar-wrap">
-              <div class="exp-bar">
-                <div id="exp-fill" class="exp-bar__fill" style="width:0%"></div>
-              </div>
-              <span id="exp-text" class="exp-text">0 / 100</span>
-            </div>
-          </div>
+        <!-- 3 swipeable pet pages -->
+        <div class="slot-scroll" id="slot-scroll">
+          <div class="slot-page" id="slot-page-0"></div>
+          <div class="slot-page" id="slot-page-1"></div>
+          <div class="slot-page" id="slot-page-2"></div>
         </div>
-
-        <!-- Stats -->
-        <div class="card stats-card">
-          <div class="stat-row">
-            <span class="stat-label">😄 心情</span>
-            <div class="stat-bar-wrap">
-              <div class="stat-bar"><div id="mood-fill" class="stat-bar__fill mood-fill" style="width:80%"></div></div>
-              <span id="stat-mood" class="stat-value">80</span>
-            </div>
-          </div>
-          <div class="stat-row">
-            <span class="stat-label">🍖 飽食</span>
-            <div class="stat-bar-wrap">
-              <div class="stat-bar"><div id="hunger-fill" class="stat-bar__fill hunger-fill" style="width:60%"></div></div>
-              <span id="stat-hunger" class="stat-value">60</span>
-            </div>
-          </div>
-          <div class="stat-row">
-            <span class="stat-label">💧 水份</span>
-            <div class="stat-bar-wrap">
-              <div class="stat-bar"><div id="water-fill" class="stat-bar__fill water-fill" style="width:70%"></div></div>
-              <span id="stat-water" class="stat-value">70</span>
-            </div>
-          </div>
+        <!-- Dot indicators -->
+        <div class="slot-dots-bar" id="slot-dots">
+          <span class="team-dot team-dot--active"></span>
+          <span class="team-dot"></span>
+          <span class="team-dot"></span>
         </div>
-
-        <!-- Action Buttons -->
-        <div class="action-grid">
-          <button class="action-btn" id="btn-feed">
-            <span class="action-icon">🍖</span>
-            <span>餵食</span>
-          </button>
-          <button class="action-btn" id="btn-drink">
-            <span class="action-icon">🥤</span>
-            <span>飲料</span>
-          </button>
-          <button class="action-btn" id="btn-itembag">
-            <span class="action-icon">🎒</span>
-            <span>道具背包</span>
-          </button>
-          <button class="action-btn" id="btn-petbag">
-            <span class="action-icon">🐾</span>
-            <span>寵物背包</span>
-          </button>
-        </div>
-
-        <!-- Change Pet Button -->
-        <div class="small-btn-row">
-          <button class="small-btn" id="btn-pet-detail" title="寵物詳細">
-            <span>ℹ️</span>
-            <span class="small-btn-label">資訊</span>
-          </button>
-          <button class="small-btn" id="btn-pokedex" title="圖鑑">
-            <span>📖</span>
-            <span class="small-btn-label">圖鑑</span>
-          </button>
-        </div>
-
-        <!-- Team Section -->
-        <div class="card team-card">
-          <h3 class="section-title">⚔️ 出戰隊伍</h3>
-          <div class="team-scroll-wrap">
-            <div class="team-container" id="team-container"></div>
-          </div>
-          <div class="team-dots" id="team-dots">
-            <span class="team-dot team-dot--active"></span>
-            <span class="team-dot"></span>
-            <span class="team-dot"></span>
-          </div>
-        </div>
-
       </section>
 
       <!-- Explore Tab -->
@@ -522,27 +437,18 @@
     </div>
   </div>
 
-  <!-- Team Add Modal -->
-  <div id="modal-team-add" class="modal hidden">
-    <div class="modal-box modal-team-add-box">
-      <h2 class="team-modal-title">🐾 選擇寵物加入隊伍</h2>
-      <div id="team-add-list" class="team-add-list"></div>
-      <button class="btn-cancel" onclick="closeModal('modal-team-add')">取消</button>
-    </div>
-  </div>
-
-  <!-- Team Options Modal -->
-  <div id="modal-team-options" class="modal hidden">
+  <!-- Slot Options Modal -->
+  <div id="modal-slot-options" class="modal hidden">
     <div class="modal-box modal-team-options-box">
       <div class="team-options-preview">
-        <img id="team-options-pet-img" class="team-options-img" src="" alt="">
-        <span id="team-options-pet-name" class="team-options-name"></span>
+        <img id="slot-options-pet-img" class="team-options-img" src="" alt="">
+        <span id="slot-options-pet-name" class="team-options-name"></span>
       </div>
       <div class="team-options-btns">
-        <button class="team-options-btn" id="btn-team-view-detail">ℹ️ 查看詳細</button>
-        <button class="team-options-btn team-options-btn--danger" id="btn-team-send-back">📦 移回背包</button>
+        <button class="team-options-btn" id="btn-slot-view-detail">ℹ️ 查看詳細</button>
+        <button class="team-options-btn team-options-btn--danger" id="btn-slot-send-back">📦 移回寵物背包</button>
       </div>
-      <button class="btn-cancel" onclick="closeModal('modal-team-options')">取消</button>
+      <button class="btn-cancel" onclick="closeModal('modal-slot-options')">取消</button>
     </div>
   </div>
 
