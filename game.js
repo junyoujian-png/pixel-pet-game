@@ -1769,21 +1769,10 @@ function startBattle(boss, isFirstTime) {
     };
   });
 
-  // Build card hand: all skills from all present pets
-  const cards = [];
-  petEntries.forEach((entry, petIdx) => {
-    if (!entry) return;
-    entry.skills.forEach((skill, skillIdx) => {
-      cards.push({
-        petIdx,
-        skillIdx,
-        skill:     { ...skill },
-        currentPP: skill.currentPP ?? skill.maxPP,
-        petName:   entry.pet.name,
-        rarity:    entry.pet.rarity,
-      });
-    });
-  });
+  // Build shuffled deck and draw initial hand of 3
+  const deck = buildBattleDeck(petEntries);
+  const hand = [];
+  drawCards(deck, hand, 3);
 
   bSt = {
     boss,
@@ -1791,7 +1780,8 @@ function startBattle(boss, isFirstTime) {
     bossHp:    bossStats.hp,
     bossMaxHp: bossStats.hp,
     pets:       petEntries,
-    cards,
+    deck,
+    hand,
     ap:         2,
     maxAp:      6,
     playerTurn: true,
@@ -1801,6 +1791,33 @@ function startBattle(boss, isFirstTime) {
 
   openModal('modal-battle');
   renderBattleUI();
+}
+
+function shuffleDeck(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function buildBattleDeck(pets) {
+  const deck = [];
+  pets.forEach((entry, petIdx) => {
+    if (!entry) return;
+    entry.skills.forEach(skill => {
+      const count = skill.currentPP ?? skill.maxPP;
+      for (let i = 0; i < count; i++) {
+        deck.push({ petIdx, skill, petName: entry.pet.name, rarity: entry.pet.rarity });
+      }
+    });
+  });
+  return shuffleDeck(deck);
+}
+
+function drawCards(deck, hand, count) {
+  const canDraw = Math.min(count, deck.length, 5 - hand.length);
+  for (let i = 0; i < canDraw; i++) hand.push(deck.pop());
 }
 
 function renderBattleUI() {
@@ -1864,40 +1881,45 @@ function renderBattleAP() {
 function renderBattleHand() {
   const area = document.getElementById('battle-hand-area');
   if (!area || !bSt) return;
-  area.innerHTML = bSt.cards.map((card, idx) => {
-    const entry  = bSt.pets[card.petIdx];
-    const petDead = !entry || entry.hp <= 0;
-    const empty  = card.currentPP <= 0 || petDead;
-    const cantUse = empty || bSt.ap <= 0 || !bSt.playerTurn || bSt.ended;
-    return `
-      <div class="battle-card card-${card.rarity}${empty ? ' card-empty' : ''}"
-           ${cantUse ? '' : `onclick="battleUseCard(${idx})"`}
-           title="${card.skill.desc}">
-        <div class="battle-card__icon">${card.skill.icon}</div>
-        <div class="battle-card__name">${card.skill.name}</div>
-        <div class="battle-card__power">×${card.skill.power}</div>
-        <div class="battle-card__count">×${card.currentPP}</div>
-        <div class="battle-card__pet">${card.petName}</div>
-      </div>`;
-  }).join('');
+
+  const deckCount = document.getElementById('battle-deck-count');
+
+  const cardHtml = bSt.hand.length === 0
+    ? `<div class="battle-hand-empty">${bSt.deck.length === 0 ? '牌庫已空' : '手牌為空'}</div>`
+    : bSt.hand.map((card, idx) => {
+        const entry   = bSt.pets[card.petIdx];
+        const petDead = !entry || entry.hp <= 0;
+        const cantUse = petDead || bSt.ap <= 0 || !bSt.playerTurn || bSt.ended;
+        return `
+          <div class="battle-card card-${card.rarity}${petDead ? ' card-empty' : ''}"
+               ${cantUse ? '' : `onclick="battleUseCard(${idx})"`}
+               title="${card.skill.desc}">
+            <div class="battle-card__icon">${card.skill.icon}</div>
+            <div class="battle-card__name">${card.skill.name}</div>
+            <div class="battle-card__power">×${card.skill.power}</div>
+            <div class="battle-card__pet">${card.petName}</div>
+          </div>`;
+      }).join('');
+
+  area.innerHTML = cardHtml +
+    `<div class="battle-deck-badge" id="battle-deck-count">🃏 ${bSt.deck.length}</div>`;
 }
 
-function battleUseCard(cardIdx) {
+function battleUseCard(handIdx) {
   if (!bSt || bSt.ended || !bSt.playerTurn) return;
   if (bSt.ap <= 0) { showToast('行動值不足！'); return; }
 
-  const card = bSt.cards[cardIdx];
-  if (!card || card.currentPP <= 0) return;
+  const card = bSt.hand[handIdx];
+  if (!card) return;
 
   const attacker = bSt.pets[card.petIdx];
   if (!attacker || attacker.hp <= 0) { showToast('該寵物已倒下！'); return; }
 
   const { dmg, crit } = calcDamage(attacker.stats.atk, card.skill.power, bSt.bossStats.def, attacker.critRate);
   bSt.bossHp = Math.max(0, bSt.bossHp - dmg);
-  card.currentPP--;
+  bSt.hand.splice(handIdx, 1);
   bSt.ap--;
 
-  // Boss flash + damage float
   const bossSprite = document.getElementById('battle-boss-sprite');
   if (bossSprite) {
     bossSprite.classList.add('boss-hit');
@@ -1972,6 +1994,10 @@ function newBattleRound() {
   if (!bSt || bSt.ended) return;
   bSt.playerTurn = true;
   bSt.ap = Math.min(bSt.maxAp, bSt.ap + 2);
+  // Draw until hand has 3 cards (capped at max 5)
+  if (bSt.hand.length < 3 && bSt.deck.length > 0) {
+    drawCards(bSt.deck, bSt.hand, 3 - bSt.hand.length);
+  }
   renderBattleUI();
 }
 

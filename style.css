@@ -1411,9 +1411,29 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .battle-card.card-SSR { background: linear-gradient(160deg,#e65100,#bf360c); border-color: #ffa000; }
 .battle-card__icon  { font-size: 22px; line-height: 1; }
 .battle-card__name  { font-size: 9px; color: #fff; font-weight: 700; text-align: center; line-height: 1.2; }
-.battle-card__power { font-size: 10px; color: #ffe082; font-weight: 800; }
-.battle-card__count { font-size: 9px; color: rgba(255,255,255,0.55); }
+.battle-card__power { font-size: 11px; color: #ffe082; font-weight: 800; }
 .battle-card__pet   { font-size: 8px; color: rgba(255,255,255,0.38); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 66px; }
+/* Hand / deck indicators */
+.battle-hand-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.3);
+  font-size: 12px;
+}
+.battle-deck-badge {
+  flex-shrink: 0;
+  align-self: center;
+  padding: 4px 10px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.45);
+  white-space: nowrap;
+  margin-left: 6px;
+}
 /* Damage floats */
 .b-dmg-float {
   position: absolute;
