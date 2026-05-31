@@ -105,8 +105,6 @@ const DRINKS = [
 const ITEM_DEFS = {
   candy:       { icon: '🍬', name: '愛心糖',      desc: '+10心情' },
   xpboost:     { icon: '⭐', name: '成長藥',       desc: '+20 EXP' },
-  pprestore:   { icon: '💊', name: 'PP 回復',      desc: '回復一個技能的 PP' },
-  hp_potion:   { icon: '🧪', name: '回復藥水',     desc: '+50 HP' },
   boss_ticket: { icon: '🎫', name: 'BOSS 挑戰卷', desc: '可額外挑戰一次 BOSS' },
 };
 
@@ -242,13 +240,6 @@ function renderPPDots(current, max) {
   return Array.from({ length: max }, (_, i) =>
     `<span class="pp-dot ${i < current ? 'pp-dot--full' : 'pp-dot--empty'}"></span>`
   ).join('');
-}
-
-// Reset all PP to maxPP for current pet (e.g. after using PP 回復 item)
-function restoreAllPP() {
-  const pet    = currentPet();
-  const skills = getPetSkills(pet);
-  saveSkillPP(pet.id, skills.map(s => s.maxPP));
 }
 
 // Daily reset: if date changed since last reset, clear all petSkillPP_* keys
@@ -693,13 +684,9 @@ function showToast(msg) {
 function useItem(id) {
   if (getItem(id) <= 0) return;
 
-  if (id === 'pprestore') {
-    showPPRestoreModal();
-    return;
-  }
   if (id === 'boss_ticket') {
     showToast('🎫 請前往 BOSS 挑戰頁面使用挑戰卷！');
-    return; // 不扣除，在 BOSS 頁面才消耗
+    return;
   }
 
   consumeItem(id);
@@ -712,58 +699,7 @@ function useItem(id) {
     saveState();
     addExp(20);
     showToast('使用成長藥！+20 EXP ⭐');
-  } else if (id === 'hp_potion') {
-    // 背包外使用：僅顯示提示，實際 HP 只在戰鬥中有效
-    showToast('🧪 回復 50 HP！');
   }
-}
-
-// ─── PP Restore Modal ─────────────────────────────────────────────────────────
-function showPPRestoreModal() {
-  const count = getItem('pprestore');
-  if (count <= 0) { showToast('背包裡沒有 PP 回復道具！'); return; }
-  const pet    = currentPet();
-  const skills = getSkillsWithPP(pet);
-  const list   = document.getElementById('pp-restore-list');
-
-  list.innerHTML = skills.map((s, i) => {
-    const full = s.currentPP >= s.maxPP;
-    return `
-      <div class="pp-restore-row${full ? ' pp-restore-row--full' : ''}">
-        <span class="pp-restore-icon">${s.icon}</span>
-        <div class="pp-restore-info">
-          <span class="pp-restore-name">${s.name}</span>
-          <div class="pp-restore-bar">
-            ${renderPPDots(s.currentPP, s.maxPP)}
-            <span class="pp-restore-count">${s.currentPP} / ${s.maxPP}</span>
-          </div>
-        </div>
-        <button class="pp-restore-btn${full ? ' pp-restore-btn--disabled' : ''}"
-                ${full ? 'disabled' : `onclick="confirmPPRestore(${i})"`}>
-          ${full ? 'PP 已滿' : '回復'}
-        </button>
-      </div>`;
-  }).join('');
-
-  document.getElementById('pp-restore-count-display').textContent = `剩餘：${count} 個`;
-  openModal('modal-pp-restore');
-}
-
-function confirmPPRestore(skillIndex) {
-  const pet    = currentPet();
-  const skills = getPetSkills(pet);
-  const saved  = loadSkillPP(pet.id) || skills.map(s => s.maxPP);
-
-  saved[skillIndex] = skills[skillIndex].maxPP;
-  saveSkillPP(pet.id, saved);
-
-  // 扣道具
-  consumeItem('pprestore');
-
-  const skillName = skills[skillIndex].name;
-  closeModal('modal-pp-restore');
-  showToast(`💊 ${skillName} PP 已回滿！`);
-  showPetDetail();
 }
 
 // ─── Food System ─────────────────────────────────────────────────────────────
@@ -1023,11 +959,6 @@ function renderItemPickModal() {
 function useItemFromPickModal(id) {
   if (id === 'boss_ticket') {
     showToast('🎫 請前往 BOSS 挑戰頁面使用挑戰卷！');
-    return; // keep modal open so user can cancel
-  }
-  if (id === 'pprestore') {
-    closeModal('modal-item-pick');
-    showPPRestoreModal();
     return;
   }
   if (getItem(id) <= 0) return;
@@ -1040,8 +971,6 @@ function useItemFromPickModal(id) {
     saveState();
     addExp(20);
     showToast('使用成長藥！+20 EXP ⭐');
-  } else if (id === 'hp_potion') {
-    showToast('🧪 回復 50 HP！');
   }
   closeModal('modal-item-pick');
 }
@@ -1341,11 +1270,7 @@ function initShop() {
       if (!spendCoins(cost)) { showToast('能量石不足！'); return; }
       if (type === 'item') {
         addItem(id);
-        if (id === 'pprestore') {
-          showToast('💊 PP 回復已加入背包！');
-        } else if (id === 'hp_potion') {
-          showToast('🧪 回復藥水已加入背包！');
-        } else if (id === 'boss_ticket') {
+        if (id === 'boss_ticket') {
           showToast('🎫 BOSS 挑戰卷已加入背包！');
         } else {
           showToast(`購買成功：${ITEM_DEFS[id]?.name ?? id} ×1`);
@@ -2065,16 +1990,6 @@ function endBattle(win) {
   if (!bSt) return;
   bSt.ended      = true;
   bSt.playerTurn = false;
-
-  // Save reduced PP counts back to localStorage
-  bSt.pets.forEach((entry, petIdx) => {
-    if (!entry) return;
-    const ppArr = entry.skills.map((_, skillIdx) => {
-      const card = bSt.cards.find(c => c.petIdx === petIdx && c.skillIdx === skillIdx);
-      return card ? card.currentPP : entry.skills[skillIdx].maxPP;
-    });
-    saveSkillPP(entry.pet.id, ppArr);
-  });
 
   let showWheel = false;
   if (win) {
