@@ -719,13 +719,9 @@ function useItem(id) {
 }
 
 // ─── PP Restore Modal ─────────────────────────────────────────────────────────
-let ppRestoreFromBattle = false; // 記錄是否從戰鬥中開啟
-
-function showPPRestoreModal(fromBattle = false) {
+function showPPRestoreModal() {
   const count = getItem('pprestore');
   if (count <= 0) { showToast('背包裡沒有 PP 回復道具！'); return; }
-
-  ppRestoreFromBattle = fromBattle;
   const pet    = currentPet();
   const skills = getSkillsWithPP(pet);
   const list   = document.getElementById('pp-restore-list');
@@ -767,88 +763,7 @@ function confirmPPRestore(skillIndex) {
   const skillName = skills[skillIndex].name;
   closeModal('modal-pp-restore');
   showToast(`💊 ${skillName} PP 已回滿！`);
-
-  if (ppRestoreFromBattle) {
-    renderBattleItemPanel(); // 戰鬥中：重繪道具欄
-  } else {
-    showPetDetail(); // 背包中：重繪技能頁
-  }
-}
-
-// ─── HP Potion In-Battle ─────────────────────────────────────────────────────
-function useHpPotionInBattle() {
-  const count = getItem('hp_potion');
-  if (count <= 0) { showToast('背包裡沒有回復藥水！'); return; }
-
-  const HEAL = 50;
-  // Modify remaining turns: add HEAL to petHp (capped at max)
-  for (let i = battleAnimIdx - 1; i < battleActiveTurns.length; i++) {
-    if (i >= 0) {
-      battleActiveTurns[i].petHp = Math.min(
-        battleAnimMaxPetHp,
-        battleActiveTurns[i].petHp + HEAL
-      );
-    }
-  }
-
-  // Immediately update HP bar with healed value
-  const curIdx     = Math.max(0, battleAnimIdx - 1);
-  const curPetHp   = battleActiveTurns[curIdx]?.petHp ?? battleAnimMaxPetHp;
-  const curBossHp  = battleActiveTurns[curIdx]?.bossHp ?? battleAnimMaxBossHp;
-  updateBattleHPBars(curPetHp, battleAnimMaxPetHp, curBossHp, battleAnimMaxBossHp);
-
-  // Show green heal float on pet side
-  showDamageFloat('battle-pet-side', HEAL, false, true);
-
-  // Deduct item
-  consumeItem('hp_potion');
-
-  showToast('🧪 回復 50 HP！');
-  renderBattleItemPanel();
-}
-
-// ─── Battle Item Panel ────────────────────────────────────────────────────────
-function toggleBattleItemPanel() {
-  const panel = document.getElementById('battle-item-panel');
-  const isHidden = panel.classList.contains('hidden');
-  if (isHidden) {
-    renderBattleItemPanel();
-    panel.classList.remove('hidden');
-  } else {
-    panel.classList.add('hidden');
-  }
-}
-
-function renderBattleItemPanel() {
-  const panel    = document.getElementById('battle-item-panel');
-  const ppCount  = getItem('pprestore');
-  const hpCount  = getItem('hp_potion');
-
-  const rows = [];
-
-  if (hpCount > 0) {
-    rows.push(`
-      <div class="battle-item-row">
-        <span class="battle-item-icon">🧪</span>
-        <span class="battle-item-name">回復藥水</span>
-        <span class="battle-item-count">×${hpCount}</span>
-        <button class="battle-item-use-btn" onclick="useHpPotionInBattle()">使用</button>
-      </div>`);
-  }
-
-  if (ppCount > 0) {
-    rows.push(`
-      <div class="battle-item-row">
-        <span class="battle-item-icon">💊</span>
-        <span class="battle-item-name">PP 回復</span>
-        <span class="battle-item-count">×${ppCount}</span>
-        <button class="battle-item-use-btn" onclick="showPPRestoreModal(true);document.getElementById('battle-item-panel').classList.add('hidden')">使用</button>
-      </div>`);
-  }
-
-  panel.innerHTML = rows.length
-    ? rows.join('')
-    : '<div class="battle-item-empty">背包沒有道具</div>';
+  showPetDetail();
 }
 
 // ─── Food System ─────────────────────────────────────────────────────────────
@@ -1898,210 +1813,306 @@ function closeWheelModal() {
   renderBossList();
 }
 
-// ─── Battle System ───────────────────────────────────────────────────────────
-let battleLog           = [];
-let battlePending       = null;
-let battleFirstWin      = false;
-let battleActiveTurns   = [];   // turns array shared with animation
-let battleAnimMaxPetHp  = 0;
-let battleAnimMaxBossHp = 0;
-let battleAnimIdx       = 0;    // index of next turn to process
+// ─── Battle System (Interactive Card) ────────────────────────────────────────
+let bSt = null;
 
 function startBattle(boss, isFirstTime) {
-  const teamPets = getSlotPets();
-  if (teamPets.length === 0) {
+  const slotPets = getSlotPets();
+  if (slotPets.length === 0) {
     showToast('巢位裡沒有寵物！請先在主頁加入寵物');
     return;
   }
 
-  const bossLevel = boss.level;
-  const bossStats = calcBossStats(boss, bossLevel);
+  const bossStats = calcBossStats(boss, boss.level);
 
-  const teamData = teamPets.map(pet => ({
-    pet,
-    stats:    calcStats(pet, state.level),
-    skills:   getPetSkills(pet),
-    critRate: SKILL_CRIT_RATE[pet.rarity] || 0.05,
-  }));
+  // Build 3 pet slots (null = empty slot)
+  const slots = loadSlots();
+  const petEntries = slots.map(id => {
+    if (!id) return null;
+    const pet = PETS.find(p => p.id === id);
+    if (!pet) return null;
+    const ps    = loadPetState(id);
+    const level = ps ? ps.level : 1;
+    const stats = calcStats(pet, level);
+    return {
+      pet,
+      stats,
+      skills:   getSkillsWithPP(pet),
+      critRate: SKILL_CRIT_RATE[pet.rarity] || 0.05,
+      hp:    stats.hp,
+      maxHp: stats.hp,
+    };
+  });
 
-  const combinedMaxHp = teamData.reduce((sum, t) => sum + t.stats.hp, 0);
-  const firstPet      = teamPets[0];
-  const displayName   = teamPets.length > 1 ? `隊伍 (${teamPets.length} 隻)` : firstPet.name;
-
-  battleLog      = [];
-  battlePending  = boss;
-  battleFirstWin = isFirstTime;
-
-  const turns = simulateBattle(teamData, boss, bossStats);
-
-  document.getElementById('battle-pet-img').src             = firstPet.image;
-  document.getElementById('battle-pet-name').textContent    = displayName;
-  document.getElementById('battle-boss-img').src            = boss.image;
-  document.getElementById('battle-boss-name').textContent   = boss.name;
-  document.getElementById('battle-log').innerHTML           = '';
-  document.getElementById('battle-result-box').classList.add('hidden');
-  document.getElementById('battle-pet-hp-bar').style.width  = '100%';
-  document.getElementById('battle-boss-hp-bar').style.width = '100%';
-  document.getElementById('battle-pet-hp-text').textContent  = `${combinedMaxHp} / ${combinedMaxHp}`;
-  document.getElementById('battle-boss-hp-text').textContent = `${bossStats.hp} / ${bossStats.hp}`;
-  openModal('modal-battle');
-
-  battleActiveTurns   = turns;
-  battleAnimMaxPetHp  = combinedMaxHp;
-  battleAnimMaxBossHp = bossStats.hp;
-  battleAnimIdx       = 0;
-
-  document.getElementById('battle-item-panel')?.classList.add('hidden');
-  animateBattleTurns();
-}
-
-const BATTLE_MAX_TURNS = 40; // cap total turn entries to keep animation under 16s
-
-// teamData = [{ pet, stats, skills, critRate }, ...]
-function simulateBattle(teamData, boss, bossStats) {
-  const turns   = [];
-  let bossHp    = bossStats.hp;
-  const alive   = teamData.map(t => ({ ...t, hp: t.stats.hp }));
-  const totalHp = alive.reduce((s, a) => s + a.stats.hp, 0);
-  const combHp  = () => alive.reduce((s, a) => s + Math.max(0, a.hp), 0);
-
-  while (bossHp > 0 && alive.some(a => a.hp > 0) && turns.length < BATTLE_MAX_TURNS) {
-    // Each alive pet attacks once per round
-    for (const a of alive) {
-      if (a.hp <= 0 || bossHp <= 0) continue;
-      const skill  = a.skills.reduce((best, s) => s.power > best.power ? s : best, a.skills[0]);
-      const petAtk = calcDamage(a.stats.atk, skill.power, bossStats.def, a.critRate);
-      bossHp = Math.max(0, bossHp - petAtk.dmg);
-      turns.push({
-        actor: 'pet', petImage: a.pet.image, petName: a.pet.name,
-        skillName: skill.name, dmg: petAtk.dmg, crit: petAtk.crit,
-        petHp: combHp(), bossHp,
+  // Build card hand: all skills from all present pets
+  const cards = [];
+  petEntries.forEach((entry, petIdx) => {
+    if (!entry) return;
+    entry.skills.forEach((skill, skillIdx) => {
+      cards.push({
+        petIdx,
+        skillIdx,
+        skill:     { ...skill },
+        currentPP: skill.currentPP ?? skill.maxPP,
+        petName:   entry.pet.name,
+        rarity:    entry.pet.rarity,
       });
-      if (bossHp <= 0) break;
-    }
-    if (bossHp <= 0) break;
-
-    // Boss attacks a random alive pet
-    const alivePets = alive.filter(a => a.hp > 0);
-    if (!alivePets.length) break;
-    const target  = alivePets[Math.floor(Math.random() * alivePets.length)];
-    const bossAtk = calcDamage(bossStats.atk, 1.0, target.stats.def, 0.05);
-    target.hp     = Math.max(0, target.hp - bossAtk.dmg);
-    turns.push({
-      actor: 'boss', skillName: '攻擊', targetName: target.pet.name,
-      dmg: bossAtk.dmg, crit: bossAtk.crit, petHp: combHp(), bossHp,
     });
-  }
+  });
 
-  // Force outcome if turn cap reached
-  if (turns.length >= BATTLE_MAX_TURNS) {
-    const petPct  = combHp() / totalHp;
-    const bossPct = bossHp / bossStats.hp;
-    if (petPct >= bossPct) bossHp = 0;
-    else                   alive.forEach(a => a.hp = 0);
-    const last = turns[turns.length - 1];
-    last.petHp  = combHp();
-    last.bossHp = bossHp;
-  }
-  return turns;
+  bSt = {
+    boss,
+    bossStats,
+    bossHp:    bossStats.hp,
+    bossMaxHp: bossStats.hp,
+    pets:       petEntries,
+    cards,
+    ap:         2,
+    maxAp:      6,
+    playerTurn: true,
+    ended:      false,
+    isFirstTime,
+  };
+
+  openModal('modal-battle');
+  renderBattleUI();
 }
 
-const BATTLE_TURN_MS = 420; // ms per turn animation
+function renderBattleUI() {
+  if (!bSt) return;
+  renderBattlePets();
+  renderBattleBoss();
+  renderBattleAP();
+  renderBattleHand();
+  const endBtn = document.getElementById('btn-end-turn');
+  if (endBtn) endBtn.disabled = !bSt.playerTurn || bSt.ended;
+  const statusEl = document.getElementById('battle-status-label');
+  if (statusEl) statusEl.textContent = bSt.playerTurn ? '玩家回合' : 'BOSS 回合';
+}
 
-function animateBattleTurns() {
-  const idx = battleAnimIdx;
-  if (idx >= battleActiveTurns.length) {
-    const win = battleActiveTurns[battleActiveTurns.length - 1].bossHp <= 0;
-    showBattleResult(win);
+function renderBattlePets() {
+  const col = document.getElementById('battle-pets-col');
+  if (!col || !bSt) return;
+  col.innerHTML = bSt.pets.map((entry, idx) => {
+    if (!entry) return `<div class="battle-pet-unit battle-pet-unit--empty"></div>`;
+    const hpPct = Math.max(0, Math.round(entry.hp / entry.maxHp * 100));
+    const dead  = entry.hp <= 0;
+    return `
+      <div class="battle-pet-unit${dead ? ' dead' : ''}" id="battle-pet-unit-${idx}">
+        <div class="b-hp-wrap">
+          <div class="b-hp-track"><div class="b-hp-bar b-hp-bar--pet" style="width:${hpPct}%"></div></div>
+          <div class="b-hp-text">${Math.max(0,entry.hp)}/${entry.maxHp}</div>
+        </div>
+        <img src="${entry.pet.image}" class="battle-pet-sprite" id="battle-pet-sprite-${idx}"
+             alt="${entry.pet.name}" onerror="this.style.opacity='0.3'">
+        <div class="battle-pet-name-small">${entry.pet.name}</div>
+      </div>`;
+  }).join('');
+}
+
+function renderBattleBoss() {
+  const col = document.getElementById('battle-boss-col');
+  if (!col || !bSt) return;
+  const hpPct = Math.max(0, Math.round(bSt.bossHp / bSt.bossMaxHp * 100));
+  col.innerHTML = `
+    <img src="${bSt.boss.image}" class="battle-boss-sprite" id="battle-boss-sprite"
+         alt="${bSt.boss.name}" onerror="this.style.opacity='0.3'">
+    <div class="battle-boss-name">${bSt.boss.name}</div>
+    <div class="battle-boss-lv">Lv.${bSt.boss.level}</div>
+    <div class="b-hp-wrap">
+      <div class="b-hp-track"><div class="b-hp-bar b-hp-bar--boss" style="width:${hpPct}%"></div></div>
+      <div class="b-hp-text">${Math.max(0,bSt.bossHp)}/${bSt.bossMaxHp}</div>
+    </div>`;
+}
+
+function renderBattleAP() {
+  const numEl  = document.getElementById('battle-ap-num');
+  const fillEl = document.getElementById('battle-ap-fill');
+  if (!numEl || !bSt) return;
+  numEl.textContent = bSt.ap;
+  if (fillEl) {
+    const circ = 213.6; // 2 × π × 34
+    fillEl.style.strokeDashoffset = circ * (1 - bSt.ap / bSt.maxAp);
+  }
+}
+
+function renderBattleHand() {
+  const area = document.getElementById('battle-hand-area');
+  if (!area || !bSt) return;
+  area.innerHTML = bSt.cards.map((card, idx) => {
+    const entry  = bSt.pets[card.petIdx];
+    const petDead = !entry || entry.hp <= 0;
+    const empty  = card.currentPP <= 0 || petDead;
+    const cantUse = empty || bSt.ap <= 0 || !bSt.playerTurn || bSt.ended;
+    return `
+      <div class="battle-card card-${card.rarity}${empty ? ' card-empty' : ''}"
+           ${cantUse ? '' : `onclick="battleUseCard(${idx})"`}
+           title="${card.skill.desc}">
+        <div class="battle-card__icon">${card.skill.icon}</div>
+        <div class="battle-card__name">${card.skill.name}</div>
+        <div class="battle-card__power">×${card.skill.power}</div>
+        <div class="battle-card__count">×${card.currentPP}</div>
+        <div class="battle-card__pet">${card.petName}</div>
+      </div>`;
+  }).join('');
+}
+
+function battleUseCard(cardIdx) {
+  if (!bSt || bSt.ended || !bSt.playerTurn) return;
+  if (bSt.ap <= 0) { showToast('行動值不足！'); return; }
+
+  const card = bSt.cards[cardIdx];
+  if (!card || card.currentPP <= 0) return;
+
+  const attacker = bSt.pets[card.petIdx];
+  if (!attacker || attacker.hp <= 0) { showToast('該寵物已倒下！'); return; }
+
+  const { dmg, crit } = calcDamage(attacker.stats.atk, card.skill.power, bSt.bossStats.def, attacker.critRate);
+  bSt.bossHp = Math.max(0, bSt.bossHp - dmg);
+  card.currentPP--;
+  bSt.ap--;
+
+  // Boss flash + damage float
+  const bossSprite = document.getElementById('battle-boss-sprite');
+  if (bossSprite) {
+    bossSprite.classList.add('boss-hit');
+    setTimeout(() => bossSprite?.classList.remove('boss-hit'), 200);
+  }
+  bDmgFloat('battle-boss-col', dmg, crit);
+
+  renderBattleBoss();
+  renderBattleAP();
+  renderBattleHand();
+  const endBtn = document.getElementById('btn-end-turn');
+  if (endBtn) endBtn.disabled = bSt.ap <= 0 || !bSt.playerTurn;
+
+  if (bSt.bossHp <= 0) {
+    bSt.ended = true;
+    setTimeout(() => endBattle(true), 500);
+  }
+}
+
+function endPlayerTurn() {
+  if (!bSt || bSt.ended || !bSt.playerTurn) return;
+  bSt.playerTurn = false;
+  const endBtn = document.getElementById('btn-end-turn');
+  if (endBtn) endBtn.disabled = true;
+  const statusEl = document.getElementById('battle-status-label');
+  if (statusEl) statusEl.textContent = 'BOSS 回合';
+  setTimeout(bossTurnAnimate, 500);
+}
+
+function bossTurnAnimate() {
+  if (!bSt || bSt.ended) return;
+
+  const alivePets = bSt.pets
+    .map((p, i) => ({ entry: p, idx: i }))
+    .filter(x => x.entry && x.entry.hp > 0);
+
+  if (alivePets.length === 0) { endBattle(false); return; }
+
+  const target = alivePets[Math.floor(Math.random() * alivePets.length)];
+  const { dmg, crit } = calcDamage(bSt.bossStats.atk, 1.0, target.entry.stats.def, 0.05);
+  target.entry.hp = Math.max(0, target.entry.hp - dmg);
+
+  // Boss shakes left, hit pet shakes right
+  const bossSprite = document.getElementById('battle-boss-sprite');
+  const petSprite  = document.getElementById(`battle-pet-sprite-${target.idx}`);
+  if (bossSprite) {
+    bossSprite.classList.remove('shake-atk');
+    void bossSprite.offsetWidth;
+    bossSprite.classList.add('shake-atk');
+    setTimeout(() => bossSprite?.classList.remove('shake-atk'), 400);
+  }
+  if (petSprite) {
+    petSprite.classList.remove('shake-hit');
+    void petSprite.offsetWidth;
+    petSprite.classList.add('shake-hit');
+    setTimeout(() => petSprite?.classList.remove('shake-hit'), 400);
+  }
+  bDmgFloat(`battle-pet-unit-${target.idx}`, dmg, crit);
+
+  renderBattlePets();
+
+  const allDead = bSt.pets.every(p => !p || p.hp <= 0);
+  if (allDead) {
+    bSt.ended = true;
+    setTimeout(() => endBattle(false), 600);
     return;
   }
-
-  battleAnimIdx++;
-  const t = battleActiveTurns[idx];
-  updateBattleHPBars(t.petHp, battleAnimMaxPetHp, t.bossHp, battleAnimMaxBossHp);
-
-  // Multi-pet: swap portrait when a different pet attacks
-  if (t.actor === 'pet' && t.petImage) {
-    document.getElementById('battle-pet-img').src = t.petImage;
-  }
-
-  const tgt = t.actor === 'pet' ? 'battle-boss-img' : 'battle-pet-img';
-  showDamageFloat(t.actor === 'pet' ? 'battle-boss-side' : 'battle-pet-side', t.dmg, t.crit);
-  const el = document.getElementById(tgt);
-  el.classList.add('battle-hit');
-  setTimeout(() => el.classList.remove('battle-hit'), 280);
-
-  addBattleLog(t);
-
-  setTimeout(animateBattleTurns, BATTLE_TURN_MS);
+  setTimeout(newBattleRound, 800);
 }
 
-function updateBattleHPBars(petHp, maxPetHp, bossHp, maxBossHp) {
-  const pp = Math.max(0, Math.round(petHp  / maxPetHp  * 100));
-  const bp = Math.max(0, Math.round(bossHp / maxBossHp * 100));
-  document.getElementById('battle-pet-hp-bar').style.width  = `${pp}%`;
-  document.getElementById('battle-boss-hp-bar').style.width = `${bp}%`;
-  document.getElementById('battle-pet-hp-text').textContent  = `${Math.max(0,petHp)} / ${maxPetHp}`;
-  document.getElementById('battle-boss-hp-text').textContent = `${Math.max(0,bossHp)} / ${maxBossHp}`;
+function newBattleRound() {
+  if (!bSt || bSt.ended) return;
+  bSt.playerTurn = true;
+  bSt.ap = Math.min(bSt.maxAp, bSt.ap + 2);
+  renderBattleUI();
 }
 
-function showDamageFloat(sideId, dmg, crit, heal = false) {
-  const side = document.getElementById(sideId);
-  if (!side) return;
+function bDmgFloat(parentId, dmg, crit, heal = false) {
+  const parent = document.getElementById(parentId);
+  if (!parent) return;
   const el = document.createElement('div');
-  if (heal)       el.className = 'dmg-float dmg-float--heal';
-  else if (crit)  el.className = 'dmg-float dmg-float--crit';
-  else            el.className = 'dmg-float';
-  el.textContent = heal ? `+${dmg} HP` : (crit ? '暴擊! ' : '') + dmg;
-  side.appendChild(el);
+  el.className = 'b-dmg-float' + (crit ? ' b-dmg-float--crit' : '') + (heal ? ' b-dmg-float--heal' : '');
+  el.textContent = heal ? `+${dmg}` : (crit ? `💥${dmg}` : `${dmg}`);
+  parent.style.position = 'relative';
+  parent.appendChild(el);
   setTimeout(() => el.remove(), 900);
 }
 
-function addBattleLog(t) {
-  const log = document.getElementById('battle-log');
-  const li  = document.createElement('div');
-  li.className = 'battle-log-entry' + (t.actor === 'pet' ? ' log-pet' : ' log-boss');
-  if (t.actor === 'pet') {
-    const who = t.petName ? `🐾 ${t.petName}` : '🐾 我方';
-    li.textContent = `${who} 使用 ${t.skillName}，造成 ${t.dmg}${t.crit ? '(暴擊!)' : ''} 傷害`;
-  } else {
-    const target = t.targetName ? ` → ${t.targetName}` : '';
-    li.textContent = `👹 BOSS 攻擊${target}，造成 ${t.dmg}${t.crit ? '(暴擊!)' : ''} 傷害`;
-  }
-  log.appendChild(li);
-  log.scrollTop = log.scrollHeight;
-}
+function endBattle(win) {
+  if (!bSt) return;
+  bSt.ended      = true;
+  bSt.playerTurn = false;
 
-function showBattleResult(win) {
-  const box = document.getElementById('battle-result-box');
-  box.classList.remove('hidden');
+  // Save reduced PP counts back to localStorage
+  bSt.pets.forEach((entry, petIdx) => {
+    if (!entry) return;
+    const ppArr = entry.skills.map((_, skillIdx) => {
+      const card = bSt.cards.find(c => c.petIdx === petIdx && c.skillIdx === skillIdx);
+      return card ? card.currentPP : entry.skills[skillIdx].maxPP;
+    });
+    saveSkillPP(entry.pet.id, ppArr);
+  });
 
-  const showWheel = win && battleFirstWin;
-  if (win && battleFirstWin) {
-    // First clear — save and show wheel
-    const cleared = loadClearedBosses();
-    if (!cleared.includes(battlePending.id)) {
-      cleared.push(battlePending.id);
-      saveClearedBosses(cleared);
+  let showWheel = false;
+  if (win) {
+    showWheel = bSt.isFirstTime;
+    if (showWheel) {
+      const cleared = loadClearedBosses();
+      if (!cleared.includes(bSt.boss.id)) {
+        cleared.push(bSt.boss.id);
+        saveClearedBosses(cleared);
+      }
     }
   }
 
-  document.getElementById('battle-result-title').textContent = win ? '🏆 勝利！' : '💀 戰敗';
-  document.getElementById('battle-result-desc').textContent  = win
-    ? (showWheel ? '精彩！繼續旋轉轉盤獲取獎勵！' : `${battlePending?.name || 'BOSS'} 已在記錄中！`)
-    : `${battlePending?.name || 'BOSS'} 太強大，繼續升等再挑戰！`;
+  const overlay  = document.getElementById('battle-result-overlay');
+  const titleEl  = document.getElementById('battle-result-title');
+  const descEl   = document.getElementById('battle-result-desc');
+  const closeBtn = document.getElementById('btn-battle-close');
+  if (!overlay) return;
 
-  const btn = document.getElementById('btn-battle-close');
-  btn.textContent  = showWheel ? '🎡 轉動轉盤！' : '確認';
-  btn.dataset.wheel = showWheel ? '1' : '0';
+  overlay.classList.remove('hidden');
+  if (win) {
+    titleEl.textContent   = '🏆 勝利！';
+    descEl.textContent    = showWheel ? '精彩！旋轉轉盤獲取獎勵！' : `${bSt.boss.name} 已在記錄中！`;
+    closeBtn.textContent  = showWheel ? '🎡 轉動轉盤！' : '確認';
+    closeBtn.dataset.wheel = showWheel ? '1' : '0';
+  } else {
+    titleEl.textContent   = '💀 戰敗';
+    descEl.textContent    = `${bSt.boss.name} 太強大，繼續升等再挑戰！`;
+    closeBtn.textContent  = '確認';
+    closeBtn.dataset.wheel = '0';
+  }
 }
 
 function closeBattleModal() {
   const btn   = document.getElementById('btn-battle-close');
   const wheel = btn?.dataset.wheel === '1';
-  const boss  = battlePending;
-  battlePending  = null;
-  battleFirstWin = false;
+  const boss  = bSt?.boss || null;
+  bSt = null;
   closeModal('modal-battle');
   renderBossList();
   if (wheel && boss) {

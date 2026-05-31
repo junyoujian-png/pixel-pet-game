@@ -462,51 +462,39 @@
   </div>
 
   <!-- Battle Modal -->
-  <div id="modal-battle" class="modal hidden">
-    <div class="modal-box modal-battle-box">
-      <h2 class="battle-title">⚔️ 戰鬥！</h2>
-
-      <!-- Combatants -->
-      <div class="battle-combatants">
-        <div class="battle-side" id="battle-pet-side">
-          <img id="battle-pet-img" class="pixel-art battle-sprite" src="" alt="">
-          <div class="battle-name" id="battle-pet-name"></div>
-          <div class="battle-hp-wrap">
-            <div class="battle-hp-track">
-              <div class="battle-hp-bar battle-hp-bar--pet" id="battle-pet-hp-bar"></div>
+  <div id="modal-battle" class="modal hidden battle-modal-fullscreen">
+    <div class="battle-screen" id="battle-screen">
+      <!-- Battle field -->
+      <div class="battle-field">
+        <!-- Left: 3 pet units -->
+        <div class="battle-pets-col" id="battle-pets-col"></div>
+        <!-- Center: AP ring + end turn -->
+        <div class="battle-center-col">
+          <div class="battle-ap-ring" id="battle-ap-ring">
+            <svg class="battle-ap-svg" viewBox="0 0 80 80">
+              <circle class="battle-ap-track" cx="40" cy="40" r="34"/>
+              <circle class="battle-ap-fill" id="battle-ap-fill" cx="40" cy="40" r="34"/>
+            </svg>
+            <div class="battle-ap-inner">
+              <span class="battle-ap-num" id="battle-ap-num">2</span>
+              <span class="battle-ap-label">行動值</span>
             </div>
-            <span class="battle-hp-text" id="battle-pet-hp-text"></span>
           </div>
+          <button class="battle-end-turn-btn" id="btn-end-turn" onclick="endPlayerTurn()">結束回合</button>
+          <div class="battle-status-label" id="battle-status-label">玩家回合</div>
         </div>
-
-        <div class="battle-vs">VS</div>
-
-        <div class="battle-side" id="battle-boss-side">
-          <img id="battle-boss-img" class="pixel-art battle-sprite" src="" alt="">
-          <div class="battle-name" id="battle-boss-name"></div>
-          <div class="battle-hp-wrap">
-            <div class="battle-hp-track">
-              <div class="battle-hp-bar battle-hp-bar--boss" id="battle-boss-hp-bar"></div>
-            </div>
-            <span class="battle-hp-text" id="battle-boss-hp-text"></span>
-          </div>
+        <!-- Right: boss -->
+        <div class="battle-boss-col" id="battle-boss-col"></div>
+      </div>
+      <!-- Card hand -->
+      <div class="battle-hand-area" id="battle-hand-area"></div>
+      <!-- Result overlay -->
+      <div class="battle-result-overlay hidden" id="battle-result-overlay">
+        <div class="battle-result-content">
+          <div class="battle-result-title" id="battle-result-title"></div>
+          <div class="battle-result-desc" id="battle-result-desc"></div>
+          <button class="btn-confirm" id="btn-battle-close" onclick="closeBattleModal()">確認</button>
         </div>
-      </div>
-
-      <!-- Battle Item Toolbar -->
-      <div class="battle-toolbar">
-        <button class="battle-item-toggle-btn" onclick="toggleBattleItemPanel()">🎒 道具</button>
-        <div id="battle-item-panel" class="battle-item-panel hidden"></div>
-      </div>
-
-      <!-- Battle Log -->
-      <div id="battle-log" class="battle-log"></div>
-
-      <!-- Result -->
-      <div id="battle-result-box" class="battle-result-box hidden">
-        <div class="battle-result-title" id="battle-result-title"></div>
-        <div class="battle-result-desc"  id="battle-result-desc"></div>
-        <button id="btn-battle-close" class="btn-confirm" onclick="closeBattleModal()">確認</button>
       </div>
     </div>
   </div>
