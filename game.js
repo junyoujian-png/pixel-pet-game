@@ -492,7 +492,7 @@ function showGachaResult(results) {
 
 function initGacha() {
   document.getElementById('btn-gacha-single')?.addEventListener('click', () => {
-    if (!spendCoins(GACHA_COST_SINGLE)) { showToast('能量石不足！'); return; }
+    if (!spendCoins(GACHA_COST_SINGLE, '扭蛋')) { showToast('能量石不足！'); return; }
     const machine = document.getElementById('gacha-machine');
     machine?.classList.add('gacha-spin');
     setTimeout(() => {
@@ -501,7 +501,7 @@ function initGacha() {
     }, 1200);
   });
   document.getElementById('btn-gacha-ten')?.addEventListener('click', () => {
-    if (!spendCoins(GACHA_COST_TEN)) { showToast('能量石不足！'); return; }
+    if (!spendCoins(GACHA_COST_TEN, '扭蛋十連')) { showToast('能量石不足！'); return; }
     const machine = document.getElementById('gacha-machine');
     machine?.classList.add('gacha-spin');
     setTimeout(() => {
@@ -636,17 +636,19 @@ function addExp(amount) {
   renderAll();
 }
 
-function addCoins(n) {
+function addCoins(n, reason = null) {
   state.coins += n;
   saveState();
   renderCoins();
+  if (reason) addWalletEntry(reason, n);
 }
 
-function spendCoins(n) {
+function spendCoins(n, reason = null) {
   if (state.coins < n) return false;
   state.coins -= n;
   saveState();
   renderCoins();
+  if (reason) addWalletEntry(reason, -n);
   return true;
 }
 
@@ -706,7 +708,7 @@ function useItem(id) {
 function buyFood(id) {
   const food = FOODS.find(f => f.id === id);
   if (!food) return;
-  if (!spendCoins(food.price)) { showToast('能量石不足！'); return; }
+  if (!spendCoins(food.price, '購買食物')) { showToast('能量石不足！'); return; }
   const inv = loadInventory();
   inv[id] = (inv[id] || 0) + 1;
   saveInventory(inv);
@@ -840,7 +842,7 @@ function migrateItemsToInventory() {
 function buyDrink(id) {
   const drink = DRINKS.find(d => d.id === id);
   if (!drink) return;
-  if (!spendCoins(drink.price)) { showToast('能量石不足！'); return; }
+  if (!spendCoins(drink.price, '購買飲料')) { showToast('能量石不足！'); return; }
   const inv = loadInventory();
   inv[id] = (inv[id] || 0) + 1;
   saveInventory(inv);
@@ -1107,9 +1109,189 @@ function decayStats() {
   renderPetSlots();
 }
 
+// ─── Bank (Step Exchange) ─────────────────────────────────────────────────────
+let selectedStepDates = new Set();
+
+function getDateStr(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function displayDate(iso) { return iso.replace(/-/g, '/'); }
+
+function getDailyRate() {
+  const d = new Date();
+  const seed = d.getFullYear() * 10000 + (d.getMonth()+1) * 100 + d.getDate();
+  return 12 + (((seed * 1664525 + 1013904223) >>> 0) % 9); // 12–20
+}
+
+function loadStepHistory()   { try { return JSON.parse(localStorage.getItem('stepHistory') || '[]'); } catch { return []; } }
+function saveStepHistory(a)  { localStorage.setItem('stepHistory', JSON.stringify(a)); }
+function loadWalletLog()     { try { return JSON.parse(localStorage.getItem('walletLog') || '[]'); } catch { return []; } }
+function saveWalletLog(a)    { localStorage.setItem('walletLog', JSON.stringify(a.slice(-200))); }
+
+function addWalletEntry(reason, amount) {
+  const log = loadWalletLog();
+  log.push({ date: displayDate(getDateStr(new Date())), reason, amount });
+  saveWalletLog(log);
+}
+
+function getMockStepsForDate(iso) {
+  const seed = parseInt(iso.replace(/-/g, ''), 10);
+  return Math.floor(200 + (((seed * 1664525 + 1013904223) >>> 0) / 4294967296) * 15800);
+}
+
+function initStepHistory() {
+  let history = loadStepHistory();
+  const today = new Date();
+
+  // Ensure an entry exists for each of the last 7 days
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const iso = getDateStr(d);
+    if (!history.find(e => e.date === iso)) {
+      history.push({ date: iso, steps: getMockStepsForDate(iso), exchanged: false });
+    }
+  }
+
+  // Keep only last 7 days
+  const cutoff = new Date(today);
+  cutoff.setDate(cutoff.getDate() - 6);
+  const cutoffIso = getDateStr(cutoff);
+  history = history.filter(e => e.date >= cutoffIso);
+  history.sort((a, b) => b.date.localeCompare(a.date));
+  saveStepHistory(history);
+}
+
+function renderBankPanel() {
+  selectedStepDates = new Set();
+  renderBankExchange();
+  renderBankWallet();
+}
+
+function switchBankTab(tab) {
+  document.querySelectorAll('.bank-tab').forEach((t, i) => {
+    t.classList.toggle('bank-tab--active', (tab === 'exchange') ? i === 0 : i === 1);
+  });
+  document.getElementById('bank-exchange')?.classList.toggle('hidden', tab !== 'exchange');
+  document.getElementById('bank-wallet')?.classList.toggle('hidden', tab !== 'wallet');
+}
+
+function renderBankExchange() {
+  const pane = document.getElementById('bank-exchange');
+  if (!pane) return;
+  const rate    = getDailyRate();
+  const history = loadStepHistory();
+  const coins   = state.coins ?? 0;
+
+  const rows = history.map(({ date, steps, exchanged }) => {
+    const gems     = Math.floor(steps / rate);
+    const selected = selectedStepDates.has(date) && !exchanged;
+    let cls = 'bank-step-row';
+    if (exchanged) cls += ' bank-step-row--exchanged';
+    else if (selected) cls += ' bank-step-row--selected';
+    const check = exchanged ? '✓' : (selected ? '✓' : '');
+    const click = exchanged ? '' : `onclick="toggleStepSelect('${date}')"`;
+    return `
+      <div class="${cls}" ${click}>
+        <div class="bank-step-check">${check}</div>
+        <div class="bank-step-info">
+          <div class="bank-step-date">${displayDate(date)}</div>
+          <div class="bank-step-count">${steps.toLocaleString()} 步</div>
+        </div>
+        <div class="bank-step-arrow">⇄</div>
+        <div class="bank-step-gems">💎 ${gems}</div>
+      </div>`;
+  }).join('');
+
+  pane.innerHTML = `
+    <div class="bank-rate-card">
+      <div class="bank-rate-header">
+        <div>
+          <div class="bank-rate-label">今日匯率</div>
+          <div class="bank-rate-value">${rate} 能量 = 1 💎</div>
+        </div>
+        <button class="bank-select-all-btn" onclick="bankSelectAll()">全選</button>
+      </div>
+      <div class="bank-rate-hint">可以兌換最近一週的步數</div>
+    </div>
+    <div class="bank-step-list">${rows}</div>
+    <div class="bank-footer">
+      <div class="bank-coin-display">
+        <div class="bank-coin-label">你擁有的像素晶石</div>
+        <div class="bank-coin-amount">💎 ${coins.toLocaleString()}</div>
+      </div>
+      <button class="bank-exchange-btn" onclick="doBankExchange()">兌換</button>
+    </div>`;
+}
+
+function renderBankWallet() {
+  const pane = document.getElementById('bank-wallet');
+  if (!pane) return;
+  const log = [...loadWalletLog()].reverse();
+  if (!log.length) {
+    pane.innerHTML = '<div class="bank-empty">尚無收支紀錄</div>';
+    return;
+  }
+  pane.innerHTML = `<div class="bank-wallet-list">${
+    log.map(({ date, reason, amount }) => {
+      const plus = amount > 0;
+      return `
+        <div class="bank-wallet-row">
+          <div class="bank-wallet-date">${date}</div>
+          <div class="bank-wallet-reason">${reason}</div>
+          <div class="bank-wallet-amount ${plus ? 'bank-wallet-amount--plus' : 'bank-wallet-amount--minus'}">
+            ${plus ? '+' : ''}${amount} 💎
+          </div>
+        </div>`;
+    }).join('')
+  }</div>`;
+}
+
+function toggleStepSelect(date) {
+  const history = loadStepHistory();
+  const entry   = history.find(e => e.date === date);
+  if (!entry || entry.exchanged) return;
+  if (selectedStepDates.has(date)) selectedStepDates.delete(date);
+  else selectedStepDates.add(date);
+  renderBankExchange();
+}
+
+function bankSelectAll() {
+  const history     = loadStepHistory();
+  const unexchanged = history.filter(e => !e.exchanged).map(e => e.date);
+  const allSelected = unexchanged.length > 0 && unexchanged.every(d => selectedStepDates.has(d));
+  if (allSelected) unexchanged.forEach(d => selectedStepDates.delete(d));
+  else             unexchanged.forEach(d => selectedStepDates.add(d));
+  renderBankExchange();
+}
+
+function doBankExchange() {
+  if (selectedStepDates.size === 0) { showToast('請先選擇要兌換的步數！'); return; }
+  const rate    = getDailyRate();
+  const history = loadStepHistory();
+  let total     = 0;
+
+  selectedStepDates.forEach(date => {
+    const entry = history.find(e => e.date === date);
+    if (entry && !entry.exchanged) {
+      total += Math.floor(entry.steps / rate);
+      entry.exchanged = true;
+    }
+  });
+
+  if (total <= 0) { showToast('沒有可兌換的能量石！'); return; }
+
+  saveStepHistory(history);
+  addCoins(total, '步數兌換');
+  selectedStepDates.clear();
+  showToast(`💎 兌換成功！+${total} 像素晶石`);
+  renderBankExchange();
+  renderBankWallet();
+}
+
 // ─── Shop Cards ───────────────────────────────────────────────────────────────
 const SHOP_TITLES = {
-  bank:  '能量銀行',
+  bank:  '能量兌換銀行',
   food:  '食物商店',
   drink: '飲料商店',
   item:  '道具商店',
@@ -1158,7 +1340,7 @@ function buildGachaPanel() {
 
 function doGacha(count) {
   const cost = count === 1 ? GACHA_COST_SINGLE : GACHA_COST_TEN;
-  if (!spendCoins(cost)) { showToast('能量石不足！'); return; }
+  if (!spendCoins(cost, '扭蛋')) { showToast('能量石不足！'); return; }
   showGachaResult(doGachaRolls(count));
 }
 
@@ -1182,7 +1364,9 @@ const showShopSub = (type) => {
   document.querySelectorAll('.shop-panel').forEach(p => {
     p.classList.toggle('active', p.id === `shop-${type}`);
   });
-  if (type === 'food') {
+  if (type === 'bank') {
+    renderBankPanel();
+  } else if (type === 'food') {
     renderFoodShop();
   } else if (type === 'drink') {
     renderDrinkShop();
@@ -1267,7 +1451,7 @@ function initShop() {
       const cost = parseInt(btn.dataset.cost, 10);
       const type = btn.dataset.type;
       const id   = btn.dataset.id;
-      if (!spendCoins(cost)) { showToast('能量石不足！'); return; }
+      if (!spendCoins(cost, `購買${ITEM_DEFS[id]?.name ?? '道具'}`)) { showToast('能量石不足！'); return; }
       if (type === 'item') {
         addItem(id);
         if (id === 'boss_ticket') {
@@ -1719,7 +1903,7 @@ function showWheelResult(segIdx) {
         <div class="wheel-result-subtitle">${boss.name}</div>
       </div>`;
   } else {
-    addCoins(seg.coins);
+    addCoins(seg.coins, '轉盤獎勵');
     content.innerHTML = `
       <div class="wheel-result-coins">
         <div class="wheel-result-gem">💎</div>
@@ -2212,12 +2396,10 @@ function collectWorldChest(cm) {
   worldChestMarkers = worldChestMarkers.filter(x => x !== cm);
 
   const reward = 50 + Math.floor(Math.random() * 51);
-  state.coins = (state.coins || 0) + reward;
-  saveState();
+  addCoins(reward, '寶箱獎勵');
   showWorldGemFloat(reward);
   showToast(`💎 獲得 ${reward} 能量石！`);
   updateWorldHUD();
-  renderCoins();
 
   // Persist collected state
   const raw = localStorage.getItem('worldChests');
@@ -2326,6 +2508,7 @@ function hideWorldPage() {
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 function init() {
   checkDailyPPReset();
+  initStepHistory();
   if (!selectedPetId) {
     selectedPetId = 'pet1';
     localStorage.setItem('selectedPetId', selectedPetId);
