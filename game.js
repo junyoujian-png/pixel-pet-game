@@ -242,15 +242,13 @@ function renderPPDots(current, max) {
   ).join('');
 }
 
-// Daily reset: if date changed since last reset, clear all petSkillPP_* keys
+// Clear all petSkillPP_* keys unconditionally — we no longer deplete PP in battle,
+// so any stored PP values (especially zeros from old code) would break deck building.
 function checkDailyPPReset() {
-  const today     = new Date().toDateString();
-  const lastReset = localStorage.getItem('ppLastReset');
-  if (lastReset === today) return;
-  localStorage.setItem('ppLastReset', today);
   Object.keys(localStorage)
     .filter(k => k.startsWith('petSkillPP_'))
     .forEach(k => localStorage.removeItem(k));
+  localStorage.removeItem('ppLastReset'); // clean up obsolete key
 }
 
 const MOOD_MOODS = [
@@ -2419,7 +2417,7 @@ function startBattle(boss, isFirstTime) {
     return {
       pet,
       stats,
-      skills:   getSkillsWithPP(pet),
+      skills:   getPetSkills(pet),   // always fresh maxPP, no stale localStorage
       critRate: SKILL_CRIT_RATE[pet.rarity] || 0.05,
       hp:    stats.hp,
       maxHp: stats.hp,
@@ -2430,6 +2428,7 @@ function startBattle(boss, isFirstTime) {
   const deck = buildBattleDeck(petEntries);
   const hand = [];
   drawCards(deck, hand, 3);
+  console.log('[Battle] deck size:', deck.length, '| initial hand:', hand.map(c => c.skill.name));
 
   bSt = {
     boss,
@@ -2463,12 +2462,15 @@ function buildBattleDeck(pets) {
   pets.forEach((entry, petIdx) => {
     if (!entry) return;
     entry.skills.forEach(skill => {
-      const count = skill.currentPP ?? skill.maxPP;
+      // Always use maxPP — never use currentPP (stale localStorage zeros
+      // from old battle-PP-save code would produce an empty deck)
+      const count = skill.maxPP || 1;
       for (let i = 0; i < count; i++) {
         deck.push({ petIdx, skill, petName: entry.pet.name, rarity: entry.pet.rarity });
       }
     });
   });
+  console.log('[Battle] buildBattleDeck total cards:', deck.length);
   return shuffleDeck(deck);
 }
 
@@ -2538,6 +2540,7 @@ function renderBattleAP() {
 function renderBattleHand() {
   const area = document.getElementById('battle-hand-area');
   if (!area || !bSt) return;
+  console.log('[Battle] hand:', bSt.hand.map(c => c.skill.name), '| deck remaining:', bSt.deck.length, '| ap:', bSt.ap);
 
   const deckCount = document.getElementById('battle-deck-count');
 
@@ -2573,6 +2576,7 @@ function battleUseCard(handIdx) {
   if (!attacker || attacker.hp <= 0) { showToast('該寵物已倒下！'); return; }
 
   const { dmg, crit } = calcDamage(attacker.stats.atk, card.skill.power, bSt.bossStats.def, attacker.critRate);
+  console.log('[Battle] damage dealt:', dmg, crit ? '(crit)' : '', '| boss hp after:', Math.max(0, bSt.bossHp - dmg));
   bSt.bossHp = Math.max(0, bSt.bossHp - dmg);
   bSt.hand.splice(handIdx, 1);
   bSt.ap--;
@@ -2597,6 +2601,7 @@ function battleUseCard(handIdx) {
 }
 
 function endPlayerTurn() {
+  console.log('[Battle] endPlayerTurn called | bSt exists:', !!bSt, '| playerTurn:', bSt?.playerTurn, '| ended:', bSt?.ended);
   if (!bSt || bSt.ended || !bSt.playerTurn) return;
   bSt.playerTurn = false;
   const endBtn = document.getElementById('btn-end-turn');
