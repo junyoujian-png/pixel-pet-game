@@ -1312,7 +1312,7 @@ function renderQuestList() {
       const btnCls = maxed
         ? 'quest-claim-btn quest-claim-btn--pending'
         : 'quest-claim-btn quest-claim-btn--ready';
-      const btnTxt = maxed ? '今日已達上限' : `觀看廣告 (${count + 1}/${max})`;
+      const btnTxt = maxed ? '今日已達上限' : `觀看廣告 (${count}/${max})`;
       return `
         <div class="quest-card">
           <div class="quest-card__info">
@@ -1472,6 +1472,12 @@ function loadAdWatchCount() {
   return { date: getDateStr(new Date()), count: 0 };
 }
 function saveAdWatchCount(o) { localStorage.setItem('adWatchCount', JSON.stringify(o)); }
+
+function initAdWatchCount() {
+  const val = loadAdWatchCount();
+  saveAdWatchCount(val); // persist default so it's always in localStorage
+  console.log('adWatchCount on load:', val);
+}
 
 function loadAdGachaUsed() {
   try {
@@ -2910,6 +2916,7 @@ function hideWorldPage() {
 function init() {
   checkDailyPPReset();
   initStepHistory();
+  initAdWatchCount();
   if (!selectedPetId) {
     selectedPetId = 'pet1';
     localStorage.setItem('selectedPetId', selectedPetId);
