@@ -467,6 +467,13 @@ function doGachaRolls(count) {
   saveUnlockedPets();
   saveState();
   renderCoins();
+  // Quest tracking
+  results.forEach(r => {
+    trackQuestEvent('gacha');
+    trackQuestEvent('gacha_count');
+    if (r.pet.rarity === 'SSR' && r.isNew) trackQuestEvent('ssr_gacha');
+  });
+  trackQuestEvent('pet_count', unlockedPets.length);
   return results;
 }
 
@@ -625,6 +632,7 @@ function addExp(amount) {
   }
 
   if (leveled) {
+    trackQuestEvent('pet_level', state.level);
     if (state.level >= maxLevel) {
       showToast(`🎉 已達等級上限 Lv.${state.level} MAX！`);
     } else {
@@ -649,6 +657,7 @@ function spendCoins(n, reason = null) {
   saveState();
   renderCoins();
   if (reason) addWalletEntry(reason, -n);
+  if (n > 0) trackQuestEvent('spend_total', n);
   return true;
 }
 
@@ -766,6 +775,8 @@ function useFoodFromModal(id) {
   if (e.hunger) state.hunger = Math.min(100, state.hunger + e.hunger);
   if (e.mood)   state.mood   = Math.min(100, state.mood   + e.mood);
   saveState();
+  trackQuestEvent('feed');
+  checkMoodQuest();
   if (e.exp) addExp(e.exp); else renderAll();
   closeModal('modal-feed');
   showToast(`使用 ${food.name}！${food.desc}`);
@@ -900,6 +911,8 @@ function useDrinkFromModal(id) {
   if (e.hunger) state.hunger = Math.min(100, state.hunger + e.hunger);
   if (e.mood)   state.mood   = Math.min(100, state.mood   + e.mood);
   saveState();
+  trackQuestEvent('drink');
+  checkMoodQuest();
   if (e.exp) addExp(e.exp); else renderAll();
   closeModal('modal-drink');
   showToast(`使用 ${drink.name}！${drink.desc}`);
@@ -968,6 +981,7 @@ function useItemFromPickModal(id) {
   if (id === 'candy') {
     state.mood = Math.min(100, state.mood + 10);
     saveState(); renderSlotPage(currentSlotIdx);
+    checkMoodQuest();
     showToast('使用愛心糖！+10心情 😄');
   } else if (id === 'xpboost') {
     saveState();
@@ -1107,6 +1121,244 @@ function decayStats() {
 
   refreshDisplayPetState();
   renderPetSlots();
+}
+
+// ─── Quest System ────────────────────────────────────────────────────────────
+const DAILY_QUESTS = [
+  { id: 'd1', name: '餵食寵物',   desc: '使用一次食物',           target: 1,  reward: 20, type: 'feed' },
+  { id: 'd2', name: '給寵物喝飲料', desc: '使用一次飲料',           target: 1,  reward: 20, type: 'drink' },
+  { id: 'd3', name: '挑戰 BOSS',  desc: '完成一場 BOSS 戰鬥',      target: 1,  reward: 50, type: 'boss_battle' },
+  { id: 'd4', name: '心情滿滿',   desc: '任一寵物心情達到 80 以上', target: 1,  reward: 30, type: 'mood_check' },
+  { id: 'd5', name: '扭蛋一抽',   desc: '抽一次扭蛋',             target: 1,  reward: 30, type: 'gacha' },
+  { id: 'd6', name: '出去尋寶',   desc: '收集一個寶箱',           target: 1,  reward: 30, type: 'treasure' },
+  { id: 'd7', name: '兌換能量',   desc: '完成一次步數兌換',         target: 1,  reward: 20, type: 'exchange' },
+];
+
+const ACHIEVEMENT_QUESTS = [
+  { id: 'a1',  name: '初出茅廬', desc: '任一寵物達到 Lv.10', target: 10,   reward: 100,  type: 'pet_level' },
+  { id: 'a2',  name: '漸入佳境', desc: '任一寵物達到 Lv.20', target: 20,   reward: 200,  type: 'pet_level' },
+  { id: 'a3',  name: '爐火純青', desc: '任一寵物達到 Lv.30', target: 30,   reward: 300,  type: 'pet_level' },
+  { id: 'a4',  name: '登峰造極', desc: '任一寵物達到 Lv.50', target: 50,   reward: 500,  type: 'pet_level' },
+  { id: 'a5',  name: '收藏家',   desc: '收集 10 隻寵物',     target: 10,   reward: 150,  type: 'pet_count' },
+  { id: 'a6',  name: '收藏大師', desc: '收集 25 隻寵物',     target: 25,   reward: 400,  type: 'pet_count' },
+  { id: 'a7',  name: '收藏王者', desc: '收集 51 隻寵物',     target: 51,   reward: 1000, type: 'pet_count' },
+  { id: 'a8',  name: '初戰告捷', desc: '通關第一隻 BOSS',    target: 1,    reward: 100,  type: 'boss_clear' },
+  { id: 'a9',  name: '無人能敵', desc: '通關全部 BOSS',      target: 16,   reward: 2000, type: 'boss_clear_all' },
+  { id: 'a10', name: '幸運降臨', desc: '抽中第一隻 SSR 寵物', target: 1,   reward: 200,  type: 'ssr_gacha' },
+  { id: 'a11', name: '小富翁',   desc: '累積花費 1000 能量石', target: 1000, reward: 100, type: 'spend_total' },
+  { id: 'a12', name: '大富翁',   desc: '累積花費 5000 能量石', target: 5000, reward: 500, type: 'spend_total' },
+];
+
+const WEEKLY_QUESTS = [
+  { id: 'w1', name: '戰鬥達人', desc: '完成 5 場戰鬥',      target: 5,  reward: 150, type: 'battle_count' },
+  { id: 'w2', name: '扭蛋十連', desc: '累積抽 10 次扭蛋',   target: 10, reward: 200, type: 'gacha_count' },
+  { id: 'w3', name: '步數達人', desc: '連續兌換步數 7 天',   target: 7,  reward: 250, type: 'exchange_streak' },
+];
+
+let activeQuestTab = 'daily';
+
+function getWeekStart(d) {
+  const day  = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  const mon  = new Date(d);
+  mon.setDate(d.getDate() + diff);
+  return getDateStr(mon);
+}
+
+function loadDailyProgress()    { try { return JSON.parse(localStorage.getItem('dailyQuestProgress')   || '{}'); } catch { return {}; } }
+function saveDailyProgress(o)   { localStorage.setItem('dailyQuestProgress',   JSON.stringify(o)); }
+function loadAchieveProgress()  { try { return JSON.parse(localStorage.getItem('achievementProgress')  || '{}'); } catch { return {}; } }
+function saveAchieveProgress(o) { localStorage.setItem('achievementProgress',  JSON.stringify(o)); }
+function loadWeeklyProgress()   { try { return JSON.parse(localStorage.getItem('weeklyQuestProgress')  || '{}'); } catch { return {}; } }
+function saveWeeklyProgress(o)  { localStorage.setItem('weeklyQuestProgress',  JSON.stringify(o)); }
+
+function resetDailyIfNeeded(dp, today) {
+  const needReset = DAILY_QUESTS.some(q => dp[q.id]?.date && dp[q.id].date !== today);
+  if (needReset) {
+    DAILY_QUESTS.forEach(q => { dp[q.id] = { progress: 0, claimed: false, date: today }; });
+  }
+}
+
+function resetWeeklyIfNeeded(wp, weekStart) {
+  const needReset = WEEKLY_QUESTS.some(q => wp[q.id]?.weekStart && wp[q.id].weekStart !== weekStart);
+  if (needReset) {
+    WEEKLY_QUESTS.forEach(q => { wp[q.id] = { progress: 0, claimed: false, weekStart, days: [] }; });
+  }
+}
+
+function trackQuestEvent(type, value = 1) {
+  const today     = getDateStr(new Date());
+  const weekStart = getWeekStart(new Date());
+
+  // --- Daily ---
+  const dp = loadDailyProgress();
+  resetDailyIfNeeded(dp, today);
+  DAILY_QUESTS.forEach(q => {
+    if (q.type !== type) return;
+    if (!dp[q.id]) dp[q.id] = { progress: 0, claimed: false, date: today };
+    if (dp[q.id].claimed || dp[q.id].progress >= q.target) return;
+    dp[q.id].progress = Math.min(q.target, dp[q.id].progress + 1);
+    dp[q.id].date = today;
+  });
+  saveDailyProgress(dp);
+
+  // --- Achievements ---
+  const ap = loadAchieveProgress();
+  ACHIEVEMENT_QUESTS.forEach(q => {
+    if (q.type !== type) return;
+    if (!ap[q.id]) ap[q.id] = { progress: 0, claimed: false };
+    if (ap[q.id].claimed) return;
+    if (type === 'pet_level' || type === 'pet_count' || type === 'boss_clear_all') {
+      ap[q.id].progress = Math.max(ap[q.id].progress, value);
+    } else if (type === 'spend_total') {
+      ap[q.id].progress = Math.min(q.target, ap[q.id].progress + value);
+    } else {
+      ap[q.id].progress = Math.min(q.target, ap[q.id].progress + 1);
+    }
+  });
+  saveAchieveProgress(ap);
+
+  // --- Weekly ---
+  const wp = loadWeeklyProgress();
+  resetWeeklyIfNeeded(wp, weekStart);
+  WEEKLY_QUESTS.forEach(q => {
+    if (q.type !== type) return;
+    if (!wp[q.id]) wp[q.id] = { progress: 0, claimed: false, weekStart, days: [] };
+    if (wp[q.id].claimed || wp[q.id].progress >= q.target) return;
+    if (type === 'exchange_streak') {
+      if (!wp[q.id].days) wp[q.id].days = [];
+      if (!wp[q.id].days.includes(String(value))) {
+        wp[q.id].days.push(String(value));
+        wp[q.id].progress = wp[q.id].days.length;
+      }
+    } else {
+      wp[q.id].progress = Math.min(q.target, (wp[q.id].progress || 0) + 1);
+    }
+    wp[q.id].weekStart = weekStart;
+  });
+  saveWeeklyProgress(wp);
+
+  // Re-render quest tab if open
+  if (document.getElementById('tab-quest')?.classList.contains('active')) {
+    renderQuestList();
+  }
+}
+
+function checkMoodQuest() {
+  const slots = loadSlots();
+  for (const id of slots) {
+    if (!id) continue;
+    const ps = loadPetState(id);
+    if (ps && (ps.mood ?? 0) >= 80) { trackQuestEvent('mood_check'); return; }
+  }
+}
+
+function initQuestTab() {
+  document.querySelectorAll('.quest-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeQuestTab = btn.dataset.qtab;
+      document.querySelectorAll('.quest-tab-btn').forEach(b =>
+        b.classList.toggle('quest-tab-btn--active', b === btn));
+      renderQuestList();
+    });
+  });
+}
+
+function renderQuestTab() {
+  // Refresh pet_count and boss_clear_all from live state
+  const ap = loadAchieveProgress();
+  const petCount   = unlockedPets.length;
+  const cleared    = loadClearedBosses().length;
+  ACHIEVEMENT_QUESTS.forEach(q => {
+    if (!ap[q.id]) ap[q.id] = { progress: 0, claimed: false };
+    if (q.type === 'pet_count')     ap[q.id].progress = Math.max(ap[q.id].progress, petCount);
+    if (q.type === 'boss_clear_all') ap[q.id].progress = Math.max(ap[q.id].progress, cleared);
+  });
+  saveAchieveProgress(ap);
+  renderQuestList();
+}
+
+function renderQuestList() {
+  const el = document.getElementById('quest-list');
+  if (!el) return;
+
+  const today     = getDateStr(new Date());
+  const weekStart = getWeekStart(new Date());
+  const dp = loadDailyProgress();
+  const ap = loadAchieveProgress();
+  const wp = loadWeeklyProgress();
+  resetDailyIfNeeded(dp, today);
+  resetWeeklyIfNeeded(wp, weekStart);
+
+  let quests, progress;
+  if (activeQuestTab === 'daily') {
+    quests = DAILY_QUESTS;
+    progress = dp;
+  } else if (activeQuestTab === 'achieve') {
+    quests = ACHIEVEMENT_QUESTS;
+    progress = ap;
+  } else {
+    quests = WEEKLY_QUESTS;
+    progress = wp;
+  }
+
+  el.innerHTML = quests.map(q => {
+    const p       = progress[q.id] || { progress: 0, claimed: false };
+    const prog    = Math.min(p.progress || 0, q.target);
+    const pct     = Math.round(prog / q.target * 100);
+    const ready   = prog >= q.target && !p.claimed;
+    const done    = p.claimed;
+    let btnClass  = 'quest-claim-btn';
+    let btnText   = '進行中';
+    let cardClass = 'quest-card';
+    if (done)        { btnClass += ' quest-claim-btn--done';    btnText = '✓ 已領取'; cardClass += ' quest-card--done'; }
+    else if (ready)  { btnClass += ' quest-claim-btn--ready';   btnText = '領取獎勵'; }
+    else             { btnClass += ' quest-claim-btn--pending';  btnText = '進行中'; }
+    const onclick = ready ? `claimQuestReward('${activeQuestTab}','${q.id}')` : '';
+    return `
+      <div class="${cardClass}">
+        <div class="quest-card__info">
+          <div class="quest-card__name">${q.name}</div>
+          <div class="quest-card__desc">${q.desc}</div>
+          <div class="quest-progress">
+            <div class="quest-progress-bar"><div class="quest-progress-fill" style="width:${pct}%"></div></div>
+            <span class="quest-progress-text">${prog} / ${q.target}</span>
+          </div>
+        </div>
+        <div class="quest-card__right">
+          <div class="quest-reward">💎 ${q.reward}</div>
+          <button class="${btnClass}" ${onclick ? `onclick="${onclick}"` : ''} ${done || !ready ? 'disabled' : ''}>${btnText}</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function claimQuestReward(tab, questId) {
+  let progress, saveFn, quests;
+  const today     = getDateStr(new Date());
+  const weekStart = getWeekStart(new Date());
+
+  if (tab === 'daily') {
+    progress = loadDailyProgress(); resetDailyIfNeeded(progress, today);
+    saveFn = saveDailyProgress; quests = DAILY_QUESTS;
+  } else if (tab === 'achieve') {
+    progress = loadAchieveProgress();
+    saveFn = saveAchieveProgress; quests = ACHIEVEMENT_QUESTS;
+  } else {
+    progress = loadWeeklyProgress(); resetWeeklyIfNeeded(progress, weekStart);
+    saveFn = saveWeeklyProgress; quests = WEEKLY_QUESTS;
+  }
+
+  const q = quests.find(x => x.id === questId);
+  if (!q) return;
+  const p = progress[q.id];
+  if (!p || p.claimed || (p.progress || 0) < q.target) return;
+
+  p.claimed = true;
+  saveFn(progress);
+  addCoins(q.reward, '任務獎勵');
+  showToast(`🎉 任務完成！獲得 ${q.reward} 💎`);
+  renderQuestList();
 }
 
 // ─── Bank (Step Exchange) ─────────────────────────────────────────────────────
@@ -1284,6 +1536,8 @@ function doBankExchange() {
   saveStepHistory(history);
   addCoins(total, '步數兌換');
   selectedStepDates.clear();
+  trackQuestEvent('exchange');
+  trackQuestEvent('exchange_streak', getDateStr(new Date()));
   showToast(`💎 兌換成功！+${total} 像素晶石`);
   renderBankExchange();
   renderBankWallet();
@@ -1439,6 +1693,9 @@ function initBottomNav() {
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-pet'));
       } else if (nav === 'explore') {
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-explore'));
+      } else if (nav === 'quest') {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-quest'));
+        renderQuestTab();
       }
     });
   });
@@ -2201,6 +2458,9 @@ function endBattle(win) {
   bSt.ended      = true;
   bSt.playerTurn = false;
 
+  trackQuestEvent('boss_battle');
+  trackQuestEvent('battle_count');
+
   let showWheel = false;
   if (win) {
     showWheel = bSt.isFirstTime;
@@ -2209,6 +2469,8 @@ function endBattle(win) {
       if (!cleared.includes(bSt.boss.id)) {
         cleared.push(bSt.boss.id);
         saveClearedBosses(cleared);
+        trackQuestEvent('boss_clear');
+        trackQuestEvent('boss_clear_all', cleared.length);
       }
     }
   }
@@ -2397,6 +2659,7 @@ function collectWorldChest(cm) {
 
   const reward = 50 + Math.floor(Math.random() * 51);
   addCoins(reward, '寶箱獎勵');
+  trackQuestEvent('treasure');
   showWorldGemFloat(reward);
   showToast(`💎 獲得 ${reward} 能量石！`);
   updateWorldHUD();
@@ -2525,6 +2788,7 @@ function init() {
   initShop();
   initShopCards();
   initGacha();
+  initQuestTab();
   initExploreCards();
   setInterval(decayStats, DECAY_INTERVAL);
 }
