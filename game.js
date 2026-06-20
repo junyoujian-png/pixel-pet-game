@@ -2475,8 +2475,25 @@ function buildBattleDeck(pets) {
 }
 
 function drawCards(deck, hand, count) {
-  const canDraw = Math.min(count, deck.length, 5 - hand.length);
-  for (let i = 0; i < canDraw; i++) hand.push(deck.pop());
+  let drawn = 0;
+  while (drawn < count && deck.length > 0 && hand.length < 5) {
+    const card = deck.pop();
+    // Safety: skip cards from dead pets even if purgePetCards wasn't called
+    const petEntry = bSt?.pets[card.petIdx];
+    if (petEntry && petEntry.hp <= 0) continue;
+    hand.push(card);
+    drawn++;
+  }
+}
+
+// Remove all cards belonging to a dead pet from deck AND hand immediately
+function purgePetCards(petIdx) {
+  if (!bSt) return;
+  const before = bSt.deck.length + bSt.hand.length;
+  bSt.deck = bSt.deck.filter(c => c.petIdx !== petIdx);
+  bSt.hand = bSt.hand.filter(c => c.petIdx !== petIdx);
+  const removed = before - (bSt.deck.length + bSt.hand.length);
+  if (removed > 0) console.log(`[Battle] purged ${removed} cards for dead pet idx ${petIdx}`);
 }
 
 function renderBattleUI() {
@@ -2626,6 +2643,12 @@ function bossTurnAnimate() {
   const { dmg, crit } = calcDamage(bSt.bossStats.atk, 1.0, target.entry.stats.def, 0.05);
   target.entry.hp = Math.max(0, target.entry.hp - dmg);
 
+  // Immediately purge this pet's cards if it just died
+  if (target.entry.hp <= 0) {
+    purgePetCards(target.idx);
+    renderBattleHand(); // update hand UI to remove dead pet's cards
+  }
+
   // Boss shakes left, hit pet shakes right
   const bossSprite = document.getElementById('battle-boss-sprite');
   const petSprite  = document.getElementById(`battle-pet-sprite-${target.idx}`);
@@ -2658,7 +2681,7 @@ function newBattleRound() {
   if (!bSt || bSt.ended) return;
   bSt.playerTurn = true;
   bSt.ap = Math.min(bSt.maxAp, bSt.ap + 2);
-  // Draw until hand has 3 cards (capped at max 5)
+  // Draw until hand has 3 cards (drawCards skips dead-pet cards internally)
   if (bSt.hand.length < 3 && bSt.deck.length > 0) {
     drawCards(bSt.deck, bSt.hand, 3 - bSt.hand.length);
   }
