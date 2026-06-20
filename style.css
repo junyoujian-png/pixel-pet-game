@@ -992,6 +992,57 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .quest-claim-btn--pending { background: var(--surface2); color: var(--text2); cursor: default; }
 .quest-claim-btn--done    { background: transparent; color: var(--text2); cursor: default; border: 1px solid var(--border); }
 
+/* ─── Ad Overlay ─── */
+.ad-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.96);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+}
+.ad-overlay.hidden { display: none; }
+.ad-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 40px 32px;
+  text-align: center;
+  width: min(320px, 90vw);
+}
+.ad-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+}
+.ad-progress-wrap {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.ad-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #4caf50;
+  border-radius: 3px;
+}
+.ad-countdown {
+  font-size: 48px;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  min-width: 60px;
+  text-align: center;
+}
+.ad-hint {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+}
+
 /* ─── Locked Select Card ─── */
 .select-card--locked { position: relative; }
 .select-card--locked:hover {

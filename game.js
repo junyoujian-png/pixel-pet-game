@@ -1132,6 +1132,7 @@ const DAILY_QUESTS = [
   { id: 'd5', name: '扭蛋一抽',   desc: '抽一次扭蛋',             target: 1,  reward: 30, type: 'gacha' },
   { id: 'd6', name: '出去尋寶',   desc: '收集一個寶箱',           target: 1,  reward: 30, type: 'treasure' },
   { id: 'd7', name: '兌換能量',   desc: '完成一次步數兌換',         target: 1,  reward: 20, type: 'exchange' },
+  { id: 'd8', name: '免費能量石', desc: '觀看廣告獲得獎勵',         target: 3,  reward: 50, type: 'watch_ad', maxPerDay: 3 },
 ];
 
 const ACHIEVEMENT_QUESTS = [
@@ -1303,6 +1304,34 @@ function renderQuestList() {
   }
 
   el.innerHTML = quests.map(q => {
+    // Special card for watch_ad type
+    if (q.type === 'watch_ad') {
+      const adSt   = loadAdWatchCount();
+      const count  = adSt.count || 0;
+      const max    = q.maxPerDay || 3;
+      const maxed  = count >= max;
+      const pct    = Math.round(count / max * 100);
+      const btnCls = maxed
+        ? 'quest-claim-btn quest-claim-btn--pending'
+        : 'quest-claim-btn quest-claim-btn--ready';
+      const btnTxt = maxed ? '今日已達上限' : `觀看廣告 (${count + 1}/${max})`;
+      return `
+        <div class="quest-card">
+          <div class="quest-card__info">
+            <div class="quest-card__name">${q.name}</div>
+            <div class="quest-card__desc">${q.desc}</div>
+            <div class="quest-progress">
+              <div class="quest-progress-bar"><div class="quest-progress-fill" style="width:${pct}%"></div></div>
+              <span class="quest-progress-text">${count} / ${max}</span>
+            </div>
+          </div>
+          <div class="quest-card__right">
+            <div class="quest-reward">💎 ${q.reward}</div>
+            <button class="${btnCls}" ${maxed ? 'disabled' : 'onclick="watchAdForReward()"'}>${btnTxt}</button>
+          </div>
+        </div>`;
+    }
+
     const p       = progress[q.id] || { progress: 0, claimed: false };
     const prog    = Math.min(p.progress || 0, q.target);
     const pct     = Math.round(prog / q.target * 100);
@@ -1359,6 +1388,101 @@ function claimQuestReward(tab, questId) {
   addCoins(q.reward, '任務獎勵');
   showToast(`🎉 任務完成！獲得 ${q.reward} 💎`);
   renderQuestList();
+}
+
+// ─── Ad System ────────────────────────────────────────────────────────────────
+// TODO: 替換成真實廣告 SDK（如 AdMob、Unity Ads）
+// 目前使用模擬倒數計時代替
+
+function loadAdWatchCount() {
+  try {
+    const raw = JSON.parse(localStorage.getItem('adWatchCount') || '{}');
+    if (raw.date === getDateStr(new Date())) return raw;
+  } catch {}
+  return { date: getDateStr(new Date()), count: 0 };
+}
+function saveAdWatchCount(o) { localStorage.setItem('adWatchCount', JSON.stringify(o)); }
+
+function loadAdGachaUsed() {
+  try {
+    const raw = JSON.parse(localStorage.getItem('adGachaUsed') || '{}');
+    if (raw.date === getDateStr(new Date())) return raw;
+  } catch {}
+  return { date: getDateStr(new Date()), used: false };
+}
+function saveAdGachaUsed(o) { localStorage.setItem('adGachaUsed', JSON.stringify(o)); }
+
+let adTimerInterval = null;
+
+function showAdModal(onComplete) {
+  // TODO: 替換成真實廣告 SDK（如 AdMob、Unity Ads）
+  const overlay    = document.getElementById('modal-ad');
+  const countdown  = document.getElementById('ad-countdown');
+  const bar        = document.getElementById('ad-progress-bar');
+  if (!overlay) { onComplete(); return; }
+
+  overlay.classList.remove('hidden');
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  let secs = 5;
+  countdown.textContent = secs;
+
+  clearInterval(adTimerInterval);
+  // Start smooth progress bar
+  requestAnimationFrame(() => {
+    bar.style.transition = `width ${secs}s linear`;
+    bar.style.width = '100%';
+  });
+
+  adTimerInterval = setInterval(() => {
+    secs--;
+    if (countdown) countdown.textContent = Math.max(0, secs);
+    if (secs <= 0) {
+      clearInterval(adTimerInterval);
+      adTimerInterval = null;
+      overlay.classList.add('hidden');
+      onComplete();
+    }
+  }, 1000);
+}
+
+function watchAdForReward() {
+  const adState  = loadAdWatchCount();
+  const MAX      = 3;
+  if (adState.count >= MAX) { showToast('今日廣告已達上限！'); return; }
+
+  showAdModal(() => {
+    const updated = loadAdWatchCount();
+    updated.count = (updated.count || 0) + 1;
+    saveAdWatchCount(updated);
+    addCoins(50, '廣告獎勵');
+    showToast('廣告獎勵 +50 能量石！');
+    if (document.getElementById('tab-quest')?.classList.contains('active')) {
+      renderQuestList();
+    }
+  });
+}
+
+function watchAdForGacha() {
+  const state = loadAdGachaUsed();
+  if (state.used) { showToast('今日廣告扭蛋已使用！'); return; }
+
+  showAdModal(() => {
+    const updated = loadAdGachaUsed();
+    updated.used = true;
+    saveAdGachaUsed(updated);
+    showToast('廣告獎勵！免費抽一次！');
+    // Refresh ad gacha button to show disabled state
+    const adBtn = document.getElementById('btn-ad-gacha');
+    if (adBtn) adBtn.outerHTML = buildAdGachaBtn();
+    // Free single gacha roll (no coins spent)
+    const machine = document.getElementById('gacha-machine');
+    machine?.classList.add('gacha-spin');
+    setTimeout(() => {
+      machine?.classList.remove('gacha-spin');
+      showGachaResult(doGachaRolls(1));
+    }, 1200);
+  });
 }
 
 // ─── Bank (Step Exchange) ─────────────────────────────────────────────────────
@@ -1589,7 +1713,21 @@ function buildGachaPanel() {
         <span style="font-size:15px;font-weight:700">十次抽獎</span>
         <span style="font-size:12px;color:#6b5a47">900 💎</span>
       </button>
-    </div>`;
+    </div>
+    ${buildAdGachaBtn()}`;
+}
+
+function buildAdGachaBtn() {
+  const used = loadAdGachaUsed().used;
+  return `<button
+    id="btn-ad-gacha"
+    ${used ? '' : 'onclick="watchAdForGacha()"'}
+    style="width:100%;margin-top:4px;padding:12px 8px;border-radius:30px;
+      background:${used ? '#aaa' : '#1565c0'};border:none;color:#fff;
+      cursor:${used ? 'default' : 'pointer'};font-size:14px;font-weight:700;
+      font-family:inherit;opacity:${used ? '0.5' : '1'}">
+    📺 ${used ? '今日廣告扭蛋已使用' : '看廣告抽一次（每日限 1 次）'}
+  </button>`;
 }
 
 function doGacha(count) {
