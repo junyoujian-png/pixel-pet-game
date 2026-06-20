@@ -2527,6 +2527,7 @@ function renderBattlePets() {
       </div>`;
   }).join('');
 }
+// Note: renderBattlePets targets .battle-pets-row (id="battle-pets-col" kept for compat)
 
 function renderBattleBoss() {
   const col = document.getElementById('battle-boss-col');
@@ -2535,11 +2536,13 @@ function renderBattleBoss() {
   col.innerHTML = `
     <img src="${bSt.boss.image}" class="battle-boss-sprite" id="battle-boss-sprite"
          alt="${bSt.boss.name}" onerror="this.style.opacity='0.3'">
-    <div class="battle-boss-name">${bSt.boss.name}</div>
-    <div class="battle-boss-lv">Lv.${bSt.boss.level}</div>
-    <div class="b-hp-wrap">
+    <div class="battle-boss-name-row">
+      <span class="battle-boss-name">${bSt.boss.name}</span>
+      <span class="battle-boss-lv">Lv.${bSt.boss.level}</span>
+    </div>
+    <div class="b-hp-wrap" style="width:min(240px,80%)">
       <div class="b-hp-track"><div class="b-hp-bar b-hp-bar--boss" style="width:${hpPct}%"></div></div>
-      <div class="b-hp-text">${Math.max(0,bSt.bossHp)}/${bSt.bossMaxHp}</div>
+      <div class="b-hp-text">${Math.max(0,bSt.bossHp)} / ${bSt.bossMaxHp}</div>
     </div>`;
 }
 

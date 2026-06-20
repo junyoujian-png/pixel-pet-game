@@ -1476,28 +1476,54 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   position: relative;
   overflow: hidden;
 }
-.battle-field {
+/* ── Boss at top ── */
+.battle-boss-section {
   flex: 1;
   display: flex;
-  align-items: stretch;
-  min-height: 0;
-  padding: 10px 6px 6px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px 4px;
   gap: 4px;
+  min-height: 90px;
 }
-.battle-pets-col {
-  flex: 0 0 86px;
+/* ── AP + end turn strip ── */
+.battle-center-row {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 8px 16px;
+  background: rgba(0,0,0,0.25);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.battle-center-actions {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+/* ── Pets row (horizontal) ── */
+.battle-pets-row {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
   justify-content: space-around;
-  gap: 6px;
+  align-items: flex-start;
+  padding: 8px 6px 4px;
+  gap: 4px;
 }
 .battle-pet-unit {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
   transition: opacity 0.3s, filter 0.3s;
   position: relative;
+  min-width: 0;
 }
 .battle-pet-unit--empty {
   flex: 1;
@@ -1508,8 +1534,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   filter: grayscale(1);
 }
 .battle-pet-sprite {
-  width: 54px;
-  height: 54px;
+  width: 52px;
+  height: 52px;
   image-rendering: pixelated;
   object-fit: contain;
 }
@@ -1519,16 +1545,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
-  max-width: 82px;
+  max-width: 80px;
   text-overflow: ellipsis;
-}
-.battle-center-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
 }
 .battle-ap-ring {
   position: relative;
@@ -1597,31 +1615,27 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   color: #888;
   text-align: center;
 }
-.battle-boss-col {
-  flex: 0 0 100px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
-  padding-bottom: 4px;
-  position: relative;
-}
+/* Boss sprite + meta (now rendered inside .battle-boss-section) */
 .battle-boss-sprite {
-  width: 90px;
-  height: 90px;
+  width: 80px;
+  height: 80px;
   image-rendering: pixelated;
   object-fit: contain;
   transform: scaleX(-1);
 }
+.battle-boss-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 .battle-boss-name {
-  font-size: 10px;
+  font-size: 12px;
   color: #fff;
   font-weight: 700;
   text-align: center;
 }
 .battle-boss-lv {
-  font-size: 9px;
+  font-size: 10px;
   color: #e57373;
   font-weight: 600;
 }

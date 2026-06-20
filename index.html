@@ -453,28 +453,29 @@
   <!-- Battle Modal -->
   <div id="modal-battle" class="modal hidden battle-modal-fullscreen">
     <div class="battle-screen" id="battle-screen">
-      <!-- Battle field -->
-      <div class="battle-field">
-        <!-- Left: 3 pet units -->
-        <div class="battle-pets-col" id="battle-pets-col"></div>
-        <!-- Center: AP ring + end turn -->
-        <div class="battle-center-col">
-          <div class="battle-ap-ring" id="battle-ap-ring">
-            <svg class="battle-ap-svg" viewBox="0 0 80 80">
-              <circle class="battle-ap-track" cx="40" cy="40" r="34"/>
-              <circle class="battle-ap-fill" id="battle-ap-fill" cx="40" cy="40" r="34"/>
-            </svg>
-            <div class="battle-ap-inner">
-              <span class="battle-ap-num" id="battle-ap-num">2</span>
-              <span class="battle-ap-label">行動值</span>
-            </div>
+      <!-- 1. BOSS (top) -->
+      <div class="battle-boss-section" id="battle-boss-col"></div>
+
+      <!-- 2. AP + end turn (center strip) -->
+      <div class="battle-center-row">
+        <div class="battle-ap-ring" id="battle-ap-ring">
+          <svg class="battle-ap-svg" viewBox="0 0 80 80">
+            <circle class="battle-ap-track" cx="40" cy="40" r="34"/>
+            <circle class="battle-ap-fill" id="battle-ap-fill" cx="40" cy="40" r="34"/>
+          </svg>
+          <div class="battle-ap-inner">
+            <span class="battle-ap-num" id="battle-ap-num">2</span>
+            <span class="battle-ap-label">行動值</span>
           </div>
+        </div>
+        <div class="battle-center-actions">
           <button class="battle-end-turn-btn" id="btn-end-turn" onclick="endPlayerTurn()">結束回合</button>
           <div class="battle-status-label" id="battle-status-label">玩家回合</div>
         </div>
-        <!-- Right: boss -->
-        <div class="battle-boss-col" id="battle-boss-col"></div>
       </div>
+
+      <!-- 3. Pets row (horizontal, 3 pets side by side) -->
+      <div class="battle-pets-row" id="battle-pets-col"></div>
       <!-- Card hand -->
       <div class="battle-hand-area" id="battle-hand-area"></div>
       <!-- Result overlay -->
