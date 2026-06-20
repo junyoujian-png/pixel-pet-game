@@ -2022,6 +2022,12 @@ function initSlotScroll() {
   const container = document.getElementById('slot-scroll');
   if (!container) return;
   slotScrollBound = true;
+
+  // Diagnostic: confirm scroll container size and page count
+  console.log('[SlotScroll] pages in DOM:', document.querySelectorAll('.slot-page').length);
+  console.log('[SlotScroll] container offsetWidth:', container.offsetWidth, 'scrollWidth:', container.scrollWidth);
+  console.log('[SlotScroll] petSlots:', loadSlots());
+
   container.addEventListener('scroll', () => {
     const w   = container.offsetWidth || 1;
     const idx = Math.min(2, Math.round(container.scrollLeft / w));
