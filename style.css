@@ -2387,35 +2387,30 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   overflow: hidden !important;
 }
 
+/* slot-scroll is 300% wide; #tab-pet.active clips it with overflow:hidden */
 .slot-scroll {
   flex: 1;
   display: flex;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
+  width: 300%;
   min-height: 0;
-  min-width: 0;
+  transition: transform 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
   cursor: grab;
-  touch-action: pan-x; /* tell browser: only horizontal pan here */
 }
-.slot-scroll::-webkit-scrollbar { display: none; }
-.slot-scroll.dragging { cursor: grabbing; }
+.slot-scroll.dragging {
+  cursor: grabbing;
+  transition: none; /* disable transition during live drag */
+}
 
 .slot-page {
-  flex: 0 0 100%;
-  min-width: 0;
-  min-height: 0;
+  flex: 0 0 33.333%;
   height: 100%;
-  scroll-snap-align: start;
   overflow-y: auto;
   padding: 12px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  touch-action: pan-y; /* pages scroll vertically on touch */
 }
 
 .slot-dots-bar {

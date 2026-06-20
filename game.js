@@ -1910,6 +1910,9 @@ function renderPetSlots() {
   for (let i = 0; i < 3; i++) renderSlotPage(i);
   updateSlotDots(currentSlotIdx);
   initSlotScroll();
+  // Re-apply transform (in case content re-render reset inline style)
+  const el = document.getElementById('slot-scroll');
+  if (el) el.style.transform = `translateX(-${currentSlotIdx * 100 / 3}%)`;
 }
 
 function renderSlotPage(slotIdx) {
@@ -2017,11 +2020,15 @@ function updateSlotDots(activeIdx) {
   });
 }
 
+// Apply transform to slot-scroll to show page `idx` (0-2)
 function scrollSlotTo(idx) {
-  const container = document.getElementById('slot-scroll');
-  if (!container) return;
-  const clamped = Math.max(0, Math.min(2, idx));
-  container.scrollTo({ left: clamped * container.offsetWidth, behavior: 'smooth' });
+  const clamped  = Math.max(0, Math.min(2, idx));
+  const el       = document.getElementById('slot-scroll');
+  if (!el) return;
+  el.style.transform = `translateX(-${clamped * 100 / 3}%)`;
+  currentSlotIdx = clamped;
+  refreshDisplayPetState();
+  updateSlotDots(clamped);
 }
 
 function initSlotScroll() {
@@ -2030,54 +2037,72 @@ function initSlotScroll() {
   if (!container) return;
   slotScrollBound = true;
 
-  // Diagnostic log
-  console.log('[SlotScroll] pages in DOM:', document.querySelectorAll('.slot-page').length);
-  console.log('[SlotScroll] container offsetWidth:', container.offsetWidth, 'scrollWidth:', container.scrollWidth);
-  console.log('[SlotScroll] petSlots:', loadSlots());
+  // Apply initial position (in case currentSlotIdx > 0 after re-render)
+  container.style.transform = `translateX(-${currentSlotIdx * 100 / 3}%)`;
 
-  // Native scroll → update dots
-  container.addEventListener('scroll', () => {
-    const w   = container.offsetWidth || 1;
-    const idx = Math.min(2, Math.round(container.scrollLeft / w));
-    if (idx !== currentSlotIdx) {
-      currentSlotIdx = idx;
-      refreshDisplayPetState();
-      updateSlotDots(idx);
-    }
+  // ── Touch (mobile) ──────────────────────────────────────────────────
+  let touchStartX = 0;
+  let touchCurX   = 0;
+
+  container.addEventListener('touchstart', (e) => {
+    touchStartX = touchCurX = e.touches[0].clientX;
+    container.classList.add('dragging'); // disable transition during drag
   }, { passive: true });
 
-  // Mouse drag support (desktop)
-  let isDragging = false;
-  let dragStartX = 0;
-  let dragScrollLeft = 0;
+  container.addEventListener('touchmove', (e) => {
+    touchCurX = e.touches[0].clientX;
+    const dx  = touchCurX - touchStartX;
+    const pageWidth = container.parentElement.offsetWidth || window.innerWidth;
+    // base translate in % + drag offset in % (% is of slot-scroll own width = 3× pageWidth)
+    const basePct = -(currentSlotIdx * 100 / 3);
+    const dragPct = (dx / pageWidth) * (100 / 3);
+    container.style.transform = `translateX(${basePct + dragPct}%)`;
+  }, { passive: true });
+
+  container.addEventListener('touchend', () => {
+    container.classList.remove('dragging');
+    const dx = touchCurX - touchStartX;
+    const threshold = (container.parentElement.offsetWidth || window.innerWidth) * 0.25;
+    if      (dx < -threshold) scrollSlotTo(currentSlotIdx + 1);
+    else if (dx >  threshold) scrollSlotTo(currentSlotIdx - 1);
+    else                      scrollSlotTo(currentSlotIdx); // snap back
+  }, { passive: true });
+
+  // ── Mouse drag (desktop) ─────────────────────────────────────────────
+  let mouseStartX = 0;
+  let mouseCurX   = 0;
+  let mouseDown   = false;
 
   container.addEventListener('mousedown', (e) => {
-    isDragging    = true;
-    dragStartX    = e.pageX - container.offsetLeft;
-    dragScrollLeft = container.scrollLeft;
+    mouseDown = true;
+    mouseStartX = mouseCurX = e.clientX;
     container.classList.add('dragging');
   });
 
-  const endDrag = () => {
-    if (!isDragging) return;
-    isDragging = false;
+  const endMouseDrag = () => {
+    if (!mouseDown) return;
+    mouseDown = false;
     container.classList.remove('dragging');
-    // Snap to nearest page after drag
-    const w = container.offsetWidth || 1;
-    const idx = Math.min(2, Math.round(container.scrollLeft / w));
-    scrollSlotTo(idx);
+    const dx = mouseCurX - mouseStartX;
+    const threshold = (container.parentElement.offsetWidth || window.innerWidth) * 0.25;
+    if      (dx < -threshold) scrollSlotTo(currentSlotIdx + 1);
+    else if (dx >  threshold) scrollSlotTo(currentSlotIdx - 1);
+    else                      scrollSlotTo(currentSlotIdx);
   };
 
-  container.addEventListener('mouseleave', endDrag);
-  container.addEventListener('mouseup',    endDrag);
-
   container.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
+    if (!mouseDown) return;
     e.preventDefault();
-    const x    = e.pageX - container.offsetLeft;
-    const walk = (x - dragStartX) * 1.5;
-    container.scrollLeft = dragScrollLeft - walk;
+    mouseCurX = e.clientX;
+    const dx  = mouseCurX - mouseStartX;
+    const pageWidth = container.parentElement.offsetWidth || window.innerWidth;
+    const basePct = -(currentSlotIdx * 100 / 3);
+    const dragPct = (dx / pageWidth) * (100 / 3);
+    container.style.transform = `translateX(${basePct + dragPct}%)`;
   });
+
+  container.addEventListener('mouseup',    endMouseDrag);
+  container.addEventListener('mouseleave', endMouseDrag);
 }
 
 // ─── Slot Action Helpers ──────────────────────────────────────────────────────
