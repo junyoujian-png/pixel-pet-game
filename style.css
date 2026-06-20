@@ -2397,12 +2397,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   -webkit-overflow-scrolling: touch;
   min-height: 0;
   min-width: 0;
+  cursor: grab;
+  touch-action: pan-x; /* tell browser: only horizontal pan here */
 }
 .slot-scroll::-webkit-scrollbar { display: none; }
+.slot-scroll.dragging { cursor: grabbing; }
 
 .slot-page {
-  /* flex: 0 0 100% is more reliable than flex-shrink:0 + width:100%
-     in flex row containers across all mobile browsers */
   flex: 0 0 100%;
   min-width: 0;
   min-height: 0;
@@ -2414,17 +2415,33 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   display: flex;
   flex-direction: column;
   gap: 12px;
+  touch-action: pan-y; /* pages scroll vertically on touch */
 }
 
 .slot-dots-bar {
   flex-shrink: 0;
   display: flex;
+  align-items: center;
   justify-content: center;
   gap: 6px;
   padding: 6px 0 10px;
   background: var(--bg);
   border-top: 1px solid var(--border);
 }
+.slot-nav-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--text2);
+  cursor: pointer;
+  padding: 0 6px;
+  line-height: 1;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+  font-family: inherit;
+}
+.slot-nav-btn:hover  { opacity: 1; }
+.slot-nav-btn:active { opacity: 0.4; }
 
 /* Empty slot */
 .slot-empty-box {

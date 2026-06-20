@@ -2017,17 +2017,25 @@ function updateSlotDots(activeIdx) {
   });
 }
 
+function scrollSlotTo(idx) {
+  const container = document.getElementById('slot-scroll');
+  if (!container) return;
+  const clamped = Math.max(0, Math.min(2, idx));
+  container.scrollTo({ left: clamped * container.offsetWidth, behavior: 'smooth' });
+}
+
 function initSlotScroll() {
   if (slotScrollBound) return;
   const container = document.getElementById('slot-scroll');
   if (!container) return;
   slotScrollBound = true;
 
-  // Diagnostic: confirm scroll container size and page count
+  // Diagnostic log
   console.log('[SlotScroll] pages in DOM:', document.querySelectorAll('.slot-page').length);
   console.log('[SlotScroll] container offsetWidth:', container.offsetWidth, 'scrollWidth:', container.scrollWidth);
   console.log('[SlotScroll] petSlots:', loadSlots());
 
+  // Native scroll → update dots
   container.addEventListener('scroll', () => {
     const w   = container.offsetWidth || 1;
     const idx = Math.min(2, Math.round(container.scrollLeft / w));
@@ -2037,6 +2045,39 @@ function initSlotScroll() {
       updateSlotDots(idx);
     }
   }, { passive: true });
+
+  // Mouse drag support (desktop)
+  let isDragging = false;
+  let dragStartX = 0;
+  let dragScrollLeft = 0;
+
+  container.addEventListener('mousedown', (e) => {
+    isDragging    = true;
+    dragStartX    = e.pageX - container.offsetLeft;
+    dragScrollLeft = container.scrollLeft;
+    container.classList.add('dragging');
+  });
+
+  const endDrag = () => {
+    if (!isDragging) return;
+    isDragging = false;
+    container.classList.remove('dragging');
+    // Snap to nearest page after drag
+    const w = container.offsetWidth || 1;
+    const idx = Math.min(2, Math.round(container.scrollLeft / w));
+    scrollSlotTo(idx);
+  };
+
+  container.addEventListener('mouseleave', endDrag);
+  container.addEventListener('mouseup',    endDrag);
+
+  container.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x    = e.pageX - container.offsetLeft;
+    const walk = (x - dragStartX) * 1.5;
+    container.scrollLeft = dragScrollLeft - walk;
+  });
 }
 
 // ─── Slot Action Helpers ──────────────────────────────────────────────────────

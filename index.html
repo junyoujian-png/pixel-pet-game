@@ -67,11 +67,13 @@
           <div class="slot-page" id="slot-page-1"></div>
           <div class="slot-page" id="slot-page-2"></div>
         </div>
-        <!-- Dot indicators -->
+        <!-- Dot indicators + nav arrows -->
         <div class="slot-dots-bar" id="slot-dots">
+          <button class="slot-nav-btn" onclick="scrollSlotTo(currentSlotIdx - 1)">‹</button>
           <span class="team-dot team-dot--active"></span>
           <span class="team-dot"></span>
           <span class="team-dot"></span>
+          <button class="slot-nav-btn" onclick="scrollSlotTo(currentSlotIdx + 1)">›</button>
         </div>
       </section>
 
