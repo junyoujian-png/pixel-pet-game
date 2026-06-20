@@ -644,19 +644,17 @@ function addExp(amount) {
   renderAll();
 }
 
-function addCoins(n, reason = null) {
+function addCoins(n) {
   state.coins += n;
   saveState();
   renderCoins();
-  if (reason) addWalletEntry(reason, n);
 }
 
-function spendCoins(n, reason = null) {
+function spendCoins(n) {
   if (state.coins < n) return false;
   state.coins -= n;
   saveState();
   renderCoins();
-  if (reason) addWalletEntry(reason, -n);
   if (n > 0) trackQuestEvent('spend_total', n);
   return true;
 }
@@ -1565,8 +1563,6 @@ function watchAdForGacha() {
 }
 
 // ─── Bank (Step Exchange) ─────────────────────────────────────────────────────
-let selectedStepDates = new Set();
-
 function getDateStr(d) {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
@@ -1578,16 +1574,8 @@ function getDailyRate() {
   return 12 + (((seed * 1664525 + 1013904223) >>> 0) % 9); // 12–20
 }
 
-function loadStepHistory()   { try { return JSON.parse(localStorage.getItem('stepHistory') || '[]'); } catch { return []; } }
-function saveStepHistory(a)  { localStorage.setItem('stepHistory', JSON.stringify(a)); }
-function loadWalletLog()     { try { return JSON.parse(localStorage.getItem('walletLog') || '[]'); } catch { return []; } }
-function saveWalletLog(a)    { localStorage.setItem('walletLog', JSON.stringify(a.slice(-200))); }
-
-function addWalletEntry(reason, amount) {
-  const log = loadWalletLog();
-  log.push({ date: displayDate(getDateStr(new Date())), reason, amount });
-  saveWalletLog(log);
-}
+function loadStepHistory()  { try { return JSON.parse(localStorage.getItem('stepHistory') || '[]'); } catch { return []; } }
+function saveStepHistory(a) { localStorage.setItem('stepHistory', JSON.stringify(a)); }
 
 function getMockStepsForDate(iso) {
   const seed = parseInt(iso.replace(/-/g, ''), 10);
@@ -1596,39 +1584,22 @@ function getMockStepsForDate(iso) {
 
 function initStepHistory() {
   let history = loadStepHistory();
-  const today = new Date();
+  const today = getDateStr(new Date());
 
-  // Ensure an entry exists for each of the last 7 days
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
-    const iso = getDateStr(d);
-    if (!history.find(e => e.date === iso)) {
-      history.push({ date: iso, steps: getMockStepsForDate(iso), exchanged: false });
-    }
+  // Only add today's entry if it doesn't already exist
+  if (!history.find(e => e.date === today)) {
+    history.push({ date: today, steps: getMockStepsForDate(today) });
   }
 
-  // Keep only last 7 days
-  const cutoff = new Date(today);
-  cutoff.setDate(cutoff.getDate() - 6);
-  const cutoffIso = getDateStr(cutoff);
-  history = history.filter(e => e.date >= cutoffIso);
+  // Keep max 7 entries (newest first), drop oldest beyond 7
   history.sort((a, b) => b.date.localeCompare(a.date));
+  if (history.length > 7) history = history.slice(0, 7);
+
   saveStepHistory(history);
 }
 
 function renderBankPanel() {
-  selectedStepDates = new Set();
   renderBankExchange();
-  renderBankWallet();
-}
-
-function switchBankTab(tab) {
-  document.querySelectorAll('.bank-tab').forEach((t, i) => {
-    t.classList.toggle('bank-tab--active', (tab === 'exchange') ? i === 0 : i === 1);
-  });
-  document.getElementById('bank-exchange')?.classList.toggle('hidden', tab !== 'exchange');
-  document.getElementById('bank-wallet')?.classList.toggle('hidden', tab !== 'wallet');
 }
 
 function renderBankExchange() {
@@ -1638,36 +1609,34 @@ function renderBankExchange() {
   const history = loadStepHistory();
   const coins   = state.coins ?? 0;
 
-  const rows = history.map(({ date, steps, exchanged }) => {
-    const gems     = Math.floor(steps / rate);
-    const selected = selectedStepDates.has(date) && !exchanged;
-    let cls = 'bank-step-row';
-    if (exchanged) cls += ' bank-step-row--exchanged';
-    else if (selected) cls += ' bank-step-row--selected';
-    const check = exchanged ? '✓' : (selected ? '✓' : '');
-    const click = exchanged ? '' : `onclick="toggleStepSelect('${date}')"`;
-    return `
-      <div class="${cls}" ${click}>
-        <div class="bank-step-check">${check}</div>
-        <div class="bank-step-info">
-          <div class="bank-step-date">${displayDate(date)}</div>
-          <div class="bank-step-count">${steps.toLocaleString()} 步</div>
-        </div>
-        <div class="bank-step-arrow">⇄</div>
-        <div class="bank-step-gems">💎 ${gems}</div>
-      </div>`;
-  }).join('');
+  if (!history.length) {
+    pane.innerHTML = `
+      <div class="bank-rate-card">
+        <div class="bank-rate-label">今日匯率</div>
+        <div class="bank-rate-value">${rate} 能量 = 1 💎</div>
+        <div class="bank-rate-hint">可以兌換最近一週的步數，兌換後清空列表</div>
+      </div>
+      <div class="bank-empty">所有步數已兌換<br>明天 00:00 後會新增當天步數</div>`;
+    return;
+  }
+
+  const totalGems = history.reduce((sum, e) => sum + Math.floor(e.steps / rate), 0);
+
+  const rows = history.map(({ date, steps }) => `
+    <div class="bank-step-row">
+      <div class="bank-step-info">
+        <div class="bank-step-date">${displayDate(date)}</div>
+        <div class="bank-step-count">${steps.toLocaleString()} 步</div>
+      </div>
+      <div class="bank-step-arrow">⇄</div>
+      <div class="bank-step-gems">💎 ${Math.floor(steps / rate)}</div>
+    </div>`).join('');
 
   pane.innerHTML = `
     <div class="bank-rate-card">
-      <div class="bank-rate-header">
-        <div>
-          <div class="bank-rate-label">今日匯率</div>
-          <div class="bank-rate-value">${rate} 能量 = 1 💎</div>
-        </div>
-        <button class="bank-select-all-btn" onclick="bankSelectAll()">全選</button>
-      </div>
-      <div class="bank-rate-hint">可以兌換最近一週的步數</div>
+      <div class="bank-rate-label">今日匯率</div>
+      <div class="bank-rate-value">${rate} 能量 = 1 💎</div>
+      <div class="bank-rate-hint">可以兌換最近一週的步數，兌換後清空列表</div>
     </div>
     <div class="bank-step-list">${rows}</div>
     <div class="bank-footer">
@@ -1675,75 +1644,27 @@ function renderBankExchange() {
         <div class="bank-coin-label">你擁有的像素晶石</div>
         <div class="bank-coin-amount">💎 ${coins.toLocaleString()}</div>
       </div>
-      <button class="bank-exchange-btn" onclick="doBankExchange()">兌換</button>
+      <div class="bank-exchange-right">
+        <div class="bank-exchange-total">可兌換 💎 ${totalGems.toLocaleString()}</div>
+        <button class="bank-exchange-btn" onclick="doBankExchange()">全部兌換</button>
+      </div>
     </div>`;
 }
 
-function renderBankWallet() {
-  const pane = document.getElementById('bank-wallet');
-  if (!pane) return;
-  const log = [...loadWalletLog()].reverse();
-  if (!log.length) {
-    pane.innerHTML = '<div class="bank-empty">尚無收支紀錄</div>';
-    return;
-  }
-  pane.innerHTML = `<div class="bank-wallet-list">${
-    log.map(({ date, reason, amount }) => {
-      const plus = amount > 0;
-      return `
-        <div class="bank-wallet-row">
-          <div class="bank-wallet-date">${date}</div>
-          <div class="bank-wallet-reason">${reason}</div>
-          <div class="bank-wallet-amount ${plus ? 'bank-wallet-amount--plus' : 'bank-wallet-amount--minus'}">
-            ${plus ? '+' : ''}${amount} 💎
-          </div>
-        </div>`;
-    }).join('')
-  }</div>`;
-}
-
-function toggleStepSelect(date) {
-  const history = loadStepHistory();
-  const entry   = history.find(e => e.date === date);
-  if (!entry || entry.exchanged) return;
-  if (selectedStepDates.has(date)) selectedStepDates.delete(date);
-  else selectedStepDates.add(date);
-  renderBankExchange();
-}
-
-function bankSelectAll() {
-  const history     = loadStepHistory();
-  const unexchanged = history.filter(e => !e.exchanged).map(e => e.date);
-  const allSelected = unexchanged.length > 0 && unexchanged.every(d => selectedStepDates.has(d));
-  if (allSelected) unexchanged.forEach(d => selectedStepDates.delete(d));
-  else             unexchanged.forEach(d => selectedStepDates.add(d));
-  renderBankExchange();
-}
-
 function doBankExchange() {
-  if (selectedStepDates.size === 0) { showToast('請先選擇要兌換的步數！'); return; }
-  const rate    = getDailyRate();
   const history = loadStepHistory();
-  let total     = 0;
+  if (!history.length) { showToast('沒有步數資料可兌換！'); return; }
 
-  selectedStepDates.forEach(date => {
-    const entry = history.find(e => e.date === date);
-    if (entry && !entry.exchanged) {
-      total += Math.floor(entry.steps / rate);
-      entry.exchanged = true;
-    }
-  });
+  const rate  = getDailyRate();
+  const total = history.reduce((sum, e) => sum + Math.floor(e.steps / rate), 0);
+  if (total <= 0) { showToast('步數不足以兌換任何能量石！'); return; }
 
-  if (total <= 0) { showToast('沒有可兌換的能量石！'); return; }
-
-  saveStepHistory(history);
+  saveStepHistory([]);                        // clear all history
   addCoins(total, '步數兌換');
-  selectedStepDates.clear();
   trackQuestEvent('exchange');
   trackQuestEvent('exchange_streak', getDateStr(new Date()));
-  showToast(`💎 兌換成功！+${total} 像素晶石`);
+  showToast(`💎 兌換成功！+${total.toLocaleString()} 像素晶石`);
   renderBankExchange();
-  renderBankWallet();
 }
 
 // ─── Shop Cards ───────────────────────────────────────────────────────────────

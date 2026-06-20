@@ -820,27 +820,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 /* ─── Bank Panel ─── */
 #shop-bank.active { gap: 0; padding: 0; }
-.bank-tabs {
-  display: flex;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.bank-tab {
-  flex: 1;
-  padding: 12px;
-  background: none;
-  border: none;
-  border-bottom: 3px solid transparent;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text2);
-  cursor: pointer;
-  font-family: inherit;
-  transition: color 0.2s, border-color 0.2s;
-}
-.bank-tab--active { color: var(--accent); border-bottom-color: var(--accent); }
-.bank-pane { display: flex; flex-direction: column; }
-.bank-pane.hidden { display: none; }
 .bank-rate-card {
   margin: 12px 12px 8px;
   padding: 12px 14px;
@@ -851,57 +830,18 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   flex-direction: column;
   gap: 6px;
 }
-.bank-rate-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
-}
 .bank-rate-label { font-size: 11px; color: var(--text2); }
 .bank-rate-value { font-size: 17px; font-weight: 900; color: var(--text); }
 .bank-rate-hint  { font-size: 11px; color: var(--text2); }
-.bank-select-all-btn {
-  flex-shrink: 0;
-  padding: 5px 13px;
-  background: var(--surface);
-  border: 1px solid var(--accent);
-  border-radius: 14px;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--accent);
-  cursor: pointer;
-  font-family: inherit;
-}
 .bank-step-list { display: flex; flex-direction: column; padding: 0 12px; }
 .bank-step-row {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 12px 6px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.12s;
   border-bottom: 1px solid var(--border);
-  user-select: none;
 }
 .bank-step-row:last-child { border-bottom: none; }
-.bank-step-row:hover:not(.bank-step-row--exchanged) { background: var(--surface2); }
-.bank-step-row--exchanged { opacity: 0.45; cursor: default; }
-.bank-step-row--selected  { background: rgba(76,175,80,.12); }
-.bank-step-check {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 2px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 13px;
-  transition: background 0.15s, border-color 0.15s;
-}
-.bank-step-row--selected .bank-step-check  { background: var(--accent); border-color: var(--accent); color: #fff; }
-.bank-step-row--exchanged .bank-step-check { background: var(--text2);  border-color: var(--text2);  color: #fff; }
 .bank-step-info { flex: 1; min-width: 0; }
 .bank-step-date  { font-size: 11px; color: var(--text2); }
 .bank-step-count { font-size: 16px; font-weight: 800; color: var(--text); }
@@ -921,6 +861,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .bank-coin-display { display: flex; flex-direction: column; gap: 2px; }
 .bank-coin-label  { font-size: 11px; color: var(--text2); }
 .bank-coin-amount { font-size: 18px; font-weight: 900; color: var(--text); }
+.bank-exchange-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.bank-exchange-total { font-size: 12px; font-weight: 700; color: var(--accent); }
 .bank-exchange-btn {
   padding: 11px 22px;
   background: #1a1a1a;
@@ -936,22 +878,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 .bank-exchange-btn:hover  { opacity: 0.85; }
 .bank-exchange-btn:active { transform: scale(0.96); }
-/* Wallet log */
-.bank-wallet-list { display: flex; flex-direction: column; padding: 0 12px; }
-.bank-wallet-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 11px 6px;
-  border-bottom: 1px solid var(--border);
-}
-.bank-wallet-row:last-child { border-bottom: none; }
-.bank-wallet-date   { font-size: 10px; color: var(--text2); flex-shrink: 0; min-width: 60px; }
-.bank-wallet-reason { flex: 1; font-size: 12px; color: var(--text); }
-.bank-wallet-amount { font-size: 13px; font-weight: 700; flex-shrink: 0; }
-.bank-wallet-amount--plus  { color: #4caf50; }
-.bank-wallet-amount--minus { color: #f44336; }
-.bank-empty { padding: 40px 16px; text-align: center; color: var(--text2); font-size: 13px; }
+.bank-empty { padding: 40px 16px; text-align: center; color: var(--text2); font-size: 13px; line-height: 1.6; }
 
 /* ─── Quest Tab ─── */
 #tab-quest.active { padding: 0; gap: 0; flex-direction: column; }
