@@ -1390,6 +1390,78 @@ function claimQuestReward(tab, questId) {
   renderQuestList();
 }
 
+// ─── IAP Store ────────────────────────────────────────────────────────────────
+// TODO: 串接真實金流（如 Stripe、街口支付、Line Pay）
+// 目前為模擬付款，直接發放晶石
+
+const IAP_PACKAGES = [
+  { id: 'pack1', amount: 100,  bonus: 0,    price: 30,   label: '新手包' },
+  { id: 'pack2', amount: 350,  bonus: 20,   price: 100,  label: '超值包' },
+  { id: 'pack3', amount: 800,  bonus: 80,   price: 220,  label: '熱門包' },
+  { id: 'pack4', amount: 1800, bonus: 250,  price: 480,  label: '豪華包', popular: true },
+  { id: 'pack5', amount: 4000, bonus: 700,  price: 980,  label: '至尊包' },
+  { id: 'pack6', amount: 9000, bonus: 2000, price: 1980, label: '王者包' },
+];
+
+function loadPurchaseHistory()  { try { return JSON.parse(localStorage.getItem('purchaseHistory') || '[]'); } catch { return []; } }
+function savePurchaseHistory(a) { localStorage.setItem('purchaseHistory', JSON.stringify(a.slice(-100))); }
+
+function openIAPStore() {
+  document.getElementById('screen-iap')?.classList.remove('hidden');
+  renderIAPStore();
+}
+
+function closeIAPStore() {
+  document.getElementById('screen-iap')?.classList.add('hidden');
+}
+
+function renderIAPStore() {
+  const grid = document.getElementById('iap-grid');
+  if (!grid) return;
+  grid.innerHTML = IAP_PACKAGES.map(pkg => {
+    const total = pkg.amount + pkg.bonus;
+    return `
+      <div class="iap-card${pkg.popular ? ' iap-card--popular' : ''}" onclick="showPurchaseConfirm('${pkg.id}')">
+        ${pkg.popular ? '<div class="iap-card__badge">最划算</div>' : ''}
+        <div class="iap-card__icon">💎</div>
+        <div class="iap-card__amount">${pkg.amount.toLocaleString()}</div>
+        ${pkg.bonus ? `<div class="iap-card__bonus">+${pkg.bonus.toLocaleString()} 贈送</div>` : ''}
+        <div class="iap-card__label">${pkg.label}</div>
+        <div class="iap-card__price">NT$ ${pkg.price}</div>
+      </div>`;
+  }).join('');
+}
+
+let pendingPurchaseId = null;
+
+function showPurchaseConfirm(packageId) {
+  const pkg = IAP_PACKAGES.find(p => p.id === packageId);
+  if (!pkg) return;
+  pendingPurchaseId = packageId;
+  const total = pkg.amount + pkg.bonus;
+  document.getElementById('iap-confirm-pkg-name').textContent = pkg.label;
+  document.getElementById('iap-confirm-amount').textContent   = `💎 ${total.toLocaleString()}`;
+  document.getElementById('iap-confirm-price').textContent    = `NT$ ${pkg.price}`;
+  openModal('modal-iap-confirm');
+}
+
+function confirmPurchase() {
+  // TODO: 串接真實金流（如 Stripe、街口支付、Line Pay）
+  // 目前為模擬付款，直接發放晶石
+  const pkg = IAP_PACKAGES.find(p => p.id === pendingPurchaseId);
+  if (!pkg) { closeModal('modal-iap-confirm'); return; }
+
+  const total   = pkg.amount + pkg.bonus;
+  const history = loadPurchaseHistory();
+  history.push({ date: displayDate(getDateStr(new Date())), packageId: pkg.id, amount: total, label: pkg.label });
+  savePurchaseHistory(history);
+
+  addCoins(total, `儲值 ${pkg.label}`);
+  closeModal('modal-iap-confirm');
+  showToast(`儲值成功！+${total.toLocaleString()} 💎`);
+  pendingPurchaseId = null;
+}
+
 // ─── Ad System ────────────────────────────────────────────────────────────────
 // TODO: 替換成真實廣告 SDK（如 AdMob、Unity Ads）
 // 目前使用模擬倒數計時代替

@@ -52,6 +52,7 @@
       <div class="top-bar__coins">
         <span class="coin-icon">💎</span>
         <span id="coin-count">0</span>
+        <button class="coin-plus-btn" onclick="openIAPStore()" aria-label="儲值">+</button>
       </div>
     </header>
 
@@ -518,6 +519,34 @@
       <h2>🎰 扭蛋結果</h2>
       <div id="gacha-result-grid" class="gacha-result-grid"></div>
       <button id="btn-gacha-close" class="btn-confirm">確認</button>
+    </div>
+  </div>
+
+  <!-- IAP Store Screen -->
+  <div id="screen-iap" class="screen-iap hidden">
+    <div class="iap-header">
+      <button class="shop-back-btn" onclick="closeIAPStore()">← 返回</button>
+      <h2 class="iap-title">儲值像素晶石</h2>
+    </div>
+    <div class="iap-body">
+      <div class="iap-grid" id="iap-grid"></div>
+      <p class="iap-notice">⚠️ 目前為測試模式，不收取真實費用</p>
+    </div>
+  </div>
+
+  <!-- IAP Confirm Modal -->
+  <div id="modal-iap-confirm" class="modal hidden">
+    <div class="modal-box iap-confirm-box">
+      <div class="iap-confirm-title">確定購買 <span id="iap-confirm-pkg-name"></span>？</div>
+      <div class="iap-confirm-amount" id="iap-confirm-amount"></div>
+      <div class="iap-confirm-price" id="iap-confirm-price"></div>
+      <div class="iap-confirm-note">
+        ⚠️ 之後串接真實金流，目前為測試模式
+      </div>
+      <div class="iap-confirm-actions">
+        <button class="btn-cancel" onclick="closeModal('modal-iap-confirm')">取消</button>
+        <button class="btn-confirm" onclick="confirmPurchase()">確認</button>
+      </div>
     </div>
   </div>
 
