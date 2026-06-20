@@ -2591,8 +2591,10 @@ function battleUseCard(handIdx) {
   renderBattleBoss();
   renderBattleAP();
   renderBattleHand();
+  // End-turn is only disabled during the boss's turn or after battle ends.
+  // AP = 0 is NOT a reason to disable it — player should always be able to end their turn.
   const endBtn = document.getElementById('btn-end-turn');
-  if (endBtn) endBtn.disabled = bSt.ap <= 0 || !bSt.playerTurn;
+  if (endBtn) endBtn.disabled = !bSt.playerTurn || bSt.ended;
 
   if (bSt.bossHp <= 0) {
     bSt.ended = true;
@@ -2601,7 +2603,7 @@ function battleUseCard(handIdx) {
 }
 
 function endPlayerTurn() {
-  console.log('[Battle] endPlayerTurn called | bSt exists:', !!bSt, '| playerTurn:', bSt?.playerTurn, '| ended:', bSt?.ended);
+  console.log('end turn clicked | bSt exists:', !!bSt, '| playerTurn:', bSt?.playerTurn, '| ended:', bSt?.ended, '| ap:', bSt?.ap);
   if (!bSt || bSt.ended || !bSt.playerTurn) return;
   bSt.playerTurn = false;
   const endBtn = document.getElementById('btn-end-turn');
