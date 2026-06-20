@@ -1488,33 +1488,38 @@ let adTimerInterval = null;
 
 function showAdModal(onComplete) {
   // TODO: 替換成真實廣告 SDK（如 AdMob、Unity Ads）
-  const overlay    = document.getElementById('modal-ad');
-  const countdown  = document.getElementById('ad-countdown');
-  const bar        = document.getElementById('ad-progress-bar');
+  const overlay   = document.getElementById('modal-ad');
+  const countdown = document.getElementById('ad-countdown');
+  const bar       = document.getElementById('ad-progress-bar');
   if (!overlay) { onComplete(); return; }
+
+  // One-shot guard — ensures onComplete fires exactly once
+  let done = false;
+  const finish = () => {
+    if (done) return;
+    done = true;
+    clearInterval(adTimerInterval);
+    adTimerInterval = null;
+    overlay.classList.add('hidden');
+    onComplete();
+  };
 
   overlay.classList.remove('hidden');
   bar.style.transition = 'none';
   bar.style.width = '0%';
   let secs = 5;
-  countdown.textContent = secs;
+  if (countdown) countdown.textContent = secs;
 
   clearInterval(adTimerInterval);
-  // Start smooth progress bar
   requestAnimationFrame(() => {
-    bar.style.transition = `width ${secs}s linear`;
+    bar.style.transition = 'width 5s linear';
     bar.style.width = '100%';
   });
 
   adTimerInterval = setInterval(() => {
     secs--;
     if (countdown) countdown.textContent = Math.max(0, secs);
-    if (secs <= 0) {
-      clearInterval(adTimerInterval);
-      adTimerInterval = null;
-      overlay.classList.add('hidden');
-      onComplete();
-    }
+    if (secs <= 0) finish();
   }, 1000);
 }
 
@@ -1524,8 +1529,10 @@ function watchAdForReward() {
   if (adState.count >= MAX) { showToast('今日廣告已達上限！'); return; }
 
   showAdModal(() => {
-    const updated = loadAdWatchCount();
-    updated.count = (updated.count || 0) + 1;
+    const updated  = loadAdWatchCount();
+    const newCount = (updated.count || 0) + 1;
+    console.log('ad watch count updated to:', newCount);
+    updated.count  = newCount;
     saveAdWatchCount(updated);
     addCoins(50, '廣告獎勵');
     showToast('廣告獎勵 +50 能量石！');
