@@ -448,6 +448,7 @@ function rollPet(forcedMinRarity = null) {
 }
 
 function doGachaRolls(count) {
+  sfxGacha();
   const results = [];
   let hasSRPlus = false;
   for (let i = 0; i < count; i++) {
@@ -631,6 +632,7 @@ function addExp(amount) {
 
   if (leveled) {
     trackQuestEvent('pet_level', state.level);
+    sfxLevelUp();
     if (state.level >= maxLevel) {
       showToast(`🎉 已達等級上限 Lv.${state.level} MAX！`);
     } else {
@@ -773,6 +775,7 @@ function useFoodFromModal(id) {
   saveState();
   trackQuestEvent('feed');
   checkMoodQuest();
+  sfxFeed();
   if (e.exp) addExp(e.exp); else renderAll();
   closeModal('modal-feed');
   showToast(`使用 ${food.name}！${food.desc}`);
@@ -909,6 +912,7 @@ function useDrinkFromModal(id) {
   saveState();
   trackQuestEvent('drink');
   checkMoodQuest();
+  sfxFeed();
   if (e.exp) addExp(e.exp); else renderAll();
   closeModal('modal-drink');
   showToast(`使用 ${drink.name}！${drink.desc}`);
@@ -2600,6 +2604,7 @@ function battleUseCard(handIdx) {
 
   const { dmg, crit } = calcDamage(attacker.stats.atk, card.skill.power, bSt.bossStats.def, attacker.critRate);
   console.log('[Battle] damage dealt:', dmg, crit ? '(crit)' : '', '| boss hp after:', Math.max(0, bSt.bossHp - dmg));
+  sfxAttack();
   bSt.bossHp = Math.max(0, bSt.bossHp - dmg);
   bSt.hand.splice(handIdx, 1);
   bSt.ap--;
@@ -2647,6 +2652,7 @@ function bossTurnAnimate() {
 
   const target = alivePets[Math.floor(Math.random() * alivePets.length)];
   const { dmg, crit } = calcDamage(bSt.bossStats.atk, 1.0, target.entry.stats.def, 0.05);
+  sfxAttack();
   target.entry.hp = Math.max(0, target.entry.hp - dmg);
 
   // Immediately purge this pet's cards if it just died
@@ -2709,6 +2715,8 @@ function endBattle(win) {
   if (!bSt) return;
   bSt.ended      = true;
   bSt.playerTurn = false;
+
+  if (win) sfxVictory(); else sfxDefeat();
 
   trackQuestEvent('boss_battle');
   trackQuestEvent('battle_count');
@@ -2912,6 +2920,7 @@ function collectWorldChest(cm) {
   const reward = 50 + Math.floor(Math.random() * 51);
   addCoins(reward, '寶箱獎勵');
   trackQuestEvent('treasure');
+  sfxTreasure();
   showWorldGemFloat(reward);
   showToast(`💎 獲得 ${reward} 能量石！`);
   updateWorldHUD();
@@ -3020,27 +3029,244 @@ function hideWorldPage() {
   }
 }
 
-// ─── Settings: Sound ───────────────────────────────────────────────────────
-// TODO: wire these to an actual audio engine once sound assets are added
+// ─── Audio Engine (Web Audio API, synthesized 8-bit SFX + BGM) ─────────────
+const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new AudioCtxClass();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
 function loadSoundSettings() {
   try {
-    return { sfx: true, music: true, volume: 80, ...JSON.parse(localStorage.getItem('soundSettings') || '{}') };
-  } catch { return { sfx: true, music: true, volume: 80 }; }
+    return { sfxOn: true, bgmOn: true, volume: 0.8, ...JSON.parse(localStorage.getItem('soundSettings') || '{}') };
+  } catch { return { sfxOn: true, bgmOn: true, volume: 0.8 }; }
 }
 function saveSoundSettings(s) { localStorage.setItem('soundSettings', JSON.stringify(s)); }
+function getMasterVolume() { return loadSoundSettings().volume ?? 0.8; }
 
+// ── SFX ──────────────────────────────────────────────────────────────────
+function sfxClick() {
+  if (!loadSoundSettings().sfxOn) return;
+  const ctx = getAudioCtx();
+  const vol = getMasterVolume();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.frequency.setValueAtTime(800, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.1);
+  gain.gain.setValueAtTime(0.3 * vol, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+  osc.start();
+  osc.stop(ctx.currentTime + 0.1);
+}
+
+function sfxFeed() {
+  if (!loadSoundSettings().sfxOn) return;
+  const ctx = getAudioCtx();
+  const vol = getMasterVolume();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(400, ctx.currentTime);
+  osc.frequency.setValueAtTime(600, ctx.currentTime + 0.1);
+  osc.frequency.setValueAtTime(800, ctx.currentTime + 0.2);
+  gain.gain.setValueAtTime(0.2 * vol, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+  osc.start();
+  osc.stop(ctx.currentTime + 0.3);
+}
+
+function sfxLevelUp() {
+  if (!loadSoundSettings().sfxOn) return;
+  const ctx = getAudioCtx();
+  const vol = getMasterVolume();
+  const notes = [523, 659, 784, 1047];
+  notes.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.15);
+    gain.gain.setValueAtTime(0.2 * vol, ctx.currentTime + i * 0.15);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.14);
+    osc.start(ctx.currentTime + i * 0.15);
+    osc.stop(ctx.currentTime + i * 0.15 + 0.15);
+  });
+}
+
+function sfxGacha() {
+  if (!loadSoundSettings().sfxOn) return;
+  const ctx = getAudioCtx();
+  const vol = getMasterVolume();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(300, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.5);
+  gain.gain.setValueAtTime(0.3 * vol, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+  osc.start();
+  osc.stop(ctx.currentTime + 0.5);
+}
+
+function sfxAttack() {
+  if (!loadSoundSettings().sfxOn) return;
+  const ctx = getAudioCtx();
+  const vol = getMasterVolume();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(200, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.15);
+  gain.gain.setValueAtTime(0.4 * vol, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+  osc.start();
+  osc.stop(ctx.currentTime + 0.15);
+}
+
+function sfxVictory() {
+  if (!loadSoundSettings().sfxOn) return;
+  const ctx = getAudioCtx();
+  const vol = getMasterVolume();
+  const notes = [523, 523, 784, 523, 784, 1047];
+  const times = [0, 0.2, 0.4, 0.7, 0.9, 1.1];
+  notes.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime + times[i]);
+    gain.gain.setValueAtTime(0.2 * vol, ctx.currentTime + times[i]);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + times[i] + 0.18);
+    osc.start(ctx.currentTime + times[i]);
+    osc.stop(ctx.currentTime + times[i] + 0.2);
+  });
+}
+
+function sfxDefeat() {
+  if (!loadSoundSettings().sfxOn) return;
+  const ctx = getAudioCtx();
+  const vol = getMasterVolume();
+  const notes = [400, 350, 300, 200];
+  const times = [0, 0.2, 0.4, 0.7];
+  notes.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime + times[i]);
+    gain.gain.setValueAtTime(0.2 * vol, ctx.currentTime + times[i]);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + times[i] + 0.18);
+    osc.start(ctx.currentTime + times[i]);
+    osc.stop(ctx.currentTime + times[i] + 0.2);
+  });
+}
+
+function sfxTreasure() {
+  if (!loadSoundSettings().sfxOn) return;
+  const ctx = getAudioCtx();
+  const vol = getMasterVolume();
+  const notes = [659, 784, 880, 1047];
+  notes.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.1);
+    gain.gain.setValueAtTime(0.2 * vol, ctx.currentTime + i * 0.1);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.1 + 0.1);
+    osc.start(ctx.currentTime + i * 0.1);
+    osc.stop(ctx.currentTime + i * 0.1 + 0.1);
+  });
+}
+
+// ── BGM (looping 8-bit melody) ──────────────────────────────────────────
+let bgmIntervalId = null;
+let bgmGainNode   = null;
+
+function startBGM() {
+  if (bgmIntervalId) return; // already running
+  if (!loadSoundSettings().bgmOn) return;
+  const ctx = getAudioCtx();
+  bgmGainNode = ctx.createGain();
+  bgmGainNode.gain.setValueAtTime(0.12 * getMasterVolume(), ctx.currentTime);
+  bgmGainNode.connect(ctx.destination);
+
+  const melody  = [262, 294, 330, 349, 392, 349, 330, 294];
+  const noteDur = 0.3;
+
+  const playLoop = () => {
+    const startTime = ctx.currentTime;
+    melody.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      osc.connect(bgmGainNode);
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(freq, startTime + i * noteDur);
+      osc.start(startTime + i * noteDur);
+      osc.stop(startTime + i * noteDur + noteDur * 0.8);
+    });
+  };
+
+  playLoop();
+  bgmIntervalId = setInterval(playLoop, melody.length * noteDur * 1000);
+}
+
+function stopBGM() {
+  if (bgmIntervalId) { clearInterval(bgmIntervalId); bgmIntervalId = null; }
+  if (bgmGainNode) { try { bgmGainNode.disconnect(); } catch {} bgmGainNode = null; }
+}
+
+function setMasterVolume(volume) {
+  if (bgmGainNode) bgmGainNode.gain.setValueAtTime(0.12 * volume, getAudioCtx().currentTime);
+}
+
+// ── Unlock AudioContext + start BGM on first user interaction ──────────
+function unlockAudioOnFirstInteraction() {
+  document.addEventListener('click', () => {
+    getAudioCtx(); // creates + resumes context
+    if (loadSoundSettings().bgmOn) startBGM();
+  }, { once: true });
+}
+
+// ── Generic "button click" SFX, delegated globally ──────────────────────
+function initSfxClickDelegation() {
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('button')) sfxClick();
+  });
+}
+
+// ─── Settings: Sound ───────────────────────────────────────────────────────
 function toggleSoundSetting(key, checked) {
   const s = loadSoundSettings();
   s[key] = checked;
   saveSoundSettings(s);
+  if (key === 'bgmOn') {
+    if (checked) startBGM(); else stopBGM();
+  }
 }
 
 function updateVolume(value) {
   const s = loadSoundSettings();
-  s.volume = parseInt(value, 10);
+  const volume = Math.max(0, Math.min(100, parseInt(value, 10))) / 100;
+  s.volume = volume;
   saveSoundSettings(s);
+  setMasterVolume(volume);
   const valEl = document.getElementById('volume-value');
-  if (valEl) valEl.textContent = s.volume;
+  if (valEl) valEl.textContent = Math.round(volume * 100);
 }
 
 // ─── Settings: Game ────────────────────────────────────────────────────────
@@ -3151,10 +3377,11 @@ function renderSettingsTab() {
   const musicEl  = document.getElementById('toggle-music');
   const volEl    = document.getElementById('range-volume');
   const volValEl = document.getElementById('volume-value');
-  if (sfxEl)    sfxEl.checked        = sound.sfx;
-  if (musicEl)  musicEl.checked      = sound.music;
-  if (volEl)    volEl.value          = sound.volume;
-  if (volValEl) volValEl.textContent = sound.volume;
+  const volPct   = Math.round((sound.volume ?? 0.8) * 100);
+  if (sfxEl)    sfxEl.checked        = sound.sfxOn;
+  if (musicEl)  musicEl.checked      = sound.bgmOn;
+  if (volEl)    volEl.value          = volPct;
+  if (volValEl) volValEl.textContent = volPct;
 
   document.querySelectorAll('.settings-lang-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.lang === game.language);
@@ -3192,6 +3419,8 @@ function init() {
   initQuestTab();
   initExploreCards();
   renderSettingsTab();
+  unlockAudioOnFirstInteraction();
+  initSfxClickDelegation();
   setInterval(decayStats, DECAY_INTERVAL);
 }
 
