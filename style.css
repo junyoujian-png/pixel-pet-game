@@ -3233,26 +3233,26 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 .settings-range-value { font-size: 13px; font-weight: 700; color: var(--accent); }
 
-/* Language segmented control */
-.settings-lang-group {
+/* Language picker (5 languages, wraps, orange border = selected) */
+.lang-picker-grid {
   display: flex;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  overflow: hidden;
+  flex-wrap: wrap;
+  gap: 8px;
 }
-.settings-lang-btn {
-  padding: 6px 14px;
-  background: var(--surface);
-  border: none;
+.lang-picker-btn {
+  padding: 7px 14px;
+  border-radius: 16px;
+  border: 2px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
   font-size: 12px;
-  font-weight: 700;
-  color: var(--text2);
+  font-weight: 600;
   cursor: pointer;
   font-family: inherit;
-  transition: background .15s, color .15s;
+  transition: border-color .15s, color .15s;
 }
-.settings-lang-btn + .settings-lang-btn { border-left: 1px solid var(--border); }
-.settings-lang-btn.active { background: var(--accent); color: #fff; }
+.lang-picker-btn:hover  { border-color: #ff6b35; }
+.lang-picker-btn.active { border-color: #ff6b35; color: #ff6b35; font-weight: 700; }
 
 /* Player name text input */
 .settings-text-input {

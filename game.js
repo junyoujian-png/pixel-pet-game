@@ -488,8 +488,8 @@ function showGachaResult(results) {
       <span class="gacha-result-card__name">${r.pet.name}</span>
       <span class="badge badge--${r.pet.rarity.toLowerCase()}">${r.pet.rarity}</span>
       ${r.isNew
-        ? '<span class="gacha-tag gacha-tag--new">NEW！</span>'
-        : '<span class="gacha-tag gacha-tag--dup">已擁有 +50G</span>'}
+        ? `<span class="gacha-tag gacha-tag--new">${t('gacha.new')}</span>`
+        : `<span class="gacha-tag gacha-tag--dup">${t('gacha.owned')} +50G</span>`}
     `;
     grid.appendChild(card);
   });
@@ -498,7 +498,7 @@ function showGachaResult(results) {
 
 function initGacha() {
   document.getElementById('btn-gacha-single')?.addEventListener('click', () => {
-    if (!spendCoins(GACHA_COST_SINGLE, '扭蛋')) { showToast('能量石不足！'); return; }
+    if (!spendCoins(GACHA_COST_SINGLE, '扭蛋')) { showToast(t('toast.no_coins')); return; }
     const machine = document.getElementById('gacha-machine');
     machine?.classList.add('gacha-spin');
     setTimeout(() => {
@@ -507,7 +507,7 @@ function initGacha() {
     }, 1200);
   });
   document.getElementById('btn-gacha-ten')?.addEventListener('click', () => {
-    if (!spendCoins(GACHA_COST_TEN, '扭蛋十連')) { showToast('能量石不足！'); return; }
+    if (!spendCoins(GACHA_COST_TEN, '扭蛋十連')) { showToast(t('toast.no_coins')); return; }
     const machine = document.getElementById('gacha-machine');
     machine?.classList.add('gacha-spin');
     setTimeout(() => {
@@ -634,9 +634,9 @@ function addExp(amount) {
     trackQuestEvent('pet_level', state.level);
     sfxLevelUp();
     if (state.level >= maxLevel) {
-      showToast(`🎉 已達等級上限 Lv.${state.level} MAX！`);
+      showToast(`🎉 ${t('toast.max_level')} Lv.${state.level} MAX`);
     } else {
-      showToast(`🎉 升級了！現在是 Lv.${state.level}！`);
+      showToast(`🎉 ${t('toast.level_up')} Lv.${state.level}`);
     }
     animateLevelUp();
   }
@@ -715,7 +715,7 @@ function useItem(id) {
 function buyFood(id) {
   const food = FOODS.find(f => f.id === id);
   if (!food) return;
-  if (!spendCoins(food.price, '購買食物')) { showToast('能量石不足！'); return; }
+  if (!spendCoins(food.price, '購買食物')) { showToast(t('toast.no_coins')); return; }
   const inv = loadInventory();
   inv[id] = (inv[id] || 0) + 1;
   saveInventory(inv);
@@ -737,8 +737,7 @@ function renderFeedModal() {
   if (!owned.length) {
     el.innerHTML = `
       <div class="modal-pick-empty">
-        <p>背包沒有食物</p>
-        <p class="modal-pick-empty-hint">去商店購買吧！</p>
+        <p>${t('bag.empty.food')}</p>
       </div>`;
     return;
   }
@@ -778,7 +777,7 @@ function useFoodFromModal(id) {
   sfxFeed();
   if (e.exp) addExp(e.exp); else renderAll();
   closeModal('modal-feed');
-  showToast(`使用 ${food.name}！${food.desc}`);
+  showToast(`${t('toast.feed_success')} ${food.name}（${food.desc}）`);
 }
 
 function renderFoodShop() {
@@ -852,7 +851,7 @@ function migrateItemsToInventory() {
 function buyDrink(id) {
   const drink = DRINKS.find(d => d.id === id);
   if (!drink) return;
-  if (!spendCoins(drink.price, '購買飲料')) { showToast('能量石不足！'); return; }
+  if (!spendCoins(drink.price, '購買飲料')) { showToast(t('toast.no_coins')); return; }
   const inv = loadInventory();
   inv[id] = (inv[id] || 0) + 1;
   saveInventory(inv);
@@ -874,8 +873,7 @@ function renderDrinkModal() {
   if (!owned.length) {
     el.innerHTML = `
       <div class="modal-pick-empty">
-        <p>背包沒有飲料</p>
-        <p class="modal-pick-empty-hint">去商店購買吧！</p>
+        <p>${t('bag.empty.drink')}</p>
       </div>`;
     return;
   }
@@ -915,7 +913,7 @@ function useDrinkFromModal(id) {
   sfxFeed();
   if (e.exp) addExp(e.exp); else renderAll();
   closeModal('modal-drink');
-  showToast(`使用 ${drink.name}！${drink.desc}`);
+  showToast(`${t('toast.drink_success')} ${drink.name}（${drink.desc}）`);
 }
 
 // ─── Bag Select Modal ────────────────────────────────────────────────────────
@@ -944,8 +942,7 @@ function renderItemPickModal() {
   if (!owned.length) {
     el.innerHTML = `
       <div class="modal-pick-empty">
-        <p>背包沒有道具</p>
-        <p class="modal-pick-empty-hint">去商店購買吧！</p>
+        <p>${t('bag.empty.item')}</p>
       </div>`;
     return;
   }
@@ -1009,8 +1006,7 @@ function renderPetPickModal() {
   if (!bagPets.length) {
     el.innerHTML = `
       <div class="modal-pick-empty">
-        <p>背包沒有寵物</p>
-        <p class="modal-pick-empty-hint">去扭蛋機抽吧！</p>
+        <p>${t('bag.empty.pet')}</p>
       </div>`;
     return;
   }
@@ -1338,11 +1334,11 @@ function renderQuestList() {
     const ready   = prog >= q.target && !p.claimed;
     const done    = p.claimed;
     let btnClass  = 'quest-claim-btn';
-    let btnText   = '進行中';
+    let btnText   = t('quest.inprogress');
     let cardClass = 'quest-card';
-    if (done)        { btnClass += ' quest-claim-btn--done';    btnText = '✓ 已領取'; cardClass += ' quest-card--done'; }
-    else if (ready)  { btnClass += ' quest-claim-btn--ready';   btnText = '領取獎勵'; }
-    else             { btnClass += ' quest-claim-btn--pending';  btnText = '進行中'; }
+    if (done)        { btnClass += ' quest-claim-btn--done';    btnText = `✓ ${t('quest.claimed')}`; cardClass += ' quest-card--done'; }
+    else if (ready)  { btnClass += ' quest-claim-btn--ready';   btnText = t('quest.claim'); }
+    else             { btnClass += ' quest-claim-btn--pending';  btnText = t('quest.inprogress'); }
     const onclick = ready ? `claimQuestReward('${activeQuestTab}','${q.id}')` : '';
     return `
       <div class="${cardClass}">
@@ -1620,7 +1616,7 @@ function renderBankExchange() {
   if (!history.length) {
     pane.innerHTML = `
       <div class="bank-rate-card">
-        <div class="bank-rate-label">今日匯率</div>
+        <div class="bank-rate-label">${t('bank.rate')}</div>
         <div class="bank-rate-value">${rate} 能量 = 1 💎</div>
         <div class="bank-rate-hint">可以兌換最近一週的步數，兌換後清空列表</div>
       </div>
@@ -1642,19 +1638,19 @@ function renderBankExchange() {
 
   pane.innerHTML = `
     <div class="bank-rate-card">
-      <div class="bank-rate-label">今日匯率</div>
+      <div class="bank-rate-label">${t('bank.rate')}</div>
       <div class="bank-rate-value">${rate} 能量 = 1 💎</div>
       <div class="bank-rate-hint">可以兌換最近一週的步數，兌換後清空列表</div>
     </div>
     <div class="bank-step-list">${rows}</div>
     <div class="bank-footer">
       <div class="bank-coin-display">
-        <div class="bank-coin-label">你擁有的像素晶石</div>
+        <div class="bank-coin-label">${t('bank.owned')}</div>
         <div class="bank-coin-amount">💎 ${coins.toLocaleString()}</div>
       </div>
       <div class="bank-exchange-right">
         <div class="bank-exchange-total">可兌換 💎 ${totalGems.toLocaleString()}</div>
-        <button class="bank-exchange-btn" onclick="doBankExchange()">全部兌換</button>
+        <button class="bank-exchange-btn" onclick="doBankExchange()">${t('bank.exchange')}</button>
       </div>
     </div>`;
 }
@@ -1677,11 +1673,11 @@ function doBankExchange() {
 
 // ─── Shop Cards ───────────────────────────────────────────────────────────────
 const SHOP_TITLES = {
-  bank:  '能量兌換銀行',
+  bank:  t('bank.title'),
   food:  '食物商店',
   drink: '飲料商店',
   item:  '道具商店',
-  gacha: '寵物抽獎',
+  gacha: t('gacha.title'),
 };
 
 // ─── Gacha Panel ─────────────────────────────────────────────────────────────
@@ -1708,17 +1704,17 @@ function buildGachaPanel() {
   if (!panel) return;
   panel.innerHTML = `
     <p style="font-size:14px;color:#888;text-align:center;margin-bottom:4px">常駐寵物卡池</p>
-    <div style="display:inline-flex;background:#e8e8e8;border-radius:20px;padding:5px 14px;font-size:13px;font-weight:600;margin-bottom:8px;cursor:pointer">常駐卡池 ▼</div>
+    <div style="display:inline-flex;background:#e8e8e8;border-radius:20px;padding:5px 14px;font-size:13px;font-weight:600;margin-bottom:8px;cursor:pointer">${t('gacha.pool')} ▼</div>
     <div id="gacha-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px;transition:opacity 0.3s">
       ${petCellsHTML(getRandomPets(16))}
     </div>
     <div style="display:flex;gap:10px;position:sticky;bottom:0;background:#f5f0eb;padding:10px 0 4px;margin-top:12px">
       <button onclick="doGacha(1)" style="flex:1;padding:14px 8px;border-radius:30px;background:#f0ebe4;border:1px solid #ddd5c8;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px">
-        <span style="font-size:15px;font-weight:700">單次抽獎</span>
+        <span style="font-size:15px;font-weight:700">${t('gacha.single')}</span>
         <span style="font-size:12px;color:#6b5a47">100 💎</span>
       </button>
       <button onclick="doGacha(10)" style="flex:1;padding:14px 8px;border-radius:30px;background:#f0ebe4;border:1px solid #ddd5c8;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px">
-        <span style="font-size:15px;font-weight:700">十次抽獎</span>
+        <span style="font-size:15px;font-weight:700">${t('gacha.ten')}</span>
         <span style="font-size:12px;color:#6b5a47">900 💎</span>
       </button>
     </div>
@@ -1734,13 +1730,13 @@ function buildAdGachaBtn() {
       background:${used ? '#aaa' : '#1565c0'};border:none;color:#fff;
       cursor:${used ? 'default' : 'pointer'};font-size:14px;font-weight:700;
       font-family:inherit;opacity:${used ? '0.5' : '1'}">
-    📺 ${used ? '今日廣告扭蛋已使用' : '看廣告抽一次（每日限 1 次）'}
+    📺 ${used ? '今日廣告扭蛋已使用' : t('gacha.ad') + '（每日限 1 次）'}
   </button>`;
 }
 
 function doGacha(count) {
   const cost = count === 1 ? GACHA_COST_SINGLE : GACHA_COST_TEN;
-  if (!spendCoins(cost, '扭蛋')) { showToast('能量石不足！'); return; }
+  if (!spendCoins(cost, '扭蛋')) { showToast(t('toast.no_coins')); return; }
   showGachaResult(doGachaRolls(count));
 }
 
@@ -1857,7 +1853,7 @@ function initShop() {
       const cost = parseInt(btn.dataset.cost, 10);
       const type = btn.dataset.type;
       const id   = btn.dataset.id;
-      if (!spendCoins(cost, `購買${ITEM_DEFS[id]?.name ?? '道具'}`)) { showToast('能量石不足！'); return; }
+      if (!spendCoins(cost, `購買${ITEM_DEFS[id]?.name ?? '道具'}`)) { showToast(t('toast.no_coins')); return; }
       if (type === 'item') {
         addItem(id);
         if (id === 'boss_ticket') {
@@ -1970,21 +1966,21 @@ function renderSlotPage(slotIdx) {
     </div>
     <div class="card stats-card">
       <div class="stat-row">
-        <span class="stat-label">😄 心情</span>
+        <span class="stat-label">😄 ${t('stat.mood')}</span>
         <div class="stat-bar-wrap">
           <div class="stat-bar"><div class="stat-bar__fill mood-fill" style="width:${Math.min(100,ps.mood)}%"></div></div>
           <span class="stat-value">${Math.round(ps.mood)}</span>
         </div>
       </div>
       <div class="stat-row">
-        <span class="stat-label">🍖 飽食</span>
+        <span class="stat-label">🍖 ${t('stat.hunger')}</span>
         <div class="stat-bar-wrap">
           <div class="stat-bar"><div class="stat-bar__fill hunger-fill" style="width:${Math.min(100,ps.hunger)}%"></div></div>
           <span class="stat-value">${Math.round(ps.hunger)}</span>
         </div>
       </div>
       <div class="stat-row">
-        <span class="stat-label">💧 水份</span>
+        <span class="stat-label">💧 ${t('stat.water')}</span>
         <div class="stat-bar-wrap">
           <div class="stat-bar"><div class="stat-bar__fill water-fill" style="width:${Math.min(100,ps.water)}%"></div></div>
           <span class="stat-value">${Math.round(ps.water)}</span>
@@ -1993,21 +1989,21 @@ function renderSlotPage(slotIdx) {
     </div>
     <div class="action-grid">
       <button class="action-btn" onclick="slotFeed(${slotIdx})">
-        <span class="action-icon">🍖</span><span>餵食</span>
+        <span class="action-icon">🍖</span><span>${t('home.feed')}</span>
       </button>
       <button class="action-btn" onclick="slotDrink(${slotIdx})">
-        <span class="action-icon">🥤</span><span>飲料</span>
+        <span class="action-icon">🥤</span><span>${t('home.drink')}</span>
       </button>
       <button class="action-btn" onclick="slotItemBag(${slotIdx})">
-        <span class="action-icon">🎒</span><span>道具背包</span>
+        <span class="action-icon">🎒</span><span>${t('home.item')}</span>
       </button>
       <button class="action-btn" onclick="openPetPickModal()">
-        <span class="action-icon">🐾</span><span>寵物背包</span>
+        <span class="action-icon">🐾</span><span>${t('home.pet')}</span>
       </button>
     </div>
     <div class="small-btn-row">
       <button class="small-btn" onclick="showPetDetail('${petId}')">
-        <span>ℹ️</span><span class="small-btn-label">資訊</span>
+        <span>ℹ️</span><span class="small-btn-label">${t('home.info')}</span>
       </button>
       <button class="small-btn" onclick="openPokedex()">
         <span>📖</span><span class="small-btn-label">圖鑑</span>
@@ -2207,11 +2203,11 @@ function renderBossList() {
 
     let actionHtml;
     if (isSeqLocked) {
-      actionHtml = `<span class="boss-status boss-status--locked">🔒 未解鎖</span>`;
+      actionHtml = `<span class="boss-status boss-status--locked">${t('boss.locked')}</span>`;
     } else if (!hasTicket) {
-      actionHtml = `<button class="boss-challenge-btn boss-btn--disabled" disabled>🎫 需要挑戰卷</button>`;
+      actionHtml = `<button class="boss-challenge-btn boss-btn--disabled" disabled>${t('boss.need_ticket')}</button>`;
     } else {
-      actionHtml = `<button class="boss-challenge-btn boss-btn--ticket" data-boss-id="${boss.id}">🎫 使用挑戰卷挑戰</button>`;
+      actionHtml = `<button class="boss-challenge-btn boss-btn--ticket" data-boss-id="${boss.id}">${t('boss.ticket')}</button>`;
     }
 
     const lockedClass  = isSeqLocked ? ' boss-card--locked' : '';
@@ -2250,7 +2246,7 @@ function challengeBoss(bossId) {
   // 消耗一張挑戰卷
   consumeItem('boss_ticket');
   const remaining = getItem('boss_ticket');
-  showToast(`🎫 使用挑戰卷！剩餘 ${remaining} 張`);
+  showToast(`🎫 ${t('toast.ticket_used')} 剩餘 ${remaining} 張`);
 
   startBattle(boss, isFirstTime);
 }
@@ -2376,7 +2372,7 @@ function showWheelResult(segIdx) {
           <img src="${boss.image}" class="wheel-result-pet-img" alt="${boss.name}"
                onerror="this.style.opacity='0.2'">
         </div>
-        <div class="wheel-result-pet-tag${isNew ? ' new-flash' : ''}">${isNew ? '✨ NEW ✨' : '已擁有'}</div>
+        <div class="wheel-result-pet-tag${isNew ? ' new-flash' : ''}">${isNew ? `✨ ${t('gacha.new')} ✨` : t('gacha.owned')}</div>
         <div class="wheel-result-title">獲得 BOSS 寵物！</div>
         <div class="wheel-result-subtitle">${boss.name}</div>
       </div>`;
@@ -2743,12 +2739,12 @@ function endBattle(win) {
 
   overlay.classList.remove('hidden');
   if (win) {
-    titleEl.textContent   = '🏆 勝利！';
+    titleEl.textContent   = `🏆 ${t('battle.victory')}`;
     descEl.textContent    = showWheel ? '精彩！旋轉轉盤獲取獎勵！' : `${bSt.boss.name} 已在記錄中！`;
     closeBtn.textContent  = showWheel ? '🎡 轉動轉盤！' : '確認';
     closeBtn.dataset.wheel = showWheel ? '1' : '0';
   } else {
-    titleEl.textContent   = '💀 戰敗';
+    titleEl.textContent   = `💀 ${t('battle.defeat')}`;
     descEl.textContent    = `${bSt.boss.name} 太強大，繼續升等再挑戰！`;
     closeBtn.textContent  = '確認';
     closeBtn.dataset.wheel = '0';
@@ -2922,7 +2918,7 @@ function collectWorldChest(cm) {
   trackQuestEvent('treasure');
   sfxTreasure();
   showWorldGemFloat(reward);
-  showToast(`💎 獲得 ${reward} 能量石！`);
+  showToast(`💎 +${reward} ${t('toast.treasure')}`);
   updateWorldHUD();
 
   // Persist collected state
@@ -3270,23 +3266,14 @@ function updateVolume(value) {
 }
 
 // ─── Settings: Game ────────────────────────────────────────────────────────
+// Note: language is handled by lang.js (currentLang / setLang / localStorage 'language'),
+// not stored here — gameSettings only covers notification toggles.
 function loadGameSettings() {
   try {
-    return { language: 'zh', hungerAlert: false, questAlert: false, ...JSON.parse(localStorage.getItem('gameSettings') || '{}') };
-  } catch { return { language: 'zh', hungerAlert: false, questAlert: false }; }
+    return { hungerAlert: false, questAlert: false, ...JSON.parse(localStorage.getItem('gameSettings') || '{}') };
+  } catch { return { hungerAlert: false, questAlert: false }; }
 }
 function saveGameSettings(s) { localStorage.setItem('gameSettings', JSON.stringify(s)); }
-
-function setLanguage(lang) {
-  const s = loadGameSettings();
-  s.language = lang;
-  saveGameSettings(s);
-  document.querySelectorAll('.settings-lang-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.lang === lang);
-  });
-  showToast(lang === 'zh' ? '語言已切換為中文' : 'Language switched to English');
-  // TODO: wire up real i18n string swapping once translations exist
-}
 
 function toggleGameSetting(key, checked) {
   const s = loadGameSettings();
@@ -3368,6 +3355,14 @@ function doClearSaveData() {
 }
 
 // ─── Settings: Render ──────────────────────────────────────────────────────
+function renderLangPicker() {
+  const grid = document.getElementById('lang-picker-grid');
+  if (!grid) return;
+  grid.innerHTML = Object.entries(LANGUAGES).map(([code, label]) =>
+    `<button class="lang-picker-btn${code === currentLang ? ' active' : ''}" onclick="setLang('${code}')">${label}</button>`
+  ).join('');
+}
+
 function renderSettingsTab() {
   const sound = loadSoundSettings();
   const game  = loadGameSettings();
@@ -3383,9 +3378,8 @@ function renderSettingsTab() {
   if (volEl)    volEl.value          = volPct;
   if (volValEl) volValEl.textContent = volPct;
 
-  document.querySelectorAll('.settings-lang-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.lang === game.language);
-  });
+  renderLangPicker();
+
   const hungerEl = document.getElementById('toggle-hunger-alert');
   const questEl  = document.getElementById('toggle-quest-alert');
   if (hungerEl) hungerEl.checked = game.hungerAlert;
@@ -3395,8 +3389,16 @@ function renderSettingsTab() {
   if (nameEl) nameEl.value = name;
 }
 
+// ─── i18n: apply translations to all static [data-i18n] elements ──────────
+function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t(el.dataset.i18n);
+  });
+}
+
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 function init() {
+  applyTranslations();
   checkDailyPPReset();
   initStepHistory();
   initAdWatchCount();

@@ -80,9 +80,9 @@
       <!-- Quest Tab -->
       <section class="tab-panel" id="tab-quest">
         <div class="quest-tab-bar">
-          <button class="quest-tab-btn quest-tab-btn--active" data-qtab="daily">📅 每日</button>
-          <button class="quest-tab-btn" data-qtab="achieve">🏆 成就</button>
-          <button class="quest-tab-btn" data-qtab="weekly">📆 週常</button>
+          <button class="quest-tab-btn quest-tab-btn--active" data-qtab="daily">📅 <span data-i18n="quest.daily">每日</span></button>
+          <button class="quest-tab-btn" data-qtab="achieve">🏆 <span data-i18n="quest.achievement">成就</span></button>
+          <button class="quest-tab-btn" data-qtab="weekly">📆 <span data-i18n="quest.weekly">週常</span></button>
         </div>
         <div id="quest-list" class="quest-list"></div>
       </section>
@@ -92,22 +92,22 @@
 
         <!-- Explore Lobby -->
         <div id="explore-lobby" class="shop-lobby">
-          <h2 class="shop-lobby__title">探索</h2>
+          <h2 class="shop-lobby__title" data-i18n="explore.title">探索</h2>
           <p class="shop-lobby__subtitle">選擇探索模式</p>
           <div class="shop-card-grid">
             <div class="shop-card" style="background:#4CAF78" data-explore="world">
               <span class="shop-card__number">01</span>
               <span class="shop-card__icon">🗺️</span>
-              <span class="shop-card__name">出去玩</span>
+              <span class="shop-card__name" data-i18n="explore.go">出去玩</span>
               <span class="shop-card__desc">在真實地圖上收集寶箱</span>
-              <button class="shop-card__btn">查看</button>
+              <button class="shop-card__btn" data-i18n="shop.view">查看</button>
             </div>
             <div class="shop-card" style="background:#E53935" data-explore="boss">
               <span class="shop-card__number">02</span>
               <span class="shop-card__icon">⚔️</span>
-              <span class="shop-card__name">BOSS 挑戰</span>
+              <span class="shop-card__name" data-i18n="explore.boss">BOSS 挑戰</span>
               <span class="shop-card__desc">挑戰強大 BOSS 獲得稀有獎勵</span>
-              <button class="shop-card__btn">查看</button>
+              <button class="shop-card__btn" data-i18n="shop.view">查看</button>
             </div>
           </div>
         </div>
@@ -117,7 +117,7 @@
           <!-- HUD bar (in-flow) -->
           <div class="world-hud">
             <button id="btn-world-back" class="world-hud__back">← 返回</button>
-            <div class="world-hud__title">🗺️ 出去玩</div>
+            <div class="world-hud__title">🗺️ <span data-i18n="explore.go">出去玩</span></div>
             <div class="world-hud__right">
               <span>💎 <span id="world-hud-gems">0</span></span>
               <span>🎁 <span id="world-hud-chests">0</span></span>
@@ -152,7 +152,7 @@
         <div id="explore-boss-sub" class="shop-subpage" style="display:none">
           <div class="shop-subpage__header">
             <button id="btn-explore-boss-back" class="shop-back-btn">← 返回</button>
-            <h3 class="shop-subpage__title">⚔️ BOSS 挑戰</h3>
+            <h3 class="shop-subpage__title">⚔️ <span data-i18n="boss.title">BOSS 挑戰</span></h3>
           </div>
           <div id="boss-list-container" class="boss-list"></div>
         </div>
@@ -164,43 +164,43 @@
 
         <!-- Shop Main -->
         <div id="shop-main" class="shop-lobby">
-          <h2 class="shop-lobby__title">商店</h2>
+          <h2 class="shop-lobby__title" data-i18n="shop.title">商店</h2>
           <p class="shop-lobby__subtitle">銀行與商店</p>
           <div class="shop-card-grid">
             <div class="shop-card" style="background:#4CAF91" data-shop="bank">
               <span class="shop-card__number">01</span>
               <span class="shop-card__icon">💎</span>
-              <span class="shop-card__name">能量銀行</span>
+              <span class="shop-card__name" data-i18n="shop.bank">能量銀行</span>
               <span class="shop-card__desc">兌換存儲管理像素晶石</span>
-              <button class="shop-card__btn">查看</button>
+              <button class="shop-card__btn" data-i18n="shop.view">查看</button>
             </div>
             <div class="shop-card" style="background:#8B5CF6" data-shop="food">
               <span class="shop-card__number">02</span>
               <span class="shop-card__icon">🍖</span>
               <span class="shop-card__name">食物商店</span>
               <span class="shop-card__desc">購買食物</span>
-              <button class="shop-card__btn">查看</button>
+              <button class="shop-card__btn" data-i18n="shop.view">查看</button>
             </div>
             <div class="shop-card" style="background:#E57373" data-shop="drink">
               <span class="shop-card__number">03</span>
               <span class="shop-card__icon">🥤</span>
               <span class="shop-card__name">飲料商店</span>
               <span class="shop-card__desc">購買飲料</span>
-              <button class="shop-card__btn">查看</button>
+              <button class="shop-card__btn" data-i18n="shop.view">查看</button>
             </div>
             <div class="shop-card" style="background:#6B8FA8" data-shop="item">
               <span class="shop-card__number">04</span>
               <span class="shop-card__icon">🎒</span>
               <span class="shop-card__name">道具商店</span>
               <span class="shop-card__desc">購買寵物道具</span>
-              <button class="shop-card__btn">查看</button>
+              <button class="shop-card__btn" data-i18n="shop.view">查看</button>
             </div>
             <div class="shop-card" style="background:#4FC3F7" data-shop="gacha">
               <span class="shop-card__number">05</span>
               <span class="shop-card__icon">🎰</span>
-              <span class="shop-card__name">扭蛋機</span>
+              <span class="shop-card__name" data-i18n="shop.gacha">扭蛋機</span>
               <span class="shop-card__desc">抽取稀有寵物</span>
-              <button class="shop-card__btn">查看</button>
+              <button class="shop-card__btn" data-i18n="shop.view">查看</button>
             </div>
           </div>
         </div>
@@ -261,20 +261,20 @@
 
       <!-- Settings Tab -->
       <section class="tab-panel" id="tab-settings">
-        <h2 class="settings-page-title">設定</h2>
+        <h2 class="settings-page-title" data-i18n="settings.title">設定</h2>
 
         <!-- 1. Sound / Music -->
         <div class="card settings-section">
           <h3 class="settings-section-title">音效 / 音樂</h3>
           <div class="settings-row">
-            <span class="settings-row__label">🔊 音效</span>
+            <span class="settings-row__label">🔊 <span data-i18n="settings.sound">音效</span></span>
             <label class="toggle-switch">
               <input type="checkbox" id="toggle-sfx" onchange="toggleSoundSetting('sfxOn', this.checked)">
               <span class="toggle-slider"></span>
             </label>
           </div>
           <div class="settings-row">
-            <span class="settings-row__label">🎵 背景音樂</span>
+            <span class="settings-row__label">🎵 <span data-i18n="settings.bgm">背景音樂</span></span>
             <label class="toggle-switch">
               <input type="checkbox" id="toggle-music" onchange="toggleSoundSetting('bgmOn', this.checked)">
               <span class="toggle-slider"></span>
@@ -282,7 +282,7 @@
           </div>
           <div class="settings-row settings-row--vertical">
             <div class="settings-row__top">
-              <span class="settings-row__label">🔈 音量</span>
+              <span class="settings-row__label">🔈 <span data-i18n="settings.volume">音量</span></span>
               <span class="settings-range-value" id="volume-value">80</span>
             </div>
             <input type="range" id="range-volume" class="settings-range" min="0" max="100" value="80"
@@ -293,12 +293,9 @@
         <!-- 2. Game Settings -->
         <div class="card settings-section">
           <h3 class="settings-section-title">遊戲設定</h3>
-          <div class="settings-row">
-            <span class="settings-row__label">🌐 語言</span>
-            <div class="settings-lang-group" id="settings-lang-group">
-              <button class="settings-lang-btn" data-lang="zh" onclick="setLanguage('zh')">中文</button>
-              <button class="settings-lang-btn" data-lang="en" onclick="setLanguage('en')">English</button>
-            </div>
+          <div class="settings-row settings-row--vertical">
+            <span class="settings-row__label">🌐 <span data-i18n="settings.language">語言</span></span>
+            <div class="lang-picker-grid" id="lang-picker-grid"></div>
           </div>
           <div class="settings-row">
             <span class="settings-row__label">🔔 寵物餓了提醒</span>
@@ -325,17 +322,17 @@
                    placeholder="輸入你的名字" oninput="savePlayerNameInput(this.value)">
           </div>
           <div class="settings-row">
-            <span class="settings-row__label">📤 匯出存檔</span>
+            <span class="settings-row__label">📤 <span data-i18n="settings.export">匯出存檔</span></span>
             <button class="settings-action-btn" onclick="exportSaveData()">匯出</button>
           </div>
           <div class="settings-row">
-            <span class="settings-row__label">📥 匯入存檔</span>
+            <span class="settings-row__label">📥 <span data-i18n="settings.import">匯入存檔</span></span>
             <button class="settings-action-btn" onclick="document.getElementById('import-file-input').click()">匯入</button>
             <input type="file" id="import-file-input" accept="application/json" style="display:none"
                    onchange="importSaveData(this.files[0])">
           </div>
           <div class="settings-row">
-            <span class="settings-row__label">🗑️ 清除存檔</span>
+            <span class="settings-row__label">🗑️ <span data-i18n="settings.clear">清除存檔</span></span>
             <button class="settings-action-btn settings-action-btn--danger" onclick="openModal('modal-clear-confirm')">清除</button>
           </div>
         </div>
@@ -344,15 +341,15 @@
         <div class="card settings-section">
           <h3 class="settings-section-title">關於</h3>
           <div class="settings-row">
-            <span class="settings-row__label">🎮 遊戲版本</span>
+            <span class="settings-row__label">🎮 <span data-i18n="settings.version">遊戲版本</span></span>
             <span class="settings-row__value">v1.0.0</span>
           </div>
           <div class="settings-row">
-            <span class="settings-row__label">👨‍💻 開發者</span>
+            <span class="settings-row__label">👨‍💻 <span data-i18n="settings.developer">開發者</span></span>
             <span class="settings-row__value">Pixel Pet Studio</span>
           </div>
           <div class="settings-row">
-            <span class="settings-row__label">📧 聯絡我們</span>
+            <span class="settings-row__label">📧 <span data-i18n="settings.contact">聯絡我們</span></span>
             <a class="settings-row__link" href="mailto:support@pixelpet.game">support@pixelpet.game</a>
           </div>
         </div>
@@ -364,23 +361,23 @@
     <nav class="bottom-nav">
       <button class="nav-btn active" data-nav="home">
         <span class="nav-icon">🏠</span>
-        <span class="nav-label">首頁</span>
+        <span class="nav-label" data-i18n="nav.home">首頁</span>
       </button>
       <button class="nav-btn" data-nav="quest">
         <span class="nav-icon">📋</span>
-        <span class="nav-label">任務</span>
+        <span class="nav-label" data-i18n="nav.quest">任務</span>
       </button>
       <button class="nav-btn" data-nav="explore">
         <span class="nav-icon">🗺️</span>
-        <span class="nav-label">探索</span>
+        <span class="nav-label" data-i18n="nav.explore">探索</span>
       </button>
       <button class="nav-btn" data-nav="shop">
         <span class="nav-icon">🛍️</span>
-        <span class="nav-label">商店</span>
+        <span class="nav-label" data-i18n="nav.shop">商店</span>
       </button>
       <button class="nav-btn" data-nav="settings">
         <span class="nav-icon">⚙️</span>
-        <span class="nav-label">設定</span>
+        <span class="nav-label" data-i18n="nav.settings">設定</span>
       </button>
     </nav>
 
@@ -416,17 +413,17 @@
       <div class="detail-stats-grid">
         <div class="detail-stat-cell">
           <span class="detail-stat-icon">❤️</span>
-          <span class="detail-stat-label">HP</span>
+          <span class="detail-stat-label" data-i18n="stat.hp">HP</span>
           <span id="detail-hp" class="detail-stat-value">—</span>
         </div>
         <div class="detail-stat-cell">
           <span class="detail-stat-icon">⚔️</span>
-          <span class="detail-stat-label">ATK</span>
+          <span class="detail-stat-label" data-i18n="stat.atk">ATK</span>
           <span id="detail-atk" class="detail-stat-value">—</span>
         </div>
         <div class="detail-stat-cell">
           <span class="detail-stat-icon">🛡️</span>
-          <span class="detail-stat-label">DEF</span>
+          <span class="detail-stat-label" data-i18n="stat.def">DEF</span>
           <span id="detail-def" class="detail-stat-value">—</span>
         </div>
         <div class="detail-stat-cell">
@@ -452,19 +449,19 @@
       <div class="bag-select-list">
         <button class="bag-select-btn" onclick="openBagModal('food')">
           <span class="bag-select-icon">🍖</span>
-          <span>食物背包</span>
+          <span data-i18n="bag.food">食物</span>
         </button>
         <button class="bag-select-btn" onclick="openBagModal('drink')">
           <span class="bag-select-icon">🥤</span>
-          <span>飲料背包</span>
+          <span data-i18n="bag.drink">飲料</span>
         </button>
         <button class="bag-select-btn" onclick="openBagModal('item')">
           <span class="bag-select-icon">🎒</span>
-          <span>道具</span>
+          <span data-i18n="bag.item">道具</span>
         </button>
         <button class="bag-select-btn" onclick="openBagModal('pet')">
           <span class="bag-select-icon">🐾</span>
-          <span>寵物</span>
+          <span data-i18n="bag.pet">寵物</span>
         </button>
       </div>
       <button class="btn-cancel" onclick="closeModal('modal-bag-select')">取消</button>
@@ -576,11 +573,11 @@
           </svg>
           <div class="battle-ap-inner">
             <span class="battle-ap-num" id="battle-ap-num">2</span>
-            <span class="battle-ap-label">行動值</span>
+            <span class="battle-ap-label" data-i18n="battle.ap">行動值</span>
           </div>
         </div>
         <div class="battle-center-actions">
-          <button class="battle-end-turn-btn" id="btn-end-turn" onclick="endPlayerTurn()">結束回合</button>
+          <button class="battle-end-turn-btn" id="btn-end-turn" onclick="endPlayerTurn()" data-i18n="battle.end_turn">結束回合</button>
           <div class="battle-status-label" id="battle-status-label">玩家回合</div>
         </div>
       </div>
@@ -625,7 +622,7 @@
   <!-- Gacha Result Modal -->
   <div id="modal-gacha-result" class="modal hidden">
     <div class="modal-box gacha-result-box">
-      <h2>🎰 扭蛋結果</h2>
+      <h2>🎰 <span data-i18n="toast.gacha_result">扭蛋結果</span></h2>
       <div id="gacha-result-grid" class="gacha-result-grid"></div>
       <button id="btn-gacha-close" class="btn-confirm">確認</button>
     </div>
@@ -675,6 +672,7 @@
   <div id="toast" class="toast hidden"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="lang.js"></script>
   <script src="game.js"></script>
 </body>
 </html>
