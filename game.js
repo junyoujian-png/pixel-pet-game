@@ -1838,6 +1838,9 @@ function initBottomNav() {
       } else if (nav === 'quest') {
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-quest'));
         renderQuestTab();
+      } else if (nav === 'settings') {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-settings'));
+        renderSettingsTab();
       }
     });
   });
@@ -3017,6 +3020,154 @@ function hideWorldPage() {
   }
 }
 
+// ─── Settings: Sound ───────────────────────────────────────────────────────
+// TODO: wire these to an actual audio engine once sound assets are added
+function loadSoundSettings() {
+  try {
+    return { sfx: true, music: true, volume: 80, ...JSON.parse(localStorage.getItem('soundSettings') || '{}') };
+  } catch { return { sfx: true, music: true, volume: 80 }; }
+}
+function saveSoundSettings(s) { localStorage.setItem('soundSettings', JSON.stringify(s)); }
+
+function toggleSoundSetting(key, checked) {
+  const s = loadSoundSettings();
+  s[key] = checked;
+  saveSoundSettings(s);
+}
+
+function updateVolume(value) {
+  const s = loadSoundSettings();
+  s.volume = parseInt(value, 10);
+  saveSoundSettings(s);
+  const valEl = document.getElementById('volume-value');
+  if (valEl) valEl.textContent = s.volume;
+}
+
+// ─── Settings: Game ────────────────────────────────────────────────────────
+function loadGameSettings() {
+  try {
+    return { language: 'zh', hungerAlert: false, questAlert: false, ...JSON.parse(localStorage.getItem('gameSettings') || '{}') };
+  } catch { return { language: 'zh', hungerAlert: false, questAlert: false }; }
+}
+function saveGameSettings(s) { localStorage.setItem('gameSettings', JSON.stringify(s)); }
+
+function setLanguage(lang) {
+  const s = loadGameSettings();
+  s.language = lang;
+  saveGameSettings(s);
+  document.querySelectorAll('.settings-lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+  showToast(lang === 'zh' ? '語言已切換為中文' : 'Language switched to English');
+  // TODO: wire up real i18n string swapping once translations exist
+}
+
+function toggleGameSetting(key, checked) {
+  const s = loadGameSettings();
+  if (!checked) {
+    s[key] = false;
+    saveGameSettings(s);
+    return;
+  }
+  if (!('Notification' in window)) {
+    s[key] = true;
+    saveGameSettings(s);
+    return;
+  }
+  if (Notification.permission === 'granted') {
+    s[key] = true;
+    saveGameSettings(s);
+  } else if (Notification.permission === 'denied') {
+    showToast('請在瀏覽器設定開啟通知權限');
+    s[key] = false;
+    saveGameSettings(s);
+    renderSettingsTab();
+  } else {
+    Notification.requestPermission().then(perm => {
+      const updated = loadGameSettings();
+      if (perm === 'granted') {
+        updated[key] = true;
+      } else {
+        showToast('請在瀏覽器設定開啟通知權限');
+        updated[key] = false;
+      }
+      saveGameSettings(updated);
+      renderSettingsTab();
+    });
+  }
+}
+
+// ─── Settings: Account / Data ──────────────────────────────────────────────
+function loadPlayerName() { return localStorage.getItem('playerName') || ''; }
+function savePlayerNameInput(name) { localStorage.setItem('playerName', name); }
+
+function exportSaveData() {
+  const data = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    data[key] = localStorage.getItem(key);
+  }
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `pixelpet-save-${getDateStr(new Date())}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('💾 存檔已匯出');
+}
+
+function importSaveData(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      Object.keys(data).forEach(key => localStorage.setItem(key, data[key]));
+      showToast('✅ 存檔已匯入，重新整理中...');
+      setTimeout(() => location.reload(), 800);
+    } catch {
+      showToast('❌ 存檔檔案格式錯誤');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function doClearSaveData() {
+  localStorage.clear();
+  closeModal('modal-clear-confirm');
+  location.reload();
+}
+
+// ─── Settings: Render ──────────────────────────────────────────────────────
+function renderSettingsTab() {
+  const sound = loadSoundSettings();
+  const game  = loadGameSettings();
+  const name  = loadPlayerName();
+
+  const sfxEl    = document.getElementById('toggle-sfx');
+  const musicEl  = document.getElementById('toggle-music');
+  const volEl    = document.getElementById('range-volume');
+  const volValEl = document.getElementById('volume-value');
+  if (sfxEl)    sfxEl.checked        = sound.sfx;
+  if (musicEl)  musicEl.checked      = sound.music;
+  if (volEl)    volEl.value          = sound.volume;
+  if (volValEl) volValEl.textContent = sound.volume;
+
+  document.querySelectorAll('.settings-lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === game.language);
+  });
+  const hungerEl = document.getElementById('toggle-hunger-alert');
+  const questEl  = document.getElementById('toggle-quest-alert');
+  if (hungerEl) hungerEl.checked = game.hungerAlert;
+  if (questEl)  questEl.checked  = game.questAlert;
+
+  const nameEl = document.getElementById('input-player-name');
+  if (nameEl) nameEl.value = name;
+}
+
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 function init() {
   checkDailyPPReset();
@@ -3040,6 +3191,7 @@ function init() {
   initGacha();
   initQuestTab();
   initExploreCards();
+  renderSettingsTab();
   setInterval(decayStats, DECAY_INTERVAL);
 }
 
