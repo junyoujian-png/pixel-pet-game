@@ -1316,8 +1316,8 @@ function renderQuestList() {
       return `
         <div class="quest-card">
           <div class="quest-card__info">
-            <div class="quest-card__name">${q.name}</div>
-            <div class="quest-card__desc">${q.desc}</div>
+            <div class="quest-card__name">${t(`quest.${q.id}.name`)}</div>
+            <div class="quest-card__desc">${t(`quest.${q.id}.desc`)}</div>
             <div class="quest-progress">
               <div class="quest-progress-bar"><div class="quest-progress-fill" style="width:${pct}%"></div></div>
               <span class="quest-progress-text">${count} / ${max}</span>
@@ -1345,8 +1345,8 @@ function renderQuestList() {
     return `
       <div class="${cardClass}">
         <div class="quest-card__info">
-          <div class="quest-card__name">${q.name}</div>
-          <div class="quest-card__desc">${q.desc}</div>
+          <div class="quest-card__name">${t(`quest.${q.id}.name`)}</div>
+          <div class="quest-card__desc">${t(`quest.${q.id}.desc`)}</div>
           <div class="quest-progress">
             <div class="quest-progress-bar"><div class="quest-progress-fill" style="width:${pct}%"></div></div>
             <span class="quest-progress-text">${prog} / ${q.target}</span>
@@ -2011,10 +2011,10 @@ function renderSlotPage(slotIdx) {
         <span>ℹ️</span><span class="small-btn-label">${t('home.info')}</span>
       </button>
       <button class="small-btn" onclick="openPokedex()">
-        <span>📖</span><span class="small-btn-label">圖鑑</span>
+        <span>📖</span><span class="small-btn-label">${t('home.collection')}</span>
       </button>
       <button class="small-btn" onclick="openSlotOptionsModal(${slotIdx})">
-        <span>⚙️</span><span class="small-btn-label">管理</span>
+        <span>⚙️</span><span class="small-btn-label">${t('home.manage')}</span>
       </button>
     </div>
   `;
