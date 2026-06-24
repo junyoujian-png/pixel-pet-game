@@ -575,10 +575,12 @@ function showPetDetail(petIdOverride = null) {
   `).join('');
 
   document.getElementById('screen-pet-detail').classList.remove('hidden');
+  applyLang();
 }
 
 function hidePetDetail() {
   document.getElementById('screen-pet-detail').classList.add('hidden');
+  applyLang();
 }
 
 function selectPet(id) {
@@ -1672,13 +1674,13 @@ function doBankExchange() {
 }
 
 // ─── Shop Cards ───────────────────────────────────────────────────────────────
-const SHOP_TITLES = {
-  bank:  t('bank.title'),
-  food:  '食物商店',
-  drink: '飲料商店',
-  item:  '道具商店',
-  gacha: t('gacha.title'),
-};
+// Function (not a cached const) so titles stay correct after a live setLang() switch.
+function getShopTitle(type) {
+  if (type === 'bank')  return t('bank.title');
+  if (type === 'gacha') return t('gacha.title');
+  const STATIC_TITLES = { food: '食物商店', drink: '飲料商店', item: '道具商店' };
+  return STATIC_TITLES[type] || '';
+}
 
 // ─── Gacha Panel ─────────────────────────────────────────────────────────────
 let gachaInterval = null;
@@ -1746,6 +1748,7 @@ const showShopMain = () => {
   document.getElementById('shop-main').style.display = 'flex';
   document.getElementById('shop-sub').style.display = 'none';
   document.querySelectorAll('.shop-panel').forEach(p => p.classList.remove('active'));
+  applyLang();
 };
 
 const showShopSub = (type) => {
@@ -1756,7 +1759,7 @@ const showShopSub = (type) => {
   gachaInterval = null;
   main.style.display = 'none';
   sub.style.display = 'flex';
-  document.getElementById('shop-subpage-title').textContent = SHOP_TITLES[type] || '';
+  document.getElementById('shop-subpage-title').textContent = getShopTitle(type);
   document.querySelectorAll('.shop-panel').forEach(p => {
     p.classList.toggle('active', p.id === `shop-${type}`);
   });
@@ -1779,6 +1782,7 @@ const showShopSub = (type) => {
       }, 300);
     }, 2000);
   }
+  applyLang();
 };
 
 function initShopCards() {
@@ -1842,6 +1846,7 @@ function initBottomNav() {
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-settings'));
         renderSettingsTab();
       }
+      applyLang();
     });
   });
 }
@@ -2184,10 +2189,12 @@ function showBossPage() {
   document.getElementById('explore-lobby').style.display    = 'none';
   document.getElementById('explore-boss-sub').style.display = 'flex';
   renderBossList();
+  applyLang();
 }
 function hideBossPage() {
   document.getElementById('explore-boss-sub').style.display = 'none';
   document.getElementById('explore-lobby').style.display    = 'flex';
+  applyLang();
 }
 
 function renderBossList() {
@@ -3013,6 +3020,7 @@ function showWorldPage() {
   }
   setTimeout(() => worldMap.invalidateSize(), 150);
   startWorldGPS();
+  applyLang();
 }
 
 function hideWorldPage() {
@@ -3023,6 +3031,7 @@ function hideWorldPage() {
     navigator.geolocation?.clearWatch(worldWatchId);
     worldWatchId = null;
   }
+  applyLang();
 }
 
 // ─── Audio Engine (Web Audio API, synthesized 8-bit SFX + BGM) ─────────────
@@ -3359,7 +3368,7 @@ function renderLangPicker() {
   const grid = document.getElementById('lang-picker-grid');
   if (!grid) return;
   grid.innerHTML = Object.entries(LANGUAGES).map(([code, label]) =>
-    `<button class="lang-picker-btn${code === currentLang ? ' active' : ''}" onclick="setLang('${code}')">${label}</button>`
+    `<button class="lang-picker-btn${code === currentLang ? ' active' : ''}" data-lang="${code}" onclick="setLang('${code}')">${label}</button>`
   ).join('');
 }
 
@@ -3389,16 +3398,8 @@ function renderSettingsTab() {
   if (nameEl) nameEl.value = name;
 }
 
-// ─── i18n: apply translations to all static [data-i18n] elements ──────────
-function applyTranslations() {
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    el.textContent = t(el.dataset.i18n);
-  });
-}
-
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 function init() {
-  applyTranslations();
   checkDailyPPReset();
   initStepHistory();
   initAdWatchCount();
@@ -3423,6 +3424,7 @@ function init() {
   renderSettingsTab();
   unlockAudioOnFirstInteraction();
   initSfxClickDelegation();
+  applyLang(); // re-apply after all dynamic rendering above (lang.js's own DOMContentLoaded fires earlier)
   setInterval(decayStats, DECAY_INTERVAL);
 }
 

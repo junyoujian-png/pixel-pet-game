@@ -240,5 +240,29 @@ const t = (key) => {
 const setLang = (lang) => {
   currentLang = lang;
   localStorage.setItem('language', lang);
-  location.reload(); // 重新整理套用新語言
+  applyLang(); // 不再 location.reload()，直接套用
 };
+
+// ─── DOM Binding: data-i18n / data-i18n-placeholder / data-lang ────────────
+const applyLang = () => {
+  // 掃描所有 data-i18n 元素自動替換文字
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const translation = t(key);
+    if (translation) el.textContent = translation;
+  });
+
+  // placeholder 支援
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    const translation = t(key);
+    if (translation) el.placeholder = translation;
+  });
+
+  // 更新語言選擇按鈕樣式
+  document.querySelectorAll('[data-lang]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === currentLang);
+  });
+};
+
+document.addEventListener('DOMContentLoaded', applyLang);
