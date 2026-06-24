@@ -93,7 +93,7 @@
         <!-- Explore Lobby -->
         <div id="explore-lobby" class="shop-lobby">
           <h2 class="shop-lobby__title" data-i18n="explore.title">探索</h2>
-          <p class="shop-lobby__subtitle">選擇探索模式</p>
+          <p class="shop-lobby__subtitle" data-i18n="explore.subtitle">選擇探索模式</p>
           <div class="shop-card-grid">
             <div class="shop-card" style="background:#4CAF78" data-explore="world">
               <span class="shop-card__number">01</span>
@@ -116,7 +116,7 @@
         <div id="explore-world-sub" class="explore-world-sub">
           <!-- HUD bar (in-flow) -->
           <div class="world-hud">
-            <button id="btn-world-back" class="world-hud__back">← 返回</button>
+            <button id="btn-world-back" class="world-hud__back" data-i18n="shop.back">← 返回</button>
             <div class="world-hud__title">🗺️ <span data-i18n="explore.go">出去玩</span></div>
             <div class="world-hud__right">
               <span>💎 <span id="world-hud-gems">0</span></span>
@@ -151,7 +151,7 @@
         <!-- Boss Sub-page -->
         <div id="explore-boss-sub" class="shop-subpage" style="display:none">
           <div class="shop-subpage__header">
-            <button id="btn-explore-boss-back" class="shop-back-btn">← 返回</button>
+            <button id="btn-explore-boss-back" class="shop-back-btn" data-i18n="shop.back">← 返回</button>
             <h3 class="shop-subpage__title">⚔️ <span data-i18n="boss.title">BOSS 挑戰</span></h3>
           </div>
           <div id="boss-list-container" class="boss-list"></div>
@@ -177,21 +177,21 @@
             <div class="shop-card" style="background:#8B5CF6" data-shop="food">
               <span class="shop-card__number">02</span>
               <span class="shop-card__icon">🍖</span>
-              <span class="shop-card__name">食物商店</span>
+              <span class="shop-card__name" data-i18n="shop.food.name">食物商店</span>
               <span class="shop-card__desc" data-i18n="shop.food.desc">購買食物</span>
               <button class="shop-card__btn" data-i18n="shop.view">查看</button>
             </div>
             <div class="shop-card" style="background:#E57373" data-shop="drink">
               <span class="shop-card__number">03</span>
               <span class="shop-card__icon">🥤</span>
-              <span class="shop-card__name">飲料商店</span>
+              <span class="shop-card__name" data-i18n="shop.drink.name">飲料商店</span>
               <span class="shop-card__desc" data-i18n="shop.drink.desc">購買飲料</span>
               <button class="shop-card__btn" data-i18n="shop.view">查看</button>
             </div>
             <div class="shop-card" style="background:#6B8FA8" data-shop="item">
               <span class="shop-card__number">04</span>
               <span class="shop-card__icon">🎒</span>
-              <span class="shop-card__name">道具商店</span>
+              <span class="shop-card__name" data-i18n="shop.item.name">道具商店</span>
               <span class="shop-card__desc" data-i18n="shop.item.desc">購買寵物道具</span>
               <button class="shop-card__btn" data-i18n="shop.view">查看</button>
             </div>
@@ -208,7 +208,7 @@
         <!-- Sub-shop Page -->
         <div id="shop-sub" class="shop-subpage" style="display:none">
           <div class="shop-subpage__header">
-            <button id="btn-shop-back" class="shop-back-btn">← 返回</button>
+            <button id="btn-shop-back" class="shop-back-btn" data-i18n="shop.back">← 返回</button>
             <h3 id="shop-subpage-title" class="shop-subpage__title"></h3>
           </div>
 
@@ -386,7 +386,7 @@
   <!-- Pet Detail Screen -->
   <div id="screen-pet-detail" class="screen-detail hidden">
     <div class="detail-header">
-      <button id="btn-detail-back" class="shop-back-btn">← 返回</button>
+      <button id="btn-detail-back" class="shop-back-btn" data-i18n="shop.back">← 返回</button>
       <h2 class="detail-title">寵物詳細</h2>
     </div>
 
@@ -631,7 +631,7 @@
   <!-- IAP Store Screen -->
   <div id="screen-iap" class="screen-iap hidden">
     <div class="iap-header">
-      <button class="shop-back-btn" onclick="closeIAPStore()">← 返回</button>
+      <button class="shop-back-btn" onclick="closeIAPStore()" data-i18n="shop.back">← 返回</button>
       <h2 class="iap-title">儲值像素晶石</h2>
     </div>
     <div class="iap-body">

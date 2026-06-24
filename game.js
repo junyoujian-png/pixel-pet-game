@@ -76,30 +76,30 @@ const PETS = [
 ];
 
 const FOODS = [
-  { id: 'food_01', name: '餅乾屑', rarity: 'F',   image: 'assets/foods/food_01.png', price: 10,  effect: { hunger: 1,  exp: 1  }, desc: '+1 飽食 +1 EXP'            },
-  { id: 'food_02', name: '餅乾',   rarity: 'F',   image: 'assets/foods/food_02.png', price: 50,  effect: { hunger: 5,  exp: 5  }, desc: '+5 飽食 +5 EXP'            },
-  { id: 'food_03', name: '玉米',   rarity: 'F',   image: 'assets/foods/food_03.png', price: 50,  effect: { hunger: 5,  exp: 5  }, desc: '+5 飽食 +5 EXP'            },
-  { id: 'food_04', name: '吐司',   rarity: 'F',   image: 'assets/foods/food_04.png', price: 50,  effect: { hunger: 5,  exp: 5  }, desc: '+5 飽食 +5 EXP'            },
-  { id: 'food_05', name: '甜甜圈', rarity: 'R',   image: 'assets/foods/food_05.png', price: 100, effect: { hunger: 15, exp: 15 }, desc: '+15 飽食 +15 EXP'          },
-  { id: 'food_06', name: '薯條',   rarity: 'R',   image: 'assets/foods/food_06.png', price: 100, effect: { hunger: 15, exp: 15 }, desc: '+15 飽食 +15 EXP'          },
-  { id: 'food_07', name: '熱狗',   rarity: 'R',   image: 'assets/foods/food_07.png', price: 100, effect: { hunger: 15, exp: 15 }, desc: '+15 飽食 +15 EXP'          },
-  { id: 'food_08', name: '雞腿',   rarity: 'SR',  image: 'assets/foods/food_08.png', price: 250, effect: { hunger: 50, exp: 25 }, desc: '+50 飽食 +25 EXP'          },
-  { id: 'food_09', name: '披薩',   rarity: 'SR',  image: 'assets/foods/food_09.png', price: 250, effect: { hunger: 50, exp: 25 }, desc: '+50 飽食 +25 EXP'          },
-  { id: 'food_10', name: '漢堡',   rarity: 'SR',  image: 'assets/foods/food_10.png', price: 250, effect: { hunger: 50, exp: 25 }, desc: '+50 飽食 +25 EXP'          },
-  { id: 'food_11', name: '鮭魚',   rarity: 'SSR', image: 'assets/foods/food_11.png', price: 500, effect: { water: 10, hunger: 90, exp: 50 }, desc: '+10 水份 +90 飽食 +50 EXP' },
-  { id: 'food_12', name: '巧克力', rarity: 'SSR', image: 'assets/foods/food_12.png', price: 500, effect: { hunger: 90, mood: 10, exp: 50  }, desc: '+90 飽食 +10 心情 +50 EXP' },
-  { id: 'food_13', name: '蛋糕',   rarity: 'SSR', image: 'assets/foods/food_13.png', price: 500, effect: { hunger: 90, exp: 60 }, desc: '+90 飽食 +60 EXP'          },
+  { id: 'food_01', name: '餅乾屑', nameKey: 'food.biscuit_crumbs', rarity: 'F',   image: 'assets/foods/food_01.png', price: 10,  effect: { hunger: 1,  exp: 1  }, desc: '+1 飽食 +1 EXP'            },
+  { id: 'food_02', name: '餅乾',   nameKey: 'food.biscuit',        rarity: 'F',   image: 'assets/foods/food_02.png', price: 50,  effect: { hunger: 5,  exp: 5  }, desc: '+5 飽食 +5 EXP'            },
+  { id: 'food_03', name: '玉米',   nameKey: 'food.corn',           rarity: 'F',   image: 'assets/foods/food_03.png', price: 50,  effect: { hunger: 5,  exp: 5  }, desc: '+5 飽食 +5 EXP'            },
+  { id: 'food_04', name: '吐司',   nameKey: 'food.toast',          rarity: 'F',   image: 'assets/foods/food_04.png', price: 50,  effect: { hunger: 5,  exp: 5  }, desc: '+5 飽食 +5 EXP'            },
+  { id: 'food_05', name: '甜甜圈', nameKey: 'food.donut',          rarity: 'R',   image: 'assets/foods/food_05.png', price: 100, effect: { hunger: 15, exp: 15 }, desc: '+15 飽食 +15 EXP'          },
+  { id: 'food_06', name: '薯條',   nameKey: 'food.fries',          rarity: 'R',   image: 'assets/foods/food_06.png', price: 100, effect: { hunger: 15, exp: 15 }, desc: '+15 飽食 +15 EXP'          },
+  { id: 'food_07', name: '熱狗',   nameKey: 'food.hotdog',         rarity: 'R',   image: 'assets/foods/food_07.png', price: 100, effect: { hunger: 15, exp: 15 }, desc: '+15 飽食 +15 EXP'          },
+  { id: 'food_08', name: '雞腿',   nameKey: 'food.chicken_leg',    rarity: 'SR',  image: 'assets/foods/food_08.png', price: 250, effect: { hunger: 50, exp: 25 }, desc: '+50 飽食 +25 EXP'          },
+  { id: 'food_09', name: '披薩',   nameKey: 'food.pizza',          rarity: 'SR',  image: 'assets/foods/food_09.png', price: 250, effect: { hunger: 50, exp: 25 }, desc: '+50 飽食 +25 EXP'          },
+  { id: 'food_10', name: '漢堡',   nameKey: 'food.burger',         rarity: 'SR',  image: 'assets/foods/food_10.png', price: 250, effect: { hunger: 50, exp: 25 }, desc: '+50 飽食 +25 EXP'          },
+  { id: 'food_11', name: '鮭魚',   nameKey: 'food.salmon',         rarity: 'SSR', image: 'assets/foods/food_11.png', price: 500, effect: { water: 10, hunger: 90, exp: 50 }, desc: '+10 水份 +90 飽食 +50 EXP' },
+  { id: 'food_12', name: '巧克力', nameKey: 'food.chocolate',      rarity: 'SSR', image: 'assets/foods/food_12.png', price: 500, effect: { hunger: 90, mood: 10, exp: 50  }, desc: '+90 飽食 +10 心情 +50 EXP' },
+  { id: 'food_13', name: '蛋糕',   nameKey: 'food.cake',           rarity: 'SSR', image: 'assets/foods/food_13.png', price: 500, effect: { hunger: 90, exp: 60 }, desc: '+90 飽食 +60 EXP'          },
 ];
 
 const DRINKS = [
-  { id: 'drink_01', name: '礦泉水', rarity: 'F',   image: 'assets/drinks/drink_01.png', price: 50,  effect: { water: 5,   exp: 5  }, desc: '+5 水份 +5 EXP'            },
-  { id: 'drink_02', name: '紅茶',   rarity: 'R',   image: 'assets/drinks/drink_02.png', price: 100, effect: { water: 15,  exp: 15 }, desc: '+15 水份 +15 EXP'          },
-  { id: 'drink_03', name: '綠茶',   rarity: 'R',   image: 'assets/drinks/drink_03.png', price: 100, effect: { water: 15,  exp: 15 }, desc: '+15 水份 +15 EXP'          },
-  { id: 'drink_04', name: '葡萄汁', rarity: 'SR',  image: 'assets/drinks/drink_04.png', price: 250, effect: { water: 50,  exp: 25 }, desc: '+50 水份 +25 EXP'          },
-  { id: 'drink_05', name: '蘋果汁', rarity: 'SR',  image: 'assets/drinks/drink_05.png', price: 250, effect: { water: 50,  exp: 25 }, desc: '+50 水份 +25 EXP'          },
-  { id: 'drink_06', name: '可樂',   rarity: 'SSR', image: 'assets/drinks/drink_06.png', price: 500, effect: { water: 90,  mood: 10, exp: 50  }, desc: '+90 水份 +10 心情 +50 EXP' },
-  { id: 'drink_07', name: '牛奶',   rarity: 'SSR', image: 'assets/drinks/drink_07.png', price: 500, effect: { water: 90,  hunger: 10, exp: 50 }, desc: '+90 水份 +10 飽食 +50 EXP' },
-  { id: 'drink_08', name: '咖啡',   rarity: 'SSR', image: 'assets/drinks/drink_08.png', price: 500, effect: { water: 100, exp: 60 }, desc: '+100 水份 +60 EXP'         },
+  { id: 'drink_01', name: '礦泉水', nameKey: 'drink.water',       rarity: 'F',   image: 'assets/drinks/drink_01.png', price: 50,  effect: { water: 5,   exp: 5  }, desc: '+5 水份 +5 EXP'            },
+  { id: 'drink_02', name: '紅茶',   nameKey: 'drink.tea',         rarity: 'R',   image: 'assets/drinks/drink_02.png', price: 100, effect: { water: 15,  exp: 15 }, desc: '+15 水份 +15 EXP'          },
+  { id: 'drink_03', name: '綠茶',   nameKey: 'drink.green_tea',   rarity: 'R',   image: 'assets/drinks/drink_03.png', price: 100, effect: { water: 15,  exp: 15 }, desc: '+15 水份 +15 EXP'          },
+  { id: 'drink_04', name: '葡萄汁', nameKey: 'drink.grape_juice', rarity: 'SR',  image: 'assets/drinks/drink_04.png', price: 250, effect: { water: 50,  exp: 25 }, desc: '+50 水份 +25 EXP'          },
+  { id: 'drink_05', name: '蘋果汁', nameKey: 'drink.apple_juice', rarity: 'SR',  image: 'assets/drinks/drink_05.png', price: 250, effect: { water: 50,  exp: 25 }, desc: '+50 水份 +25 EXP'          },
+  { id: 'drink_06', name: '可樂',   nameKey: 'drink.cola',        rarity: 'SSR', image: 'assets/drinks/drink_06.png', price: 500, effect: { water: 90,  mood: 10, exp: 50  }, desc: '+90 水份 +10 心情 +50 EXP' },
+  { id: 'drink_07', name: '牛奶',   nameKey: 'drink.milk',        rarity: 'SSR', image: 'assets/drinks/drink_07.png', price: 500, effect: { water: 90,  hunger: 10, exp: 50 }, desc: '+90 水份 +10 飽食 +50 EXP' },
+  { id: 'drink_08', name: '咖啡',   nameKey: 'drink.coffee',      rarity: 'SSR', image: 'assets/drinks/drink_08.png', price: 500, effect: { water: 100, exp: 60 }, desc: '+100 水份 +60 EXP'         },
 ];
 
 const ITEM_DEFS = {
@@ -721,7 +721,7 @@ function buyFood(id) {
   const inv = loadInventory();
   inv[id] = (inv[id] || 0) + 1;
   saveInventory(inv);
-  showToast(`購買成功：${food.name} ×1`);
+  showToast(`購買成功：${t(food.nameKey)} ×1`);
   renderFoodShop();
 }
 
@@ -753,7 +753,7 @@ function renderFeedModal() {
         </div>
         <div class="modal-pick-info">
           <div class="modal-pick-name">
-            ${f.name}
+            ${t(f.nameKey)}
             <span class="badge badge--${f.rarity.toLowerCase()}">${f.rarity}</span>
           </div>
           <div class="modal-pick-desc">${f.desc}</div>
@@ -779,7 +779,7 @@ function useFoodFromModal(id) {
   sfxFeed();
   if (e.exp) addExp(e.exp); else renderAll();
   closeModal('modal-feed');
-  showToast(`${t('toast.feed_success')} ${food.name}（${food.desc}）`);
+  showToast(`${t('toast.feed_success')} ${t(food.nameKey)}（${food.desc}）`);
 }
 
 function renderFoodShop() {
@@ -797,7 +797,7 @@ function renderFoodShop() {
           <div class="drink-shop-card">
             <img src="${f.image}" class="drink-shop-img" onerror="this.style.opacity='0.15'">
             <div class="drink-shop-info">
-              <span class="drink-shop-name">${f.name}</span>
+              <span class="drink-shop-name">${t(f.nameKey)}</span>
               <span class="badge badge--${f.rarity.toLowerCase()}">${f.rarity}</span>
               <span class="drink-shop-desc">${f.desc}</span>
             </div>
@@ -857,7 +857,7 @@ function buyDrink(id) {
   const inv = loadInventory();
   inv[id] = (inv[id] || 0) + 1;
   saveInventory(inv);
-  showToast(`購買成功：${drink.name} ×1`);
+  showToast(`購買成功：${t(drink.nameKey)} ×1`);
   renderDrinkShop();
 }
 
@@ -889,7 +889,7 @@ function renderDrinkModal() {
         </div>
         <div class="modal-pick-info">
           <div class="modal-pick-name">
-            ${d.name}
+            ${t(d.nameKey)}
             <span class="badge badge--${d.rarity.toLowerCase()}">${d.rarity}</span>
           </div>
           <div class="modal-pick-desc">${d.desc}</div>
@@ -915,7 +915,7 @@ function useDrinkFromModal(id) {
   sfxFeed();
   if (e.exp) addExp(e.exp); else renderAll();
   closeModal('modal-drink');
-  showToast(`${t('toast.drink_success')} ${drink.name}（${drink.desc}）`);
+  showToast(`${t('toast.drink_success')} ${t(drink.nameKey)}（${drink.desc}）`);
 }
 
 // ─── Bag Select Modal ────────────────────────────────────────────────────────
@@ -1073,7 +1073,7 @@ function renderDrinkShop() {
           <div class="drink-shop-card">
             <img src="${d.image}" class="drink-shop-img" onerror="this.style.opacity='0.15'">
             <div class="drink-shop-info">
-              <span class="drink-shop-name">${d.name}</span>
+              <span class="drink-shop-name">${t(d.nameKey)}</span>
               <span class="badge badge--${d.rarity.toLowerCase()}">${d.rarity}</span>
               <span class="drink-shop-desc">${d.desc}</span>
             </div>
@@ -1620,9 +1620,9 @@ function renderBankExchange() {
       <div class="bank-rate-card">
         <div class="bank-rate-label">${t('bank.rate')}</div>
         <div class="bank-rate-value">${rate} 能量 = 1 💎</div>
-        <div class="bank-rate-hint">可以兌換最近一週的步數，兌換後清空列表</div>
+        <div class="bank-rate-hint">${t('bank.rate.desc')}</div>
       </div>
-      <div class="bank-empty">所有步數已兌換<br>明天 00:00 後會新增當天步數</div>`;
+      <div class="bank-empty">${t('bank.empty')}<br>${t('bank.empty.desc')}</div>`;
     return;
   }
 
@@ -1642,7 +1642,7 @@ function renderBankExchange() {
     <div class="bank-rate-card">
       <div class="bank-rate-label">${t('bank.rate')}</div>
       <div class="bank-rate-value">${rate} 能量 = 1 💎</div>
-      <div class="bank-rate-hint">可以兌換最近一週的步數，兌換後清空列表</div>
+      <div class="bank-rate-hint">${t('bank.rate.desc')}</div>
     </div>
     <div class="bank-step-list">${rows}</div>
     <div class="bank-footer">
@@ -1678,8 +1678,10 @@ function doBankExchange() {
 function getShopTitle(type) {
   if (type === 'bank')  return t('bank.title');
   if (type === 'gacha') return t('gacha.title');
-  const STATIC_TITLES = { food: '食物商店', drink: '飲料商店', item: '道具商店' };
-  return STATIC_TITLES[type] || '';
+  if (type === 'food')  return t('food.shop.title');
+  if (type === 'drink') return t('drink.shop.title');
+  if (type === 'item')  return t('shop.item.name');
+  return '';
 }
 
 // ─── Gacha Panel ─────────────────────────────────────────────────────────────
