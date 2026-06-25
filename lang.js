@@ -65,6 +65,7 @@ const LANG_DATA = {
     'shop.drink.desc': '購買飲料',
     'shop.item.desc': '購買寵物道具',
     'shop.gacha.desc': '抽取稀有寵物',
+    'shop.item.section': '道具',
     'food.shop.title': '食物商店',
     'drink.shop.title': '飲料商店',
     // 扭蛋
@@ -330,6 +331,7 @@ const LANG_DATA = {
     'shop.drink.desc': 'Buy drinks',
     'shop.item.desc': 'Buy pet items',
     'shop.gacha.desc': 'Draw rare pets',
+    'shop.item.section': 'Items',
     'food.shop.title': 'Food Shop',
     'drink.shop.title': 'Drink Shop',
     // Gacha

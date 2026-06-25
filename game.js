@@ -103,9 +103,9 @@ const DRINKS = [
 ];
 
 const ITEM_DEFS = {
-  candy:       { icon: '🍬', name: '愛心糖',      nameKey: 'item.heart_candy',    desc: '+10心情',           descKey: 'item.heart_candy.desc' },
-  xpboost:     { icon: '⭐', name: '成長藥',       nameKey: 'item.growth_potion',  desc: '+20 EXP',           descKey: 'item.growth_potion.desc' },
-  boss_ticket: { icon: '🎫', name: 'BOSS 挑戰卷', nameKey: 'item.boss_ticket',    desc: '可額外挑戰一次 BOSS', descKey: 'item.boss_ticket.desc' },
+  candy:       { icon: '🍬', name: '愛心糖',      nameKey: 'item.heart_candy',    desc: '+10心情',           descKey: 'item.heart_candy.desc',   price: 100 },
+  xpboost:     { icon: '⭐', name: '成長藥',       nameKey: 'item.growth_potion',  desc: '+20 EXP',           descKey: 'item.growth_potion.desc', price: 100 },
+  boss_ticket: { icon: '🎫', name: 'BOSS 挑戰卷', nameKey: 'item.boss_ticket',    desc: '可額外挑戰一次 BOSS', descKey: 'item.boss_ticket.desc',   price: 2000 },
 };
 
 const BOSSES = [
@@ -1771,6 +1771,8 @@ const showShopSub = (type) => {
     renderFoodShop();
   } else if (type === 'drink') {
     renderDrinkShop();
+  } else if (type === 'item') {
+    renderItemShop();
   } else if (type === 'gacha') {
     buildGachaPanel();
     if (gachaInterval) clearInterval(gachaInterval);
@@ -1854,23 +1856,40 @@ function initBottomNav() {
 }
 
 // ─── Shop / Buy ───────────────────────────────────────────────────────────────
-function initShop() {
-  document.querySelectorAll('.buy-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const cost = parseInt(btn.dataset.cost, 10);
-      const type = btn.dataset.type;
-      const id   = btn.dataset.id;
-      if (!spendCoins(cost, `購買${ITEM_DEFS[id]?.name ?? '道具'}`)) { showToast(t('toast.no_coins')); return; }
-      if (type === 'item') {
-        addItem(id);
-        if (id === 'boss_ticket') {
-          showToast('🎫 BOSS 挑戰卷已加入背包！');
-        } else {
-          showToast(`購買成功：${ITEM_DEFS[id] ? t(ITEM_DEFS[id].nameKey) : id} ×1`);
-        }
-      }
-    });
-  });
+// Item shop is rendered dynamically (like food/drink) so names/descs/prices
+// always reflect ITEM_DEFS and the current language — no more static HTML.
+function renderItemShop() {
+  const panel = document.getElementById('shop-item');
+  if (!panel) return;
+  const coins = state.coins;
+  const rows = Object.entries(ITEM_DEFS).map(([id, def]) => `
+    <div class="shop-item">
+      <span class="item-icon">${def.icon}</span>
+      <span class="item-name">${t(def.nameKey)}</span>
+      <span class="item-desc">${t(def.descKey)}</span>
+      <button class="buy-btn${coins >= def.price ? '' : ' buy-btn--disabled'}"
+        onclick="buyShopItem('${id}')" ${coins >= def.price ? '' : 'disabled'}>
+        ${def.price}💎
+      </button>
+    </div>`).join('');
+  panel.innerHTML = `
+    <div class="card">
+      <h3 class="section-title" data-i18n="shop.item.section">${t('shop.item.section')}</h3>
+      <div class="item-grid">${rows}</div>
+    </div>`;
+}
+
+function buyShopItem(id) {
+  const def = ITEM_DEFS[id];
+  if (!def) return;
+  if (!spendCoins(def.price, `購買${t(def.nameKey)}`)) { showToast(t('toast.no_coins')); return; }
+  addItem(id);
+  if (id === 'boss_ticket') {
+    showToast(`🎫 ${t(def.nameKey)} 已加入背包！`);
+  } else {
+    showToast(`購買成功：${t(def.nameKey)} ×1`);
+  }
+  renderItemShop();
 }
 
 // ─── Action Buttons ──────────────────────────────────────────────────────────
@@ -3417,7 +3436,6 @@ function init() {
   initModals();
   initBottomNav();
   initActions();
-  initShop();
   initShopCards();
   initGacha();
   initQuestTab();
