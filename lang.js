@@ -3,15 +3,11 @@
 // ─── Supported Languages ────────────────────────────────────────────────────
 const LANGUAGES = {
   'zh-TW': '中文（繁體）',
-  'zh-CN': '中文（簡體）',
   'en':    'English',
-  'ja':    '日本語',
-  'ko':    '한국어',
 };
 
 // ─── Translation Data ───────────────────────────────────────────────────────
-// Phase 1: zh-TW and en are fully populated. zh-CN / ja / ko are stubs to be
-// filled in later — t() falls back to zh-TW for any missing key.
+// zh-TW and en are fully populated — t() falls back to zh-TW for any missing key.
 const LANG_DATA = {
   'zh-TW': {
     // 導航
@@ -545,9 +541,6 @@ const LANG_DATA = {
     'quest.w3.name': 'Step Master',      'quest.w3.desc': 'Exchange steps 7 days in a row',
   },
 
-  'zh-CN': {},  // 之後補
-  'ja': {},     // 之後補
-  'ko': {},     // 之後補
 };
 
 // ─── Active Language State ──────────────────────────────────────────────────
