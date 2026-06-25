@@ -565,7 +565,7 @@ function showPetDetail(petIdOverride = null) {
       <div class="detail-skill-card__icon">${s.icon}</div>
       <div class="detail-skill-card__name">${t(s.nameKey)}</div>
       <div class="detail-skill-card__desc">${t(s.descKey)}</div>
-      <div class="detail-skill-card__power">威力：${Number(s.power).toFixed(1)}×</div>
+      <div class="detail-skill-card__power">${t('skill.power')}：${Number(s.power).toFixed(1)}×</div>
       <div class="detail-skill-card__pp">
         <div class="pp-dots">${renderPPDots(s.currentPP, s.maxPP)}</div>
         <span class="pp-count">${s.currentPP} / ${s.maxPP}</span>
@@ -1619,7 +1619,7 @@ function renderBankExchange() {
     pane.innerHTML = `
       <div class="bank-rate-card">
         <div class="bank-rate-label">${t('bank.rate')}</div>
-        <div class="bank-rate-value">${rate} 能量 = 1 💎</div>
+        <div class="bank-rate-value">${rate} ${t('bank.rate.unit')} 💎</div>
         <div class="bank-rate-hint">${t('bank.rate.desc')}</div>
       </div>
       <div class="bank-empty">${t('bank.empty')}<br>${t('bank.empty.desc')}</div>`;
@@ -1632,7 +1632,7 @@ function renderBankExchange() {
     <div class="bank-step-row">
       <div class="bank-step-info">
         <div class="bank-step-date">${displayDate(date)}</div>
-        <div class="bank-step-count">${steps.toLocaleString()} 步</div>
+        <div class="bank-step-count">${steps.toLocaleString()} ${t('bank.steps.unit')}</div>
       </div>
       <div class="bank-step-arrow">⇄</div>
       <div class="bank-step-gems">💎 ${Math.floor(steps / rate)}</div>
@@ -1641,7 +1641,7 @@ function renderBankExchange() {
   pane.innerHTML = `
     <div class="bank-rate-card">
       <div class="bank-rate-label">${t('bank.rate')}</div>
-      <div class="bank-rate-value">${rate} 能量 = 1 💎</div>
+      <div class="bank-rate-value">${rate} ${t('bank.rate.unit')} 💎</div>
       <div class="bank-rate-hint">${t('bank.rate.desc')}</div>
     </div>
     <div class="bank-step-list">${rows}</div>
@@ -1651,7 +1651,7 @@ function renderBankExchange() {
         <div class="bank-coin-amount">💎 ${coins.toLocaleString()}</div>
       </div>
       <div class="bank-exchange-right">
-        <div class="bank-exchange-total">可兌換 💎 ${totalGems.toLocaleString()}</div>
+        <div class="bank-exchange-total">${t('bank.exchangeable')} 💎 ${totalGems.toLocaleString()}</div>
         <button class="bank-exchange-btn" onclick="doBankExchange()">${t('bank.exchange')}</button>
       </div>
     </div>`;

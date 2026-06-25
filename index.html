@@ -99,14 +99,14 @@
               <span class="shop-card__number">01</span>
               <span class="shop-card__icon">🗺️</span>
               <span class="shop-card__name" data-i18n="explore.go">出去玩</span>
-              <span class="shop-card__desc">在真實地圖上收集寶箱</span>
+              <span class="shop-card__desc" data-i18n="explore.go.desc">在真實地圖上收集寶箱</span>
               <button class="shop-card__btn" data-i18n="shop.view">查看</button>
             </div>
             <div class="shop-card" style="background:#E53935" data-explore="boss">
               <span class="shop-card__number">02</span>
               <span class="shop-card__icon">⚔️</span>
               <span class="shop-card__name" data-i18n="explore.boss">BOSS 挑戰</span>
-              <span class="shop-card__desc">挑戰強大 BOSS 獲得稀有獎勵</span>
+              <span class="shop-card__desc" data-i18n="explore.boss.desc">挑戰強大 BOSS 獲得稀有獎勵</span>
               <button class="shop-card__btn" data-i18n="shop.view">查看</button>
             </div>
           </div>
@@ -171,7 +171,7 @@
               <span class="shop-card__number">01</span>
               <span class="shop-card__icon">💎</span>
               <span class="shop-card__name" data-i18n="shop.bank">能量銀行</span>
-              <span class="shop-card__desc">兌換存儲管理像素晶石</span>
+              <span class="shop-card__desc" data-i18n="shop.bank.desc">兌換存儲管理像素晶石</span>
               <button class="shop-card__btn" data-i18n="shop.view">查看</button>
             </div>
             <div class="shop-card" style="background:#8B5CF6" data-shop="food">
@@ -265,7 +265,7 @@
 
         <!-- 1. Sound / Music -->
         <div class="card settings-section">
-          <h3 class="settings-section-title">音效 / 音樂</h3>
+          <h3 class="settings-section-title" data-i18n="settings.sound.section">音效 / 音樂</h3>
           <div class="settings-row">
             <span class="settings-row__label">🔊 <span data-i18n="settings.sound">音效</span></span>
             <label class="toggle-switch">
@@ -292,20 +292,20 @@
 
         <!-- 2. Game Settings -->
         <div class="card settings-section">
-          <h3 class="settings-section-title">遊戲設定</h3>
+          <h3 class="settings-section-title" data-i18n="settings.game.section">遊戲設定</h3>
           <div class="settings-row settings-row--vertical">
             <span class="settings-row__label">🌐 <span data-i18n="settings.language">語言</span></span>
             <div class="lang-picker-grid" id="lang-picker-grid"></div>
           </div>
           <div class="settings-row">
-            <span class="settings-row__label">🔔 寵物餓了提醒</span>
+            <span class="settings-row__label">🔔 <span data-i18n="settings.pet.notify">寵物餓了提醒</span></span>
             <label class="toggle-switch">
               <input type="checkbox" id="toggle-hunger-alert" onchange="toggleGameSetting('hungerAlert', this.checked)">
               <span class="toggle-slider"></span>
             </label>
           </div>
           <div class="settings-row">
-            <span class="settings-row__label">✅ 任務完成提醒</span>
+            <span class="settings-row__label">✅ <span data-i18n="settings.quest.notify">任務完成提醒</span></span>
             <label class="toggle-switch">
               <input type="checkbox" id="toggle-quest-alert" onchange="toggleGameSetting('questAlert', this.checked)">
               <span class="toggle-slider"></span>
@@ -315,19 +315,19 @@
 
         <!-- 3. Account / Data -->
         <div class="card settings-section">
-          <h3 class="settings-section-title">帳號 / 資料</h3>
+          <h3 class="settings-section-title" data-i18n="settings.account.section">帳號 / 資料</h3>
           <div class="settings-row settings-row--vertical">
-            <span class="settings-row__label">👤 玩家名稱</span>
+            <span class="settings-row__label">👤 <span data-i18n="settings.player.name">玩家名稱</span></span>
             <input type="text" id="input-player-name" class="settings-text-input"
-                   placeholder="輸入你的名字" oninput="savePlayerNameInput(this.value)">
+                   placeholder="輸入你的名字" data-i18n-placeholder="settings.player.placeholder" oninput="savePlayerNameInput(this.value)">
           </div>
           <div class="settings-row">
             <span class="settings-row__label">📤 <span data-i18n="settings.export">匯出存檔</span></span>
-            <button class="settings-action-btn" onclick="exportSaveData()">匯出</button>
+            <button class="settings-action-btn" onclick="exportSaveData()" data-i18n="settings.export.btn">匯出</button>
           </div>
           <div class="settings-row">
             <span class="settings-row__label">📥 <span data-i18n="settings.import">匯入存檔</span></span>
-            <button class="settings-action-btn" onclick="document.getElementById('import-file-input').click()">匯入</button>
+            <button class="settings-action-btn" onclick="document.getElementById('import-file-input').click()" data-i18n="settings.import.btn">匯入</button>
             <input type="file" id="import-file-input" accept="application/json" style="display:none"
                    onchange="importSaveData(this.files[0])">
           </div>
@@ -387,7 +387,7 @@
   <div id="screen-pet-detail" class="screen-detail hidden">
     <div class="detail-header">
       <button id="btn-detail-back" class="shop-back-btn" data-i18n="shop.back">← 返回</button>
-      <h2 class="detail-title">寵物詳細</h2>
+      <h2 class="detail-title" data-i18n="pet.detail.title">寵物詳細</h2>
     </div>
 
     <!-- Pet Info Row -->
@@ -409,7 +409,7 @@
 
     <!-- Combat Stats Grid (2×2) -->
     <div class="card">
-      <h3 class="section-title">⚔️ 戰鬥屬性</h3>
+      <h3 class="section-title">⚔️ <span data-i18n="pet.detail.stats">戰鬥屬性</span></h3>
       <div class="detail-stats-grid">
         <div class="detail-stat-cell">
           <span class="detail-stat-icon">❤️</span>
@@ -428,7 +428,7 @@
         </div>
         <div class="detail-stat-cell">
           <span class="detail-stat-icon">⭐</span>
-          <span class="detail-stat-label">稀有度</span>
+          <span class="detail-stat-label" data-i18n="stat.rarity">稀有度</span>
           <span id="detail-rarity-val" class="detail-stat-value">—</span>
         </div>
       </div>
@@ -436,7 +436,7 @@
 
     <!-- Skill Cards -->
     <div class="card">
-      <h3 class="section-title">✨ 技能</h3>
+      <h3 class="section-title">✨ <span data-i18n="pet.detail.skills">技能</span></h3>
       <div id="detail-skills-container" class="detail-skills-container"></div>
     </div>
   </div>
@@ -542,10 +542,10 @@
         <span id="slot-options-pet-name" class="team-options-name"></span>
       </div>
       <div class="team-options-btns">
-        <button class="team-options-btn" id="btn-slot-view-detail">ℹ️ 查看詳細</button>
-        <button class="team-options-btn team-options-btn--danger" id="btn-slot-send-back">📦 移回寵物背包</button>
+        <button class="team-options-btn" id="btn-slot-view-detail">ℹ️ <span data-i18n="pet.action.detail">查看詳細</span></button>
+        <button class="team-options-btn team-options-btn--danger" id="btn-slot-send-back">📦 <span data-i18n="pet.action.remove">移回寵物背包</span></button>
       </div>
-      <button class="btn-cancel" onclick="closeModal('modal-slot-options')">取消</button>
+      <button class="btn-cancel" onclick="closeModal('modal-slot-options')" data-i18n="pet.action.cancel">取消</button>
     </div>
   </div>
 
