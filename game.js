@@ -3224,9 +3224,12 @@ let bgmIntervalId = null;
 let bgmGainNode   = null;
 
 function startBGM() {
+  console.log('BGM started');
   if (bgmIntervalId) return; // already running
   if (!loadSoundSettings().bgmOn) return;
   const ctx = getAudioCtx();
+  console.log('AudioContext state:', ctx.state);
+  if (ctx.state === 'suspended') ctx.resume();
   bgmGainNode = ctx.createGain();
   bgmGainNode.gain.setValueAtTime(0.12 * getMasterVolume(), ctx.currentTime);
   bgmGainNode.connect(ctx.destination);
@@ -3262,6 +3265,7 @@ function setMasterVolume(volume) {
 // ── Unlock AudioContext + start BGM on first user interaction ──────────
 function unlockAudioOnFirstInteraction() {
   document.addEventListener('click', () => {
+    console.log('First click detected — unlocking audio');
     getAudioCtx(); // creates + resumes context
     if (loadSoundSettings().bgmOn) startBGM();
   }, { once: true });
@@ -3420,6 +3424,11 @@ function renderSettingsTab() {
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 function init() {
+  // Registered first so a later render/init failure can never prevent the
+  // audio-unlock listener from being attached (BGM would otherwise never play).
+  unlockAudioOnFirstInteraction();
+  initSfxClickDelegation();
+
   checkDailyPPReset();
   initStepHistory();
   initAdWatchCount();
@@ -3441,8 +3450,6 @@ function init() {
   initQuestTab();
   initExploreCards();
   renderSettingsTab();
-  unlockAudioOnFirstInteraction();
-  initSfxClickDelegation();
   applyLang(); // re-apply after all dynamic rendering above (lang.js's own DOMContentLoaded fires earlier)
   setInterval(decayStats, DECAY_INTERVAL);
 }
