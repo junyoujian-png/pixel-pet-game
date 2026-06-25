@@ -75,6 +75,15 @@ const LANG_DATA = {
     'gacha.ad': '看廣告抽一次',
     'gacha.new': 'NEW！',
     'gacha.owned': '已擁有',
+    // 廣告
+    'ad.watch': '觀看廣告',
+    'ad.watching': '廣告播放中...',
+    'ad.reward': '廣告獎勵',
+    'ad.limit': '今日已達上限',
+    'ad.free_gacha': '看廣告抽一次',
+    'ad.count': '觀看廣告',
+    'ad.reward.toast': '廣告獎勵 +50 能量石！',
+    'ad.gacha.toast': '免費抽獎獲得！',
     // 探索
     'explore.title': '探索',
     'explore.subtitle': '選擇探索模式',
@@ -322,6 +331,15 @@ const LANG_DATA = {
     'gacha.ad': 'Watch Ad to Draw',
     'gacha.new': 'NEW!',
     'gacha.owned': 'Owned',
+    // Ads
+    'ad.watch': 'Watch Ad',
+    'ad.watching': 'Ad playing...',
+    'ad.reward': 'Ad Reward',
+    'ad.limit': 'Daily limit reached',
+    'ad.free_gacha': 'Watch Ad for Free Draw',
+    'ad.count': 'Watch Ad',
+    'ad.reward.toast': 'Ad Reward +50 Gems!',
+    'ad.gacha.toast': 'Free draw obtained!',
     // Explore
     'explore.title': 'Explore',
     'explore.subtitle': 'Choose Explore Mode',

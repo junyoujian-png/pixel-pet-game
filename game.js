@@ -1312,7 +1312,7 @@ function renderQuestList() {
       const btnCls = maxed
         ? 'quest-claim-btn quest-claim-btn--pending'
         : 'quest-claim-btn quest-claim-btn--ready';
-      const btnTxt = maxed ? '今日已達上限' : `觀看廣告 (${count}/${max})`;
+      const btnTxt = maxed ? t('ad.limit') : `${t('ad.count')} (${count}/${max})`;
       return `
         <div class="quest-card">
           <div class="quest-card__info">
@@ -1530,7 +1530,7 @@ function showAdModal(onComplete) {
 function watchAdForReward() {
   const adState  = loadAdWatchCount();
   const MAX      = 3;
-  if (adState.count >= MAX) { showToast('今日廣告已達上限！'); return; }
+  if (adState.count >= MAX) { showToast(t('ad.limit')); return; }
 
   showAdModal(() => {
     const updated  = loadAdWatchCount();
@@ -1539,7 +1539,7 @@ function watchAdForReward() {
     updated.count  = newCount;
     saveAdWatchCount(updated);
     addCoins(50, '廣告獎勵');
-    showToast('廣告獎勵 +50 能量石！');
+    showToast(t('ad.reward.toast'));
     if (document.getElementById('tab-quest')?.classList.contains('active')) {
       renderQuestList();
     }
@@ -1554,7 +1554,7 @@ function watchAdForGacha() {
     const updated = loadAdGachaUsed();
     updated.used = true;
     saveAdGachaUsed(updated);
-    showToast('廣告獎勵！免費抽一次！');
+    showToast(t('ad.gacha.toast'));
     // Refresh ad gacha button to show disabled state
     const adBtn = document.getElementById('btn-ad-gacha');
     if (adBtn) adBtn.outerHTML = buildAdGachaBtn();
@@ -1734,7 +1734,7 @@ function buildAdGachaBtn() {
       background:${used ? '#aaa' : '#1565c0'};border:none;color:#fff;
       cursor:${used ? 'default' : 'pointer'};font-size:14px;font-weight:700;
       font-family:inherit;opacity:${used ? '0.5' : '1'}">
-    📺 ${used ? '今日廣告扭蛋已使用' : t('gacha.ad') + '（每日限 1 次）'}
+    📺 ${used ? '今日廣告扭蛋已使用' : t('ad.free_gacha') + '（每日限 1 次）'}
   </button>`;
 }
 
