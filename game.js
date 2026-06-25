@@ -103,9 +103,9 @@ const DRINKS = [
 ];
 
 const ITEM_DEFS = {
-  candy:       { icon: '🍬', name: '愛心糖',      desc: '+10心情' },
-  xpboost:     { icon: '⭐', name: '成長藥',       desc: '+20 EXP' },
-  boss_ticket: { icon: '🎫', name: 'BOSS 挑戰卷', desc: '可額外挑戰一次 BOSS' },
+  candy:       { icon: '🍬', name: '愛心糖',      nameKey: 'item.heart_candy',    desc: '+10心情',           descKey: 'item.heart_candy.desc' },
+  xpboost:     { icon: '⭐', name: '成長藥',       nameKey: 'item.growth_potion',  desc: '+20 EXP',           descKey: 'item.growth_potion.desc' },
+  boss_ticket: { icon: '🎫', name: 'BOSS 挑戰卷', nameKey: 'item.boss_ticket',    desc: '可額外挑戰一次 BOSS', descKey: 'item.boss_ticket.desc' },
 };
 
 const BOSSES = [
@@ -957,13 +957,13 @@ function renderItemPickModal() {
           ${def.icon}
         </div>
         <div class="modal-pick-info">
-          <div class="modal-pick-name">${def.name}</div>
-          <div class="modal-pick-desc">${def.desc}</div>
+          <div class="modal-pick-name">${t(def.nameKey)}</div>
+          <div class="modal-pick-desc">${t(def.descKey)}</div>
         </div>
         <div class="modal-pick-right">
           <span class="modal-pick-count">×${cnt}</span>
           <button class="use-btn${isBoss ? ' use-btn--boss' : ''}" onclick="useItemFromPickModal('${id}')">
-            ${isBoss ? '前往 BOSS' : '使用'}
+            ${isBoss ? t('item.boss_ticket.goto') : t('item.use')}
           </button>
         </div>
       </div>`;
@@ -1866,7 +1866,7 @@ function initShop() {
         if (id === 'boss_ticket') {
           showToast('🎫 BOSS 挑戰卷已加入背包！');
         } else {
-          showToast(`購買成功：${ITEM_DEFS[id]?.name ?? id} ×1`);
+          showToast(`購買成功：${ITEM_DEFS[id] ? t(ITEM_DEFS[id].nameKey) : id} ×1`);
         }
       }
     });

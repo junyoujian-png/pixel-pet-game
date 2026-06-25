@@ -84,6 +84,15 @@ const LANG_DATA = {
     'ad.count': '觀看廣告',
     'ad.reward.toast': '廣告獎勵 +50 能量石！',
     'ad.gacha.toast': '免費抽獎獲得！',
+    // 道具
+    'item.heart_candy': '愛心糖',
+    'item.heart_candy.desc': '+10 心情',
+    'item.growth_potion': '成長藥',
+    'item.growth_potion.desc': '+10 EXP',
+    'item.boss_ticket': 'BOSS 挑戰卷',
+    'item.boss_ticket.desc': '可挑戰任意已解鎖的 BOSS，一張只能使用一次',
+    'item.boss_ticket.goto': '前往 BOSS 挑戰使用',
+    'item.use': '使用',
     // 探索
     'explore.title': '探索',
     'explore.subtitle': '選擇探索模式',
@@ -340,6 +349,15 @@ const LANG_DATA = {
     'ad.count': 'Watch Ad',
     'ad.reward.toast': 'Ad Reward +50 Gems!',
     'ad.gacha.toast': 'Free draw obtained!',
+    // Items
+    'item.heart_candy': 'Heart Candy',
+    'item.heart_candy.desc': '+10 Mood',
+    'item.growth_potion': 'Growth Potion',
+    'item.growth_potion.desc': '+10 EXP',
+    'item.boss_ticket': 'BOSS Challenge Ticket',
+    'item.boss_ticket.desc': 'Challenge any unlocked BOSS. One ticket per battle.',
+    'item.boss_ticket.goto': 'Go to BOSS Battle',
+    'item.use': 'Use',
     // Explore
     'explore.title': 'Explore',
     'explore.subtitle': 'Choose Explore Mode',
