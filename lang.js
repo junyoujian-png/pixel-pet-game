@@ -163,6 +163,16 @@ const LANG_DATA = {
     'battle.victory': '勝利！',
     'battle.defeat': '戰鬥失敗',
     'battle.crit': '暴擊！',
+    'battle.defeat.desc': '太強大，繼續升等再挑戰！',
+    'battle.confirm': '確認',
+    // BOSS 挑戰卷確認彈窗
+    'boss.ticket.confirm.title': '使用 BOSS 挑戰卷',
+    'boss.ticket.confirm.desc': '確定使用挑戰卷挑戰',
+    'boss.ticket.confirm.question': '嗎？',
+    'boss.ticket.remaining': '剩餘挑戰卷：',
+    'boss.ticket.remaining.unit': '張',
+    'boss.ticket.cancel': '取消',
+    'boss.ticket.confirm.btn': '確定',
     // 任務
     'quest.daily': '每日',
     'quest.achievement': '成就',
@@ -429,6 +439,16 @@ const LANG_DATA = {
     'battle.victory': 'Victory!',
     'battle.defeat': 'Defeated',
     'battle.crit': 'Critical!',
+    'battle.defeat.desc': 'is too powerful. Level up and try again!',
+    'battle.confirm': 'OK',
+    // BOSS Ticket Confirm Modal
+    'boss.ticket.confirm.title': 'Use BOSS Challenge Ticket',
+    'boss.ticket.confirm.desc': 'Use a ticket to challenge',
+    'boss.ticket.confirm.question': '?',
+    'boss.ticket.remaining': 'Remaining tickets:',
+    'boss.ticket.remaining.unit': '',
+    'boss.ticket.cancel': 'Cancel',
+    'boss.ticket.confirm.btn': 'Confirm',
     // Quest
     'quest.daily': 'Daily',
     'quest.achievement': 'Achievement',

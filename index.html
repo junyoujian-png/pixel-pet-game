@@ -487,15 +487,15 @@
   <!-- Boss Ticket Confirm Modal -->
   <div id="modal-ticket-confirm" class="modal hidden">
     <div class="modal-box modal-ticket-confirm-box">
-      <h2 class="ticket-confirm-title">🎫 使用 BOSS 挑戰卷</h2>
+      <h2 class="ticket-confirm-title">🎫 <span data-i18n="boss.ticket.confirm.title">使用 BOSS 挑戰卷</span></h2>
       <p class="ticket-confirm-body">
-        確定使用挑戰卷挑戰<br>
-        <span id="ticket-confirm-boss-name" class="ticket-confirm-boss-name"></span> 嗎？
+        <span data-i18n="boss.ticket.confirm.desc">確定使用挑戰卷挑戰</span><br>
+        <span id="ticket-confirm-boss-name" class="ticket-confirm-boss-name"></span> <span data-i18n="boss.ticket.confirm.question">嗎？</span>
       </p>
-      <p class="ticket-confirm-remaining">剩餘挑戰卷：<span id="ticket-confirm-count">0</span> 張</p>
+      <p id="ticket-confirm-remaining" class="ticket-confirm-remaining"></p>
       <div class="ticket-confirm-actions">
-        <button class="btn-cancel" onclick="closeModal('modal-ticket-confirm')">取消</button>
-        <button class="btn-confirm-ticket" onclick="confirmBossTicketUse()">確定</button>
+        <button class="btn-cancel" onclick="closeModal('modal-ticket-confirm')" data-i18n="boss.ticket.cancel">取消</button>
+        <button class="btn-confirm-ticket" onclick="confirmBossTicketUse()" data-i18n="boss.ticket.confirm.btn">確定</button>
       </div>
     </div>
   </div>

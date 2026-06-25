@@ -2287,7 +2287,7 @@ function openBossTicketConfirm(bossId) {
   const count = getItem('boss_ticket');
   ticketTargetBossId = bossId;
   document.getElementById('ticket-confirm-boss-name').textContent = t(boss.nameKey);
-  document.getElementById('ticket-confirm-count').textContent     = count;
+  document.getElementById('ticket-confirm-remaining').textContent = t('boss.ticket.remaining') + count + t('boss.ticket.remaining.unit');
   openModal('modal-ticket-confirm');
 }
 
@@ -2768,12 +2768,12 @@ function endBattle(win) {
   if (win) {
     titleEl.textContent   = `🏆 ${t('battle.victory')}`;
     descEl.textContent    = showWheel ? '精彩！旋轉轉盤獲取獎勵！' : `${t(bSt.boss.nameKey)} 已在記錄中！`;
-    closeBtn.textContent  = showWheel ? '🎡 轉動轉盤！' : '確認';
+    closeBtn.textContent  = showWheel ? '🎡 轉動轉盤！' : t('battle.confirm');
     closeBtn.dataset.wheel = showWheel ? '1' : '0';
   } else {
     titleEl.textContent   = `💀 ${t('battle.defeat')}`;
-    descEl.textContent    = `${t(bSt.boss.nameKey)} 太強大，繼續升等再挑戰！`;
-    closeBtn.textContent  = '確認';
+    descEl.textContent    = `${t(bSt.boss.nameKey)} ${t('battle.defeat.desc')}`;
+    closeBtn.textContent  = t('battle.confirm');
     closeBtn.dataset.wheel = '0';
   }
 }
