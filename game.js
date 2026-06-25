@@ -109,22 +109,22 @@ const ITEM_DEFS = {
 };
 
 const BOSSES = [
-  { id: 'boss_01', name: '金剛鸚鵡', nameKey: 'pet.boss_pet_01.name', image: 'assets/boss/boss_01.png', level: 30,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 800,   rarity: 'SSR' }, desc: '以鋼鐵利喙和強力爪牙令對手喪膽' },
-  { id: 'boss_02', name: '蟒蛇',     nameKey: 'pet.boss_pet_02.name', image: 'assets/boss/boss_02.png', level: 35,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 1000,  rarity: 'SSR' }, desc: '能以驚人力道將獵物纏繞窒息的巨大蟒蛇' },
-  { id: 'boss_03', name: '鴕鳥',     nameKey: 'pet.boss_pet_03.name', image: 'assets/boss/boss_03.png', level: 40,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 1200,  rarity: 'SSR' }, desc: '奔速如風、一踢可碎石的沙漠巨鳥' },
-  { id: 'boss_04', name: '狼',       nameKey: 'pet.boss_pet_04.name', image: 'assets/boss/boss_04.png', level: 45,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 1500,  rarity: 'SSR' }, desc: '統領狼群、嗜血好鬥的孤狼首領' },
-  { id: 'boss_05', name: '袋鼠',     nameKey: 'pet.boss_pet_05.name', image: 'assets/boss/boss_05.png', level: 50,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 1800,  rarity: 'SSR' }, desc: '後腿爆發力驚人的拳擊格鬥高手' },
-  { id: 'boss_06', name: '獵豹',     nameKey: 'pet.boss_pet_06.name', image: 'assets/boss/boss_06.png', level: 55,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 2200,  rarity: 'SSR' }, desc: '地表最快的掠食者，無處可逃' },
-  { id: 'boss_07', name: '河馬',     nameKey: 'pet.boss_pet_07.name', image: 'assets/boss/boss_07.png', level: 60,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 2700,  rarity: 'SSR' }, desc: '龐大體型與驚人咬合力的河中霸主' },
-  { id: 'boss_08', name: '犀牛',     nameKey: 'pet.boss_pet_08.name', image: 'assets/boss/boss_08.png', level: 65,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 3300,  rarity: 'SSR' }, desc: '以鋼鐵犀角衝撞萬物的荒野壁壘' },
-  { id: 'boss_09', name: '棕熊',     nameKey: 'pet.boss_pet_09.name', image: 'assets/boss/boss_09.png', level: 70,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 4000,  rarity: 'SSR' }, desc: '山林之王，爪力足以撕碎一切' },
-  { id: 'boss_10', name: '貓頭鷹',   nameKey: 'pet.boss_pet_10.name', image: 'assets/boss/boss_10.png', level: 75,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 4800,  rarity: 'SSR' }, desc: '黑暗中的智慧獵手，神出鬼沒' },
-  { id: 'boss_11', name: '大猩猩',   nameKey: 'pet.boss_pet_11.name', image: 'assets/boss/boss_11.png', level: 80,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 5800,  rarity: 'SSR' }, desc: '叢林之王，力量超群的巨型靈長類' },
-  { id: 'boss_12', name: '藏獒',     nameKey: 'pet.boss_pet_12.name', image: 'assets/boss/boss_12.png', level: 85,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 7000,  rarity: 'SSR' }, desc: '高原守護神，忠誠又兇猛的藏地聖犬' },
-  { id: 'boss_13', name: '鱷魚',     nameKey: 'pet.boss_pet_13.name', image: 'assets/boss/boss_13.png', level: 90,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 8500,  rarity: 'SSR' }, desc: '遠古爬行霸主，咬合力無與倫比' },
-  { id: 'boss_14', name: '老鷹',     nameKey: 'pet.boss_pet_14.name', image: 'assets/boss/boss_14.png', level: 95,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 10000, rarity: 'SSR' }, desc: '統御天空的王者，俯衝速度令人窒息' },
-  { id: 'boss_15', name: '獅子',     nameKey: 'pet.boss_pet_15.name', image: 'assets/boss/boss_15.png', level: 100, baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 12000, rarity: 'SSR' }, desc: '萬獸之王，吼聲震天的非洲草原霸主' },
-  { id: 'boss_16', name: '老虎',     nameKey: 'pet.boss_pet_16.name', image: 'assets/boss/boss_16.png', level: 105, baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 15000, rarity: 'SSR' }, desc: '終極BOSS，山林中最強的孤獨王者' },
+  { id: 'boss_01', name: '金剛鸚鵡', nameKey: 'pet.boss_pet_01.name', image: 'assets/boss/boss_01.png', level: 30,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 800,   rarity: 'SSR' } },
+  { id: 'boss_02', name: '蟒蛇',     nameKey: 'pet.boss_pet_02.name', image: 'assets/boss/boss_02.png', level: 35,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 1000,  rarity: 'SSR' } },
+  { id: 'boss_03', name: '鴕鳥',     nameKey: 'pet.boss_pet_03.name', image: 'assets/boss/boss_03.png', level: 40,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 1200,  rarity: 'SSR' } },
+  { id: 'boss_04', name: '狼',       nameKey: 'pet.boss_pet_04.name', image: 'assets/boss/boss_04.png', level: 45,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 1500,  rarity: 'SSR' } },
+  { id: 'boss_05', name: '袋鼠',     nameKey: 'pet.boss_pet_05.name', image: 'assets/boss/boss_05.png', level: 50,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 1800,  rarity: 'SSR' } },
+  { id: 'boss_06', name: '獵豹',     nameKey: 'pet.boss_pet_06.name', image: 'assets/boss/boss_06.png', level: 55,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 2200,  rarity: 'SSR' } },
+  { id: 'boss_07', name: '河馬',     nameKey: 'pet.boss_pet_07.name', image: 'assets/boss/boss_07.png', level: 60,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 2700,  rarity: 'SSR' } },
+  { id: 'boss_08', name: '犀牛',     nameKey: 'pet.boss_pet_08.name', image: 'assets/boss/boss_08.png', level: 65,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 3300,  rarity: 'SSR' } },
+  { id: 'boss_09', name: '棕熊',     nameKey: 'pet.boss_pet_09.name', image: 'assets/boss/boss_09.png', level: 70,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 4000,  rarity: 'SSR' } },
+  { id: 'boss_10', name: '貓頭鷹',   nameKey: 'pet.boss_pet_10.name', image: 'assets/boss/boss_10.png', level: 75,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 4800,  rarity: 'SSR' } },
+  { id: 'boss_11', name: '大猩猩',   nameKey: 'pet.boss_pet_11.name', image: 'assets/boss/boss_11.png', level: 80,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 5800,  rarity: 'SSR' } },
+  { id: 'boss_12', name: '藏獒',     nameKey: 'pet.boss_pet_12.name', image: 'assets/boss/boss_12.png', level: 85,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 7000,  rarity: 'SSR' } },
+  { id: 'boss_13', name: '鱷魚',     nameKey: 'pet.boss_pet_13.name', image: 'assets/boss/boss_13.png', level: 90,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 8500,  rarity: 'SSR' } },
+  { id: 'boss_14', name: '老鷹',     nameKey: 'pet.boss_pet_14.name', image: 'assets/boss/boss_14.png', level: 95,  baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 10000, rarity: 'SSR' } },
+  { id: 'boss_15', name: '獅子',     nameKey: 'pet.boss_pet_15.name', image: 'assets/boss/boss_15.png', level: 100, baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 12000, rarity: 'SSR' } },
+  { id: 'boss_16', name: '老虎',     nameKey: 'pet.boss_pet_16.name', image: 'assets/boss/boss_16.png', level: 105, baseStats: { hp: 350, atk: 50, def: 30 }, reward: { coins: 15000, rarity: 'SSR' } },
 ];
 
 // ─── Wheel Segments ──────────────────────────────────────────────────────────
@@ -2235,7 +2235,6 @@ function renderBossList() {
             <span class="boss-card__name">${t(boss.nameKey)}</span>
             <span class="badge badge--${boss.reward.rarity.toLowerCase()}">${boss.reward.rarity}</span>
           </div>
-          <div class="boss-card__desc">${boss.desc}</div>
         </div>
         <div class="boss-card__action">${actionHtml}</div>
       </div>`;
