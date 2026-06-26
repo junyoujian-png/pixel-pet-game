@@ -103,9 +103,10 @@ const DRINKS = [
 ];
 
 const ITEM_DEFS = {
-  candy:       { icon: '🍬', name: '愛心糖',      nameKey: 'item.heart_candy',    desc: '+10心情',           descKey: 'item.heart_candy.desc',   price: 100 },
-  xpboost:     { icon: '⭐', name: '成長藥',       nameKey: 'item.growth_potion',  desc: '+20 EXP',           descKey: 'item.growth_potion.desc', price: 100 },
-  boss_ticket: { icon: '🎫', name: 'BOSS 挑戰卷', nameKey: 'item.boss_ticket',    desc: '可額外挑戰一次 BOSS', descKey: 'item.boss_ticket.desc',   price: 2000 },
+  candy:        { icon: '🍬', name: '愛心糖',      nameKey: 'item.heart_candy',   desc: '+10心情',             descKey: 'item.heart_candy.desc',   price: 100 },
+  xpboost:      { icon: '⭐', name: '成長藥',       nameKey: 'item.growth_potion', desc: '+20 EXP',             descKey: 'item.growth_potion.desc', price: 100 },
+  boss_ticket:  { icon: '🎫', name: 'BOSS 挑戰卷', nameKey: 'item.boss_ticket',   desc: '可額外挑戰一次 BOSS', descKey: 'item.boss_ticket.desc',   price: 2000 },
+  super_growth: { icon: '⭐', name: '超級成長藥',  nameKey: 'item.super_growth',  desc: '使用後寵物直接升到等級上限', descKey: 'item.super_growth.desc', price: 10000, currency: 'energyStones', effect: { maxLevel: true } },
 };
 
 const BOSSES = [
@@ -976,6 +977,21 @@ function useItemFromPickModal(id) {
     return;
   }
   if (getItem(id) <= 0) return;
+  if (id === 'super_growth') {
+    const maxLevel = getMaxLevel(currentPet().rarity);
+    if (state.level >= maxLevel) {
+      showToast(t('item.super_growth.maxed'));
+      return;
+    }
+    consumeItem(id);
+    state.level = maxLevel;
+    state.exp   = 0;
+    saveState();
+    renderAll();
+    showToast(t('item.super_growth.used'));
+    closeModal('modal-item-pick');
+    return;
+  }
   consumeItem(id);
   if (id === 'candy') {
     state.mood = Math.min(100, state.mood + 10);

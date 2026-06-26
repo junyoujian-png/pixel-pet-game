@@ -90,6 +90,10 @@ const LANG_DATA = {
     'item.boss_ticket.desc': '可挑戰任意已解鎖的 BOSS，一張只能使用一次',
     'item.boss_ticket.goto': '前往 BOSS 挑戰使用',
     'item.use': '使用',
+    'item.super_growth': '超級成長藥',
+    'item.super_growth.desc': '使用後寵物直接升到等級上限',
+    'item.super_growth.used': '超級成長藥使用！寵物升到最高等級！',
+    'item.super_growth.maxed': '寵物已經是最高等級了！',
     // 探索
     'explore.title': '探索',
     'explore.subtitle': '選擇探索模式',
@@ -366,6 +370,10 @@ const LANG_DATA = {
     'item.boss_ticket.desc': 'Challenge any unlocked BOSS. One ticket per battle.',
     'item.boss_ticket.goto': 'Go to BOSS Battle',
     'item.use': 'Use',
+    'item.super_growth': 'Super Growth Potion',
+    'item.super_growth.desc': 'Instantly levels up pet to max level',
+    'item.super_growth.used': 'Super Growth Potion used! Pet reached max level!',
+    'item.super_growth.maxed': 'Pet is already at max level!',
     // Explore
     'explore.title': 'Explore',
     'explore.subtitle': 'Choose Explore Mode',
