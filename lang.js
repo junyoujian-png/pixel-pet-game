@@ -188,6 +188,7 @@ const LANG_DATA = {
     'wheel.pet.result': '獲得 BOSS 寵物！',
     'wheel.pet.owned': '已擁有 +50 💎',
     'wheel.confirm': '確認',
+    'wheel.pet.label': '寵物',
     // 儲值頁面
     'iap.title': '儲值像素晶石',
     'iap.test.mode': '⚠️ 目前為測試模式，不收取真實費用',
@@ -490,6 +491,7 @@ const LANG_DATA = {
     'wheel.pet.result': 'BOSS Pet obtained!',
     'wheel.pet.owned': 'Already owned +50 💎',
     'wheel.confirm': 'OK',
+    'wheel.pet.label': 'Pet',
     // IAP Store
     'iap.title': 'Top Up Pixel Gems',
     'iap.test.mode': '⚠️ Test mode - no real charges',

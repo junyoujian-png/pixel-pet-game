@@ -2362,7 +2362,7 @@ function buildWheelLabels(boss) {
         <img src="${boss.image}" class="wheel-boss-img" alt="${t(boss.nameKey)}"
              onerror="this.style.display='none';this.nextSibling.style.display='block'">
         <span style="display:none;font-size:20px">🏆</span>
-        <span class="wheel-label-name">寵物</span>`;
+        <span class="wheel-label-name">${t('wheel.pet.label')}</span>`;
     } else {
       label.innerHTML = `<span class="wheel-label-icon">💎</span>
         <span class="wheel-label-coins">${seg.coins}</span>`;
