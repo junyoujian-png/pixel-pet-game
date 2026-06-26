@@ -2407,17 +2407,29 @@ function showWheelResult(segIdx) {
   if (seg.pet) {
     const petId = boss.id.replace('boss_', 'boss_pet_');
     const isNew = !unlockedPets.includes(petId);
-    if (isNew) { unlockedPets.push(petId); saveUnlockedPets(); }
+    if (isNew) {
+      unlockedPets.push(petId);
+      saveUnlockedPets();
+    } else {
+      addCoins(50); // 已擁有該 BOSS 寵物 → 補償能量石，不重複發放寵物
+    }
 
-    content.innerHTML = `
+    content.innerHTML = isNew ? `
       <div class="wheel-result-pet">
         <div class="wheel-result-pet-frame">
           <img src="${boss.image}" class="wheel-result-pet-img" alt="${t(boss.nameKey)}"
                onerror="this.style.opacity='0.2'">
         </div>
-        <div class="wheel-result-pet-tag${isNew ? ' new-flash' : ''}">${isNew ? `✨ ${t('gacha.new')} ✨` : t('gacha.owned')}</div>
-        <div class="wheel-result-title">獲得 BOSS 寵物！</div>
+        <div class="wheel-result-pet-tag new-flash">✨ ${t('gacha.new')} ✨</div>
+        <div class="wheel-result-title">${t('wheel.pet.obtained')}</div>
         <div class="wheel-result-subtitle">${t(boss.nameKey)}</div>
+      </div>` : `
+      <div class="wheel-result-pet">
+        <div class="wheel-result-pet-frame">
+          <img src="${boss.image}" class="wheel-result-pet-img" alt="${t(boss.nameKey)}"
+               onerror="this.style.opacity='0.2'">
+        </div>
+        <div class="wheel-result-pet-tag wheel-result-pet-tag--dup">${t('gacha.owned')} +50 💎</div>
       </div>`;
   } else {
     addCoins(seg.coins, '轉盤獎勵');
