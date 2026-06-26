@@ -2760,17 +2760,16 @@ function endBattle(win) {
   trackQuestEvent('boss_battle');
   trackQuestEvent('battle_count');
 
-  let showWheel = false;
-  if (win) {
-    showWheel = bSt.isFirstTime;
-    if (showWheel) {
-      const cleared = loadClearedBosses();
-      if (!cleared.includes(bSt.boss.id)) {
-        cleared.push(bSt.boss.id);
-        saveClearedBosses(cleared);
-        trackQuestEvent('boss_clear');
-        trackQuestEvent('boss_clear_all', cleared.length);
-      }
+  // Clear-record tracking stays gated by isFirstTime (unlocks the next boss),
+  // but is independent of whether the wheel shows — the wheel now always
+  // shows on a win, regardless of how many times this boss was beaten before.
+  if (win && bSt.isFirstTime) {
+    const cleared = loadClearedBosses();
+    if (!cleared.includes(bSt.boss.id)) {
+      cleared.push(bSt.boss.id);
+      saveClearedBosses(cleared);
+      trackQuestEvent('boss_clear');
+      trackQuestEvent('boss_clear_all', cleared.length);
     }
   }
 
@@ -2782,10 +2781,10 @@ function endBattle(win) {
 
   overlay.classList.remove('hidden');
   if (win) {
-    titleEl.textContent   = `🏆 ${t('battle.victory')}`;
-    descEl.textContent    = showWheel ? t('battle.victory.desc') : `${t(bSt.boss.nameKey)} 已在記錄中！`;
-    closeBtn.textContent  = showWheel ? t('battle.spin') : t('battle.confirm');
-    closeBtn.dataset.wheel = showWheel ? '1' : '0';
+    titleEl.textContent    = `🏆 ${t('battle.victory')}`;
+    descEl.textContent     = t('battle.victory.desc');
+    closeBtn.textContent   = t('battle.spin');
+    closeBtn.dataset.wheel = '1';
   } else {
     titleEl.textContent   = `💀 ${t('battle.defeat')}`;
     descEl.textContent    = `${t(bSt.boss.nameKey)} ${t('battle.defeat.desc')}`;
