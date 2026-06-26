@@ -1409,12 +1409,12 @@ function claimQuestReward(tab, questId) {
 // 目前為模擬付款，直接發放晶石
 
 const IAP_PACKAGES = [
-  { id: 'pack1', amount: 100,  bonus: 0,    price: 30,   label: '新手包' },
-  { id: 'pack2', amount: 350,  bonus: 20,   price: 100,  label: '超值包' },
-  { id: 'pack3', amount: 800,  bonus: 80,   price: 220,  label: '熱門包' },
-  { id: 'pack4', amount: 1800, bonus: 250,  price: 480,  label: '豪華包', popular: true },
-  { id: 'pack5', amount: 4000, bonus: 700,  price: 980,  label: '至尊包' },
-  { id: 'pack6', amount: 9000, bonus: 2000, price: 1980, label: '王者包' },
+  { id: 'pack1', amount: 100,  bonus: 0,    price: 30,   label: '新手包', labelKey: 'iap.pack.starter' },
+  { id: 'pack2', amount: 350,  bonus: 20,   price: 100,  label: '超值包', labelKey: 'iap.pack.value' },
+  { id: 'pack3', amount: 800,  bonus: 80,   price: 220,  label: '熱門包', labelKey: 'iap.pack.popular' },
+  { id: 'pack4', amount: 1800, bonus: 250,  price: 480,  label: '豪華包', labelKey: 'iap.pack.deluxe', popular: true },
+  { id: 'pack5', amount: 4000, bonus: 700,  price: 980,  label: '至尊包', labelKey: 'iap.pack.supreme' },
+  { id: 'pack6', amount: 9000, bonus: 2000, price: 1980, label: '王者包', labelKey: 'iap.pack.royal' },
 ];
 
 function loadPurchaseHistory()  { try { return JSON.parse(localStorage.getItem('purchaseHistory') || '[]'); } catch { return []; } }
@@ -1436,11 +1436,11 @@ function renderIAPStore() {
     const total = pkg.amount + pkg.bonus;
     return `
       <div class="iap-card${pkg.popular ? ' iap-card--popular' : ''}" onclick="showPurchaseConfirm('${pkg.id}')">
-        ${pkg.popular ? '<div class="iap-card__badge">最划算</div>' : ''}
+        ${pkg.popular ? `<div class="iap-card__badge">${t('iap.best')}</div>` : ''}
         <div class="iap-card__icon">💎</div>
         <div class="iap-card__amount">${pkg.amount.toLocaleString()}</div>
-        ${pkg.bonus ? `<div class="iap-card__bonus">+${pkg.bonus.toLocaleString()} 贈送</div>` : ''}
-        <div class="iap-card__label">${pkg.label}</div>
+        ${pkg.bonus ? `<div class="iap-card__bonus">+${pkg.bonus.toLocaleString()} ${t('iap.bonus')}</div>` : ''}
+        <div class="iap-card__label">${t(pkg.labelKey)}</div>
         <div class="iap-card__price">NT$ ${pkg.price}</div>
       </div>`;
   }).join('');
@@ -1453,7 +1453,7 @@ function showPurchaseConfirm(packageId) {
   if (!pkg) return;
   pendingPurchaseId = packageId;
   const total = pkg.amount + pkg.bonus;
-  document.getElementById('iap-confirm-pkg-name').textContent = pkg.label;
+  document.getElementById('iap-confirm-pkg-name').textContent = t(pkg.labelKey);
   document.getElementById('iap-confirm-amount').textContent   = `💎 ${total.toLocaleString()}`;
   document.getElementById('iap-confirm-price').textContent    = `NT$ ${pkg.price}`;
   openModal('modal-iap-confirm');
@@ -2330,7 +2330,7 @@ function showWheelModal(boss) {
   disc.style.transform  = 'rotate(0deg)';
 
   buildWheelLabels(boss);
-  document.getElementById('wheel-boss-name').textContent = `恭喜打敗 ${t(boss.nameKey)}！轉動轉盤獲得獎勵！`;
+  document.getElementById('wheel-boss-name').textContent = `${t('wheel.desc')} ${t(boss.nameKey)}${t('wheel.desc2')}`;
   document.getElementById('btn-spin').disabled           = false;
   document.getElementById('btn-spin').classList.remove('hidden');
   document.getElementById('wheel-result').classList.add('hidden');
@@ -2783,8 +2783,8 @@ function endBattle(win) {
   overlay.classList.remove('hidden');
   if (win) {
     titleEl.textContent   = `🏆 ${t('battle.victory')}`;
-    descEl.textContent    = showWheel ? '精彩！旋轉轉盤獲取獎勵！' : `${t(bSt.boss.nameKey)} 已在記錄中！`;
-    closeBtn.textContent  = showWheel ? '🎡 轉動轉盤！' : t('battle.confirm');
+    descEl.textContent    = showWheel ? t('battle.victory.desc') : `${t(bSt.boss.nameKey)} 已在記錄中！`;
+    closeBtn.textContent  = showWheel ? t('battle.spin') : t('battle.confirm');
     closeBtn.dataset.wheel = showWheel ? '1' : '0';
   } else {
     titleEl.textContent   = `💀 ${t('battle.defeat')}`;

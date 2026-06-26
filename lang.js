@@ -169,6 +169,8 @@ const LANG_DATA = {
     'battle.crit': '暴擊！',
     'battle.defeat.desc': '太強大，繼續升等再挑戰！',
     'battle.confirm': '確認',
+    'battle.victory.desc': '精彩！旋轉轉盤獲取獎勵！',
+    'battle.spin': '🎰 轉動轉盤！',
     // BOSS 挑戰卷確認彈窗
     'boss.ticket.confirm.title': '使用 BOSS 挑戰卷',
     'boss.ticket.confirm.desc': '確定使用挑戰卷挑戰',
@@ -177,6 +179,22 @@ const LANG_DATA = {
     'boss.ticket.remaining.unit': '張',
     'boss.ticket.cancel': '取消',
     'boss.ticket.confirm.btn': '確定',
+    // 命運轉盤
+    'wheel.title': '命運轉盤',
+    'wheel.desc': '恭喜打敗',
+    'wheel.desc2': '！轉動轉盤獲得獎勵！',
+    'wheel.spin': '🎰 轉動！',
+    // 儲值頁面
+    'iap.title': '儲值像素晶石',
+    'iap.test.mode': '⚠️ 目前為測試模式，不收取真實費用',
+    'iap.bonus': '贈送',
+    'iap.best': '最划算',
+    'iap.pack.starter': '新手包',
+    'iap.pack.value': '超值包',
+    'iap.pack.popular': '熱門包',
+    'iap.pack.deluxe': '豪華包',
+    'iap.pack.supreme': '至尊包',
+    'iap.pack.royal': '王者包',
     // 任務
     'quest.daily': '每日',
     'quest.achievement': '成就',
@@ -449,6 +467,8 @@ const LANG_DATA = {
     'battle.crit': 'Critical!',
     'battle.defeat.desc': 'is too powerful. Level up and try again!',
     'battle.confirm': 'OK',
+    'battle.victory.desc': 'Spin the wheel to get rewards!',
+    'battle.spin': '🎰 Spin Wheel!',
     // BOSS Ticket Confirm Modal
     'boss.ticket.confirm.title': 'Use BOSS Challenge Ticket',
     'boss.ticket.confirm.desc': 'Use a ticket to challenge',
@@ -457,6 +477,22 @@ const LANG_DATA = {
     'boss.ticket.remaining.unit': '',
     'boss.ticket.cancel': 'Cancel',
     'boss.ticket.confirm.btn': 'Confirm',
+    // Fortune Wheel
+    'wheel.title': 'Fortune Wheel',
+    'wheel.desc': 'Congratulations! You defeated',
+    'wheel.desc2': '! Spin the wheel for rewards!',
+    'wheel.spin': '🎰 Spin!',
+    // IAP Store
+    'iap.title': 'Top Up Pixel Gems',
+    'iap.test.mode': '⚠️ Test mode - no real charges',
+    'iap.bonus': 'Bonus',
+    'iap.best': 'Best Value',
+    'iap.pack.starter': 'Starter Pack',
+    'iap.pack.value': 'Value Pack',
+    'iap.pack.popular': 'Popular Pack',
+    'iap.pack.deluxe': 'Deluxe Pack',
+    'iap.pack.supreme': 'Supreme Pack',
+    'iap.pack.royal': 'Royal Pack',
     // Quest
     'quest.daily': 'Daily',
     'quest.achievement': 'Achievement',
