@@ -2421,7 +2421,7 @@ function showWheelResult(segIdx) {
                onerror="this.style.opacity='0.2'">
         </div>
         <div class="wheel-result-pet-tag new-flash">✨ ${t('gacha.new')} ✨</div>
-        <div class="wheel-result-title">${t('wheel.pet.obtained')}</div>
+        <div class="wheel-result-title">${t('wheel.pet.result')}</div>
         <div class="wheel-result-subtitle">${t(boss.nameKey)}</div>
       </div>` : `
       <div class="wheel-result-pet">
@@ -2429,7 +2429,7 @@ function showWheelResult(segIdx) {
           <img src="${boss.image}" class="wheel-result-pet-img" alt="${t(boss.nameKey)}"
                onerror="this.style.opacity='0.2'">
         </div>
-        <div class="wheel-result-pet-tag wheel-result-pet-tag--dup">${t('gacha.owned')} +50 💎</div>
+        <div class="wheel-result-pet-tag wheel-result-pet-tag--dup">${t('wheel.pet.owned')}</div>
       </div>`;
   } else {
     addCoins(seg.coins, '轉盤獎勵');
@@ -2437,7 +2437,7 @@ function showWheelResult(segIdx) {
       <div class="wheel-result-coins">
         <div class="wheel-result-gem">💎</div>
         <div class="wheel-result-amount">+${seg.coins}</div>
-        <div class="wheel-result-title">能量石獲得！</div>
+        <div class="wheel-result-title">${t('wheel.gems.result')}</div>
       </div>`;
   }
 

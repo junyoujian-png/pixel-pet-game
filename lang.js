@@ -184,7 +184,10 @@ const LANG_DATA = {
     'wheel.desc': '恭喜打敗',
     'wheel.desc2': '！轉動轉盤獲得獎勵！',
     'wheel.spin': '🎰 轉動！',
-    'wheel.pet.obtained': '獲得 BOSS 寵物！',
+    'wheel.gems.result': '能量石獲得！',
+    'wheel.pet.result': '獲得 BOSS 寵物！',
+    'wheel.pet.owned': '已擁有 +50 💎',
+    'wheel.confirm': '確認',
     // 儲值頁面
     'iap.title': '儲值像素晶石',
     'iap.test.mode': '⚠️ 目前為測試模式，不收取真實費用',
@@ -483,7 +486,10 @@ const LANG_DATA = {
     'wheel.desc': 'Congratulations! You defeated',
     'wheel.desc2': '! Spin the wheel for rewards!',
     'wheel.spin': '🎰 Spin!',
-    'wheel.pet.obtained': 'Obtained BOSS Pet!',
+    'wheel.gems.result': 'Gems obtained!',
+    'wheel.pet.result': 'BOSS Pet obtained!',
+    'wheel.pet.owned': 'Already owned +50 💎',
+    'wheel.confirm': 'OK',
     // IAP Store
     'iap.title': 'Top Up Pixel Gems',
     'iap.test.mode': '⚠️ Test mode - no real charges',
