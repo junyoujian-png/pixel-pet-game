@@ -11,7 +11,7 @@ const root = path.join(__dirname, '..');
 const www  = path.join(root, 'www');
 
 const FILES = ['index.html', 'style.css', 'game.js', 'lang.js'];
-const DIRS  = ['assets'];
+const DIRS  = ['assets', 'vendor'];
 
 fs.rmSync(www, { recursive: true, force: true });
 fs.mkdirSync(www);

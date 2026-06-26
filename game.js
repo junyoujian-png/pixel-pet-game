@@ -3449,12 +3449,28 @@ function renderSettingsTab() {
   if (nameEl) nameEl.value = name;
 }
 
+// ─── App Tracking Transparency ────────────────────────────────────────────────
+// No bundler in this project, so the plugin is loaded as a plain global via
+// vendor/capacitor.js + vendor/capacitor-att.js (see index.html) instead of
+// `import` — registerPlugin() in those scripts exposes it on Capacitor.Plugins.
+// isNativePlatform() is false in a regular browser, so this is a no-op there.
+async function requestATT() {
+  if (!window.Capacitor?.isNativePlatform?.()) return;
+  try {
+    const { status } = await Capacitor.Plugins.AppTrackingTransparency.requestPermission();
+    console.log('ATT status:', status);
+  } catch (e) {
+    console.error('ATT request failed:', e);
+  }
+}
+
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 function init() {
   // Registered first so a later render/init failure can never prevent the
   // audio-unlock listener from being attached (BGM would otherwise never play).
   unlockAudioOnFirstInteraction();
   initSfxClickDelegation();
+  requestATT();
 
   checkDailyPPReset();
   initStepHistory();

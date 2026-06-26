@@ -47,5 +47,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>我們使用追蹤資料來提供個人化廣告體驗</string>
 </dict>
 </plist>
