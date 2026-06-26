@@ -490,7 +490,7 @@ function showGachaResult(results) {
       <span class="badge badge--${r.pet.rarity.toLowerCase()}">${r.pet.rarity}</span>
       ${r.isNew
         ? `<span class="gacha-tag gacha-tag--new">${t('gacha.new')}</span>`
-        : `<span class="gacha-tag gacha-tag--dup">${t('gacha.owned')} +50G</span>`}
+        : `<span class="gacha-tag gacha-tag--dup">${t('gacha.owned')} +50 💎</span>`}
     `;
     grid.appendChild(card);
   });
