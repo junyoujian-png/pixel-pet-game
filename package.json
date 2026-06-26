@@ -4,7 +4,9 @@
   "description": "A browser-based pixel pet game built with vanilla HTML / CSS / JavaScript.",
   "main": "game.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "sync:www": "node scripts/sync-www.js",
+    "ios:sync": "npm run sync:www && npx cap sync ios"
   },
   "repository": {
     "type": "git",

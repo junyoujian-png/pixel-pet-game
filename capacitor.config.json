@@ -1,5 +1,8 @@
 {
   "appId": "com.junyoujian.pixelpet",
   "appName": "Pixel Pet",
-  "webDir": "."
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
 }
