@@ -18,6 +18,9 @@ workflows:
       - name: Install dependencies
         script: |
           npm install
+      - name: Create www directory
+        script: |
+          npm run sync:www
       - name: Capacitor sync
         script: |
           npx cap sync ios
