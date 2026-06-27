@@ -137,7 +137,6 @@ const LANG_DATA = {
     'pet.pet35.element': '水',
     'pet.pet36.element': '水',
     'pet.pet37.element': '水',
-    'pet.pet38.element': '水',
     'pet.pet41.element': '水',
     'pet.pet42.element': '水',
     'pet.pet46.element': '水',
@@ -182,6 +181,7 @@ const LANG_DATA = {
     'pet.pet31.element': '土',
     'pet.pet32.element': '土',
     'pet.pet33.element': '土',
+    'pet.pet38.element': '土',
     'pet.pet50.element': '土',
     // BOSS 水屬性
     'pet.boss_pet_02.element': '水',
@@ -522,7 +522,6 @@ const LANG_DATA = {
     'pet.pet35.element': '水',
     'pet.pet36.element': '水',
     'pet.pet37.element': '水',
-    'pet.pet38.element': '水',
     'pet.pet41.element': '水',
     'pet.pet42.element': '水',
     'pet.pet46.element': '水',
@@ -567,6 +566,7 @@ const LANG_DATA = {
     'pet.pet31.element': '土',
     'pet.pet32.element': '土',
     'pet.pet33.element': '土',
+    'pet.pet38.element': '土',
     'pet.pet50.element': '土',
     // BOSS Water
     'pet.boss_pet_02.element': '水',
