@@ -229,6 +229,16 @@ const getPetElement = (petId) => {
   return t(`pet.${lookupId}.element`) || '無';
 };
 
+const getElementIcon = (petId) => ELEMENT_ICON[getPetElement(petId)] || '';
+
+// Reusable <span> for "next to the rarity badge" placement everywhere a pet is shown.
+const getElementBadgeHtml = (petId) => {
+  const element = getPetElement(petId);
+  const icon    = ELEMENT_ICON[element];
+  if (!icon) return '';
+  return `<span class="element-badge element-${element}">${icon}${t('element.' + element)}</span>`;
+};
+
 const calcDamage = (attackerAtk, skillPower, defenderDef, critRate, elementMultiplier = 1) => {
   const base     = attackerAtk * skillPower;
   const defense  = Math.floor(defenderDef * 0.5);
@@ -438,7 +448,7 @@ function renderSelectScreen() {
       </div>
       <span class="select-card__name">${t(pet.nameKey)}</span>
       <div class="select-card__footer">
-        <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
+        <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>${getElementBadgeHtml(pet.id)}
         <span class="select-card__maxlv">上限 Lv.${getMaxLevel(pet.rarity)}</span>
       </div>
     `;
@@ -515,7 +525,7 @@ function showGachaResult(results) {
     card.innerHTML = `
       <img src="${r.pet.image}" alt="${t(r.pet.nameKey)}" class="pixel-art gacha-result-card__img" />
       <span class="gacha-result-card__name">${t(r.pet.nameKey)}</span>
-      <span class="badge badge--${r.pet.rarity.toLowerCase()}">${r.pet.rarity}</span>
+      <span class="badge badge--${r.pet.rarity.toLowerCase()}">${r.pet.rarity}</span>${getElementBadgeHtml(r.pet.id)}
       ${r.isNew
         ? `<span class="gacha-tag gacha-tag--new">${t('gacha.new')}</span>`
         : `<span class="gacha-tag gacha-tag--dup">${t('gacha.owned')} +50 💎</span>`}
@@ -582,9 +592,8 @@ function showPetDetail(petIdOverride = null) {
   badge.textContent = pet.rarity;
   badge.className   = `badge badge--${pet.rarity.toLowerCase()}`;
 
-  const element = getPetElement(pet.id);
   const elementEl = document.getElementById('detail-pet-element');
-  elementEl.textContent = `${ELEMENT_ICON[element] || ''}${t('element.' + element)}`;
+  elementEl.innerHTML = getElementBadgeHtml(pet.id);
 
   document.getElementById('detail-hp').textContent         = stats.hp;
   document.getElementById('detail-atk').textContent        = stats.atk;
@@ -1072,7 +1081,7 @@ function renderPetPickModal() {
         <div class="modal-pick-info">
           <div class="modal-pick-name">
             ${t(pet.nameKey)}
-            <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
+            <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>${getElementBadgeHtml(pet.id)}
           </div>
           <div class="modal-pick-desc">Lv.${ps.level}</div>
         </div>
@@ -1974,7 +1983,7 @@ function renderPokedex() {
             : `<div class="pokedex-card__lock">🔒</div>`}
         </div>
         <div class="pokedex-card__name">${unlocked ? t(pet.nameKey) : '???'}</div>
-        <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
+        <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>${getElementBadgeHtml(pet.id)}
         ${unlocked && ps ? `<div class="pokedex-card__lv">Lv.${ps.level}</div>` : ''}
       </div>`;
   }).join('');
@@ -2026,7 +2035,7 @@ function renderSlotPage(slotIdx) {
       <div class="pet-card__right">
         <div class="pet-name-row">
           <span class="pet-name">${t(pet.nameKey)}</span>
-          <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>
+          <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>${getElementBadgeHtml(pet.id)}
         </div>
         <div class="pet-level-row">
           <span class="label">Lv.</span>
@@ -2628,6 +2637,7 @@ function renderBattlePets() {
              alt="${t(entry.pet.nameKey)}" onerror="this.style.opacity='0.3'">
         <div class="battle-pet-element">${ELEMENT_ICON[petElement] || ''}${counterHint}</div>
         <div class="battle-pet-name-small">${t(entry.pet.nameKey)}</div>
+        ${getElementBadgeHtml(entry.pet.id)}
       </div>`;
   }).join('');
 }

@@ -205,6 +205,25 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .badge--sr  { background: #f3e5f5; color: #6a1b9a; border: 1px solid #ce93d8; }
 .badge--ssr { background: #fff8e1; color: #e65100; border: 1px solid #ffcc80; }
 
+.element-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  color: white;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+.element-水 { background: #3b82f6; }
+.element-火 { background: #ef4444; }
+.element-木 { background: #22c55e; }
+.element-土 { background: #a16207; }
+/* Compact variant for the cramped battle-screen pet units */
+.battle-pet-unit .element-badge {
+  font-size: 8px;
+  padding: 1px 4px;
+  margin-left: 0;
+}
+
 .rarity-divider {
   grid-column: 1 / -1;
   display: flex;
