@@ -137,6 +137,7 @@ const LANG_DATA = {
     'pet.pet35.element': '水',
     'pet.pet36.element': '水',
     'pet.pet37.element': '水',
+    'pet.pet38.element': '水',
     'pet.pet41.element': '水',
     'pet.pet42.element': '水',
     'pet.pet46.element': '水',
@@ -247,6 +248,11 @@ const LANG_DATA = {
     'battle.victory.desc': '精彩！旋轉轉盤獲取獎勵！',
     'battle.spin': '🎰 轉動轉盤！',
     'battle.super_effective': '效果絕佳！',
+    // 屬性名稱
+    'element.水': '水',
+    'element.火': '火',
+    'element.木': '木',
+    'element.土': '土',
     // BOSS 挑戰卷確認彈窗
     'boss.ticket.confirm.title': '使用 BOSS 挑戰卷',
     'boss.ticket.confirm.desc': '確定使用挑戰卷挑戰',
@@ -516,6 +522,7 @@ const LANG_DATA = {
     'pet.pet35.element': '水',
     'pet.pet36.element': '水',
     'pet.pet37.element': '水',
+    'pet.pet38.element': '水',
     'pet.pet41.element': '水',
     'pet.pet42.element': '水',
     'pet.pet46.element': '水',
@@ -626,6 +633,11 @@ const LANG_DATA = {
     'battle.victory.desc': 'Spin the wheel to get rewards!',
     'battle.spin': '🎰 Spin Wheel!',
     'battle.super_effective': 'Super Effective!',
+    // Element names
+    'element.水': 'Water',
+    'element.火': 'Fire',
+    'element.木': 'Wood',
+    'element.土': 'Earth',
     // BOSS Ticket Confirm Modal
     'boss.ticket.confirm.title': 'Use BOSS Challenge Ticket',
     'boss.ticket.confirm.desc': 'Use a ticket to challenge',

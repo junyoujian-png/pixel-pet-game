@@ -1559,6 +1559,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   text-align: center;
   line-height: 1;
 }
+.battle-pet-counter {
+  font-size: 10px;
+  font-weight: 900;
+  margin-left: 1px;
+}
+.battle-pet-counter--up   { color: #4caf50; }
+.battle-pet-counter--down { color: #e53935; }
 .battle-ap-ring {
   position: relative;
   width: 74px;
@@ -1653,6 +1660,11 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .battle-boss-lv {
   font-size: 10px;
   color: #e57373;
+  font-weight: 600;
+}
+.battle-boss-element-label {
+  font-size: 10px;
+  color: #bbb;
   font-weight: 600;
 }
 .b-hp-wrap { width: 100%; }
@@ -2060,6 +2072,11 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   font-size: 14px;
   font-weight: 700;
   color: var(--text);
+}
+.boss-card__element {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text2);
 }
 .boss-card__level {
   font-size: 11px;

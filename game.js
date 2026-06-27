@@ -222,7 +222,11 @@ const isEffective = (attackerElement, defenderElement) => {
 };
 
 const getPetElement = (petId) => {
-  return t(`pet.${petId}.element`) || '無';
+  // BOSSES entries use id 'boss_NN', but their element keys (like their nameKeys)
+  // are stored under the PETS-style 'boss_pet_NN' id — convert transparently so
+  // every caller can just pass boss.id / pet.id without worrying about this.
+  const lookupId = /^boss_\d+$/.test(petId) ? petId.replace('boss_', 'boss_pet_') : petId;
+  return t(`pet.${lookupId}.element`) || '無';
 };
 
 const calcDamage = (attackerAtk, skillPower, defenderDef, critRate, elementMultiplier = 1) => {
@@ -580,7 +584,7 @@ function showPetDetail(petIdOverride = null) {
 
   const element = getPetElement(pet.id);
   const elementEl = document.getElementById('detail-pet-element');
-  elementEl.textContent = `${ELEMENT_ICON[element] || ''}${element}`;
+  elementEl.textContent = `${ELEMENT_ICON[element] || ''}${t('element.' + element)}`;
 
   document.getElementById('detail-hp').textContent         = stats.hp;
   document.getElementById('detail-atk').textContent        = stats.atk;
@@ -2297,6 +2301,11 @@ function renderBossList() {
           <div class="boss-card__name-row">
             <span class="boss-card__name">${t(boss.nameKey)}</span>
             <span class="badge badge--${boss.reward.rarity.toLowerCase()}">${boss.reward.rarity}</span>
+            <span class="boss-card__element">${(() => {
+              const bossElement = getPetElement(boss.id);
+              const elementIcon = ELEMENT_ICON[bossElement] || '';
+              return `${elementIcon}${t('element.' + bossElement)}`;
+            })()}</span>
           </div>
         </div>
         <div class="boss-card__action">${actionHtml}</div>
@@ -2597,10 +2606,18 @@ function renderBattleUI() {
 function renderBattlePets() {
   const col = document.getElementById('battle-pets-col');
   if (!col || !bSt) return;
+  const bossElement = getPetElement(bSt.boss.id);
   col.innerHTML = bSt.pets.map((entry, idx) => {
     if (!entry) return `<div class="battle-pet-unit battle-pet-unit--empty"></div>`;
     const hpPct = Math.max(0, Math.round(entry.hp / entry.maxHp * 100));
     const dead  = entry.hp <= 0;
+    const petElement = getPetElement(entry.pet.id);
+    let counterHint = '';
+    if (isEffective(petElement, bossElement)) {
+      counterHint = `<span class="battle-pet-counter battle-pet-counter--up">▲</span>`;
+    } else if (isEffective(bossElement, petElement)) {
+      counterHint = `<span class="battle-pet-counter battle-pet-counter--down">▼</span>`;
+    }
     return `
       <div class="battle-pet-unit${dead ? ' dead' : ''}" id="battle-pet-unit-${idx}">
         <div class="b-hp-wrap">
@@ -2609,7 +2626,7 @@ function renderBattlePets() {
         </div>
         <img src="${entry.pet.image}" class="battle-pet-sprite" id="battle-pet-sprite-${idx}"
              alt="${t(entry.pet.nameKey)}" onerror="this.style.opacity='0.3'">
-        <div class="battle-pet-element">${ELEMENT_ICON[getPetElement(entry.pet.id)] || ''}</div>
+        <div class="battle-pet-element">${ELEMENT_ICON[petElement] || ''}${counterHint}</div>
         <div class="battle-pet-name-small">${t(entry.pet.nameKey)}</div>
       </div>`;
   }).join('');
@@ -2619,14 +2636,17 @@ function renderBattlePets() {
 function renderBattleBoss() {
   const col = document.getElementById('battle-boss-col');
   if (!col || !bSt) return;
-  const hpPct = Math.max(0, Math.round(bSt.bossHp / bSt.bossMaxHp * 100));
+  const hpPct      = Math.max(0, Math.round(bSt.bossHp / bSt.bossMaxHp * 100));
+  const bossElement = getPetElement(bSt.boss.id);
+  const elementIcon = ELEMENT_ICON[bossElement] || '';
   col.innerHTML = `
     <img src="${bSt.boss.image}" class="battle-boss-sprite" id="battle-boss-sprite"
          alt="${t(bSt.boss.nameKey)}" onerror="this.style.opacity='0.3'">
-    <div class="battle-boss-element">${ELEMENT_ICON[getPetElement(bSt.boss.id)] || ''}</div>
+    <div class="battle-boss-element">${elementIcon}</div>
     <div class="battle-boss-name-row">
       <span class="battle-boss-name">${t(bSt.boss.nameKey)}</span>
       <span class="battle-boss-lv">Lv.${bSt.boss.level}</span>
+      <span class="battle-boss-element-label">${elementIcon}${t('element.' + bossElement)}</span>
     </div>
     <div class="b-hp-wrap" style="width:min(240px,80%)">
       <div class="b-hp-track"><div class="b-hp-bar b-hp-bar--boss" style="width:${hpPct}%"></div></div>
