@@ -202,14 +202,38 @@ const calcBossStats = (boss, level) => ({
 
 const SKILL_CRIT_RATE = { F: 0.05, R: 0.08, SR: 0.12, SSR: 0.15 };
 
-const calcDamage = (attackerAtk, skillPower, defenderDef, critRate) => {
+// ─── Pet Elements ────────────────────────────────────────────────────────────
+const ELEMENT_ICON = {
+  '水': '💧',
+  '火': '🔥',
+  '木': '🌳',
+  '土': '⛰️',
+};
+
+const ELEMENT_COUNTER = {
+  '水': '火', // 水克火
+  '火': '木', // 火克木
+  '木': '土', // 木克土
+  '土': '水', // 土克水
+};
+
+const isEffective = (attackerElement, defenderElement) => {
+  return ELEMENT_COUNTER[attackerElement] === defenderElement;
+};
+
+const getPetElement = (petId) => {
+  return t(`pet.${petId}.element`) || '無';
+};
+
+const calcDamage = (attackerAtk, skillPower, defenderDef, critRate, elementMultiplier = 1) => {
   const base     = attackerAtk * skillPower;
   const defense  = Math.floor(defenderDef * 0.5);
   const raw      = Math.max(1, base - defense);
   const variance = 0.9 + Math.random() * 0.2;
   const isCrit   = Math.random() < (critRate || 0.05);
-  const dmg      = Math.floor(raw * variance * (isCrit ? 1.5 : 1));
-  return { dmg, crit: isCrit };
+  let dmg        = Math.floor(raw * variance * (isCrit ? 1.5 : 1));
+  dmg = Math.floor(dmg * elementMultiplier);
+  return { dmg, crit: isCrit, superEffective: elementMultiplier > 1 };
 };
 
 const getPetSkills = (pet) => pet.skills || RARITY_SKILLS[pet.rarity] || RARITY_SKILLS.F;
@@ -553,6 +577,10 @@ function showPetDetail(petIdOverride = null) {
   const badge = document.getElementById('detail-pet-rarity');
   badge.textContent = pet.rarity;
   badge.className   = `badge badge--${pet.rarity.toLowerCase()}`;
+
+  const element = getPetElement(pet.id);
+  const elementEl = document.getElementById('detail-pet-element');
+  elementEl.textContent = `${ELEMENT_ICON[element] || ''}${element}`;
 
   document.getElementById('detail-hp').textContent         = stats.hp;
   document.getElementById('detail-atk').textContent        = stats.atk;
@@ -2581,6 +2609,7 @@ function renderBattlePets() {
         </div>
         <img src="${entry.pet.image}" class="battle-pet-sprite" id="battle-pet-sprite-${idx}"
              alt="${t(entry.pet.nameKey)}" onerror="this.style.opacity='0.3'">
+        <div class="battle-pet-element">${ELEMENT_ICON[getPetElement(entry.pet.id)] || ''}</div>
         <div class="battle-pet-name-small">${t(entry.pet.nameKey)}</div>
       </div>`;
   }).join('');
@@ -2594,6 +2623,7 @@ function renderBattleBoss() {
   col.innerHTML = `
     <img src="${bSt.boss.image}" class="battle-boss-sprite" id="battle-boss-sprite"
          alt="${t(bSt.boss.nameKey)}" onerror="this.style.opacity='0.3'">
+    <div class="battle-boss-element">${ELEMENT_ICON[getPetElement(bSt.boss.id)] || ''}</div>
     <div class="battle-boss-name-row">
       <span class="battle-boss-name">${t(bSt.boss.nameKey)}</span>
       <span class="battle-boss-lv">Lv.${bSt.boss.level}</span>
@@ -2653,7 +2683,11 @@ function battleUseCard(handIdx) {
   const attacker = bSt.pets[card.petIdx];
   if (!attacker || attacker.hp <= 0) { showToast('該寵物已倒下！'); return; }
 
-  const { dmg, crit } = calcDamage(attacker.stats.atk, card.skill.power, bSt.bossStats.def, attacker.critRate);
+  const attackerElement   = getPetElement(attacker.pet.id);
+  const defenderElement   = getPetElement(bSt.boss.id);
+  const elementMultiplier = isEffective(attackerElement, defenderElement) ? 2.0 : 1.0;
+
+  const { dmg, crit, superEffective } = calcDamage(attacker.stats.atk, card.skill.power, bSt.bossStats.def, attacker.critRate, elementMultiplier);
   console.log('[Battle] damage dealt:', dmg, crit ? '(crit)' : '', '| boss hp after:', Math.max(0, bSt.bossHp - dmg));
   sfxAttack();
   bSt.bossHp = Math.max(0, bSt.bossHp - dmg);
@@ -2665,7 +2699,7 @@ function battleUseCard(handIdx) {
     bossSprite.classList.add('boss-hit');
     setTimeout(() => bossSprite?.classList.remove('boss-hit'), 200);
   }
-  bDmgFloat('battle-boss-col', dmg, crit);
+  bDmgFloat('battle-boss-col', dmg, crit, false, superEffective);
 
   renderBattleBoss();
   renderBattleAP();
@@ -2702,7 +2736,12 @@ function bossTurnAnimate() {
   if (alivePets.length === 0) { endBattle(false); return; }
 
   const target = alivePets[Math.floor(Math.random() * alivePets.length)];
-  const { dmg, crit } = calcDamage(bSt.bossStats.atk, 1.0, target.entry.stats.def, 0.05);
+
+  const attackerElement   = getPetElement(bSt.boss.id);
+  const defenderElement   = getPetElement(target.entry.pet.id);
+  const elementMultiplier = isEffective(attackerElement, defenderElement) ? 2.0 : 1.0;
+
+  const { dmg, crit, superEffective } = calcDamage(bSt.bossStats.atk, 1.0, target.entry.stats.def, 0.05, elementMultiplier);
   sfxAttack();
   target.entry.hp = Math.max(0, target.entry.hp - dmg);
 
@@ -2727,7 +2766,7 @@ function bossTurnAnimate() {
     petSprite.classList.add('shake-hit');
     setTimeout(() => petSprite?.classList.remove('shake-hit'), 400);
   }
-  bDmgFloat(`battle-pet-unit-${target.idx}`, dmg, crit);
+  bDmgFloat(`battle-pet-unit-${target.idx}`, dmg, crit, false, superEffective);
 
   renderBattlePets();
 
@@ -2751,12 +2790,15 @@ function newBattleRound() {
   renderBattleUI();
 }
 
-function bDmgFloat(parentId, dmg, crit, heal = false) {
+function bDmgFloat(parentId, dmg, crit, heal = false, superEffective = false) {
   const parent = document.getElementById(parentId);
   if (!parent) return;
   const el = document.createElement('div');
-  el.className = 'b-dmg-float' + (crit ? ' b-dmg-float--crit' : '') + (heal ? ' b-dmg-float--heal' : '');
-  el.textContent = heal ? `+${dmg}` : (crit ? `💥${dmg}` : `${dmg}`);
+  el.className = 'b-dmg-float' + (crit ? ' b-dmg-float--crit' : '') + (heal ? ' b-dmg-float--heal' : '') + (superEffective ? ' b-dmg-float--super' : '');
+  const numberText = heal ? `+${dmg}` : (crit ? `💥${dmg}` : `${dmg}`);
+  el.innerHTML = superEffective
+    ? `<div class="b-dmg-float__super-label">${t('battle.super_effective')}</div>${numberText}`
+    : numberText;
   parent.style.position = 'relative';
   parent.appendChild(el);
   setTimeout(() => el.remove(), 900);

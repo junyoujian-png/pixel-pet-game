@@ -1340,6 +1340,12 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   gap: 8px;
 }
 
+.pet-element {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+}
+
 /* 2×2 Combat Stats Grid */
 .detail-stats-grid {
   display: grid;
@@ -1548,6 +1554,11 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   max-width: 80px;
   text-overflow: ellipsis;
 }
+.battle-pet-element {
+  font-size: 12px;
+  text-align: center;
+  line-height: 1;
+}
 .battle-ap-ring {
   position: relative;
   width: 74px;
@@ -1622,6 +1633,11 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   image-rendering: pixelated;
   object-fit: contain;
   transform: scaleX(-1);
+}
+.battle-boss-element {
+  font-size: 14px;
+  text-align: center;
+  line-height: 1;
 }
 .battle-boss-name-row {
   display: flex;
@@ -1746,6 +1762,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 .b-dmg-float--crit { color: #ff6d00; font-size: 21px; }
 .b-dmg-float--heal { color: #66bb6a; }
+.b-dmg-float--super { color: #ff6d00; }
+.b-dmg-float__super-label { font-size: 11px; font-weight: 800; color: #ff6d00; white-space: nowrap; }
 @keyframes bDmgRise {
   0%   { opacity: 1; transform: translateX(-50%) translateY(0); }
   100% { opacity: 0; transform: translateX(-50%) translateY(-48px); }
