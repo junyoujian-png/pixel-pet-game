@@ -2111,7 +2111,7 @@ const DEFAULT_FOCUS_TASKS = [
   { id: 'relax',    name: '放鬆',   nameEn: 'Relax',    minutes: 20 },
 ];
 const FOCUS_DURATION_OPTIONS = [5, 10, 15, 20, 25, 30, 45, 50, 60, 90];
-const FOCUS_EXP_PER_MINUTE = 2;
+const FOCUS_COMPLETE_COIN_REWARD = 100;
 
 function loadFocusTasks() {
   try {
@@ -2414,15 +2414,15 @@ function stopFocusTimer() {
 function completeFocusTimer() {
   if (!focusTimerState) return;
   clearInterval(focusTimerState.intervalId);
-  const minutes = Math.round(focusTimerState.totalSeconds / 60);
-  const reward  = Math.round(minutes * FOCUS_EXP_PER_MINUTE);
   focusTimerState = null;
   stopFocusSound();
   document.getElementById('screen-focus-timer')?.classList.add('hidden');
-  addExp(reward);
+  state.coins += FOCUS_COMPLETE_COIN_REWARD;
+  saveState();
+  renderCoins();
   trackQuestEvent('focus_complete');
   renderFocusPetDisplay('focus-complete-pet-img', 'focus-complete-pet-fallback');
-  document.getElementById('focus-complete-exp').textContent = `+${reward} EXP`;
+  showToast(t('focus.complete.toast'));
   openModal('modal-focus-complete');
 }
 
