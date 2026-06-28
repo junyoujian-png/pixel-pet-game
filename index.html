@@ -635,6 +635,60 @@
     </div>
   </div>
 
+  <!-- Focus Timer: Task Grid Screen -->
+  <div id="screen-focus" class="screen-focus hidden">
+    <div class="focus-header">
+      <button class="shop-back-btn" onclick="hideFocusPage()" data-i18n="focus.back">← 返回</button>
+      <h2 class="focus-title" data-i18n="focus.title">專注</h2>
+    </div>
+    <div class="focus-body">
+      <div class="focus-task-grid" id="focus-task-grid"></div>
+    </div>
+  </div>
+
+  <!-- Focus Timer: Add/Edit Task Modal -->
+  <div id="modal-focus-task-edit" class="modal hidden">
+    <div class="modal-box">
+      <h2 class="focus-edit-title" id="focus-edit-title"></h2>
+      <div class="focus-edit-field">
+        <label data-i18n="focus.name">任務名稱</label>
+        <input type="text" id="focus-task-name-input" class="settings-text-input" maxlength="12">
+      </div>
+      <div class="focus-edit-field">
+        <label data-i18n="focus.time">時間（分鐘）</label>
+        <div class="focus-minute-grid" id="focus-minute-grid"></div>
+      </div>
+      <div class="focus-edit-actions">
+        <button class="btn-cancel" onclick="closeModal('modal-focus-task-edit')" data-i18n="focus.cancel">取消</button>
+        <button class="btn-confirm-ticket" onclick="saveFocusTaskFromModal()" data-i18n="focus.save">儲存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Focus Timer: Task Options Modal (long-press) -->
+  <div id="modal-focus-task-options" class="modal hidden">
+    <div class="modal-box modal-team-options-box">
+      <div class="team-options-preview">
+        <span id="focus-options-task-name" class="team-options-name"></span>
+      </div>
+      <div class="team-options-btns">
+        <button class="team-options-btn" onclick="editFocusTaskFromOptions()">✏️ <span data-i18n="focus.edit">編輯</span></button>
+        <button class="team-options-btn team-options-btn--danger" onclick="deleteFocusTaskFromOptions()">🗑️ <span data-i18n="focus.delete">刪除</span></button>
+      </div>
+      <button class="btn-cancel" onclick="closeModal('modal-focus-task-options')" data-i18n="focus.cancel">取消</button>
+    </div>
+  </div>
+
+  <!-- Focus Timer: Active Countdown Screen -->
+  <div id="screen-focus-timer" class="screen-focus-timer hidden">
+    <div class="focus-timer-task-name" id="focus-timer-task-name"></div>
+    <div class="focus-timer-display" id="focus-timer-display">00:00</div>
+    <div class="focus-timer-actions">
+      <button class="focus-timer-btn" id="btn-focus-pause" onclick="toggleFocusPause()" data-i18n="focus.pause">暫停</button>
+      <button class="focus-timer-btn focus-timer-btn--danger" onclick="stopFocusTimer()" data-i18n="focus.stop">結束</button>
+    </div>
+  </div>
+
   <!-- Ad Overlay (fullscreen, not part of modal system) -->
   <div id="modal-ad" class="ad-overlay hidden">
     <div class="ad-content">

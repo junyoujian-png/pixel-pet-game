@@ -2099,8 +2099,202 @@ function renderSlotPage(slotIdx) {
   `;
 }
 
+// ─── Focus Timer ──────────────────────────────────────────────────────────────
+const DEFAULT_FOCUS_TASKS = [
+  { id: 'work',     name: '工作',   nameEn: 'Work',     minutes: 25 },
+  { id: 'design',   name: '設計',   nameEn: 'Design',   minutes: 30 },
+  { id: 'sport',    name: '運動',   nameEn: 'Exercise', minutes: 25 },
+  { id: 'study',    name: '學習',   nameEn: 'Study',    minutes: 45 },
+  { id: 'read',     name: '閱讀',   nameEn: 'Reading',  minutes: 15 },
+  { id: 'code',     name: '寫代碼', nameEn: 'Coding',   minutes: 50 },
+  { id: 'meditate', name: '冥想',   nameEn: 'Meditate', minutes: 20 },
+  { id: 'relax',    name: '放鬆',   nameEn: 'Relax',    minutes: 20 },
+];
+const FOCUS_DURATION_OPTIONS = [5, 10, 15, 20, 25, 30, 45, 50, 60, 90];
+const FOCUS_EXP_PER_MINUTE = 2;
+
+function loadFocusTasks() {
+  try {
+    const raw = localStorage.getItem('focusTasks');
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return DEFAULT_FOCUS_TASKS.map(task => ({ ...task }));
+}
+function saveFocusTasks(tasks) {
+  localStorage.setItem('focusTasks', JSON.stringify(tasks));
+}
+const getFocusTaskName = (task) => (currentLang === 'en' && task.nameEn) ? task.nameEn : task.name;
+const formatFocusTime  = (totalSeconds) => {
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+};
+
 function openFocusTimer() {
-  showToast(t('toast.coming_soon'));
+  document.getElementById('screen-focus')?.classList.remove('hidden');
+  renderFocusTaskGrid();
+  applyLang();
+}
+
+function hideFocusPage() {
+  document.getElementById('screen-focus')?.classList.add('hidden');
+}
+
+function renderFocusTaskGrid() {
+  const grid = document.getElementById('focus-task-grid');
+  if (!grid) return;
+  const tasks = loadFocusTasks();
+  grid.innerHTML = tasks.map(task => `
+    <div class="focus-task-card" data-task-id="${task.id}">
+      <div class="focus-task-card__name">${getFocusTaskName(task)}</div>
+      <div class="focus-task-card__time">${formatFocusTime(task.minutes * 60)}</div>
+    </div>`).join('') +
+    `<button class="focus-task-card focus-task-card--add" onclick="openFocusTaskModal()">${t('focus.new')}</button>`;
+
+  // Click starts the timer; a ~500ms press-and-hold opens edit/delete options instead.
+  grid.querySelectorAll('.focus-task-card[data-task-id]').forEach(card => {
+    const taskId = card.dataset.taskId;
+    let pressTimer  = null;
+    let longPressed = false;
+    const startPress = () => {
+      longPressed = false;
+      pressTimer = setTimeout(() => { longPressed = true; openFocusTaskOptions(taskId); }, 500);
+    };
+    const endPress = () => clearTimeout(pressTimer);
+    card.addEventListener('mousedown', startPress);
+    card.addEventListener('touchstart', startPress);
+    card.addEventListener('mouseup', endPress);
+    card.addEventListener('mouseleave', endPress);
+    card.addEventListener('touchend', endPress);
+    card.addEventListener('click', () => { if (!longPressed) startFocusTimer(taskId); });
+  });
+}
+
+// ── Add / Edit Task Modal ──
+let focusEditingTaskId = null;
+let focusSelectedMinutes = 25;
+
+function openFocusTaskModal(taskId = null) {
+  focusEditingTaskId = taskId;
+  const task = taskId ? loadFocusTasks().find(t => t.id === taskId) : null;
+  document.getElementById('focus-edit-title').textContent = t(task ? 'focus.edit' : 'focus.new');
+  document.getElementById('focus-task-name-input').value  = task ? task.name : '';
+  focusSelectedMinutes = task ? task.minutes : 25;
+  renderFocusMinutePicker(focusSelectedMinutes);
+  openModal('modal-focus-task-edit');
+}
+
+function renderFocusMinutePicker(selected) {
+  const grid = document.getElementById('focus-minute-grid');
+  if (!grid) return;
+  grid.innerHTML = FOCUS_DURATION_OPTIONS.map(m =>
+    `<button type="button" class="focus-minute-btn${m === selected ? ' active' : ''}" onclick="selectFocusMinutes(${m})">${m}</button>`
+  ).join('');
+}
+
+function selectFocusMinutes(minutes) {
+  focusSelectedMinutes = minutes;
+  renderFocusMinutePicker(minutes);
+}
+
+function saveFocusTaskFromModal() {
+  const name = document.getElementById('focus-task-name-input').value.trim();
+  if (!name) return;
+  const tasks = loadFocusTasks();
+  if (focusEditingTaskId) {
+    const task = tasks.find(t => t.id === focusEditingTaskId);
+    if (task) { task.name = name; task.minutes = focusSelectedMinutes; delete task.nameEn; }
+  } else {
+    tasks.push({ id: `custom_${Date.now()}`, name, minutes: focusSelectedMinutes });
+  }
+  saveFocusTasks(tasks);
+  closeModal('modal-focus-task-edit');
+  renderFocusTaskGrid();
+}
+
+// ── Long-press Options Modal (Edit / Delete) ──
+let focusOptionsTaskId = null;
+
+function openFocusTaskOptions(taskId) {
+  focusOptionsTaskId = taskId;
+  const task = loadFocusTasks().find(t => t.id === taskId);
+  document.getElementById('focus-options-task-name').textContent = task ? getFocusTaskName(task) : '';
+  openModal('modal-focus-task-options');
+}
+
+function editFocusTaskFromOptions() {
+  closeModal('modal-focus-task-options');
+  openFocusTaskModal(focusOptionsTaskId);
+}
+
+function deleteFocusTaskFromOptions() {
+  if (!focusOptionsTaskId) return;
+  saveFocusTasks(loadFocusTasks().filter(t => t.id !== focusOptionsTaskId));
+  closeModal('modal-focus-task-options');
+  renderFocusTaskGrid();
+}
+
+// ── Active Countdown ──
+let focusTimerState = null; // { taskId, taskName, totalSeconds, remainingSeconds, intervalId, paused }
+
+function startFocusTimer(taskId) {
+  const task = loadFocusTasks().find(t => t.id === taskId);
+  if (!task) return;
+  const totalSeconds = task.minutes * 60;
+  focusTimerState = {
+    taskId,
+    taskName: getFocusTaskName(task),
+    totalSeconds,
+    remainingSeconds: totalSeconds,
+    intervalId: null,
+    paused: false,
+  };
+  document.getElementById('focus-timer-task-name').textContent = focusTimerState.taskName;
+  document.getElementById('btn-focus-pause').textContent = t('focus.pause');
+  renderFocusTimerDisplay();
+  document.getElementById('screen-focus')?.classList.add('hidden');
+  document.getElementById('screen-focus-timer')?.classList.remove('hidden');
+  focusTimerState.intervalId = setInterval(tickFocusTimer, 1000);
+}
+
+function renderFocusTimerDisplay() {
+  const el = document.getElementById('focus-timer-display');
+  if (el && focusTimerState) el.textContent = formatFocusTime(focusTimerState.remainingSeconds);
+}
+
+function tickFocusTimer() {
+  if (!focusTimerState || focusTimerState.paused) return;
+  focusTimerState.remainingSeconds--;
+  renderFocusTimerDisplay();
+  if (focusTimerState.remainingSeconds <= 0) completeFocusTimer();
+}
+
+function toggleFocusPause() {
+  if (!focusTimerState) return;
+  focusTimerState.paused = !focusTimerState.paused;
+  document.getElementById('btn-focus-pause').textContent = t(focusTimerState.paused ? 'focus.resume' : 'focus.pause');
+}
+
+function stopFocusTimer() {
+  if (focusTimerState?.intervalId) clearInterval(focusTimerState.intervalId);
+  focusTimerState = null;
+  document.getElementById('screen-focus-timer')?.classList.add('hidden');
+  document.getElementById('screen-focus')?.classList.remove('hidden');
+  renderFocusTaskGrid();
+}
+
+function completeFocusTimer() {
+  if (!focusTimerState) return;
+  clearInterval(focusTimerState.intervalId);
+  const minutes = Math.round(focusTimerState.totalSeconds / 60);
+  const reward  = Math.round(minutes * FOCUS_EXP_PER_MINUTE);
+  focusTimerState = null;
+  document.getElementById('screen-focus-timer')?.classList.add('hidden');
+  document.getElementById('screen-focus')?.classList.remove('hidden');
+  renderFocusTaskGrid();
+  addExp(reward);
+  trackQuestEvent('focus_complete');
+  showToast(`${t('focus.complete')} +${reward} EXP`);
 }
 
 function updateSlotDots(activeIdx) {
