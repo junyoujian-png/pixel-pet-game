@@ -689,6 +689,7 @@
     <div class="focus-timer-meta">
       <span class="focus-timer-task-name" id="focus-timer-task-name"></span>
       <button class="focus-timer-pause-icon" id="btn-focus-pause" onclick="toggleFocusPause()">⏸</button>
+      <button class="focus-timer-pause-icon" id="btn-focus-sound" onclick="openFocusSoundModal()">🎵</button>
     </div>
     <button class="focus-abandon-btn" id="btn-focus-abandon"></button>
   </div>
@@ -719,6 +720,15 @@
         <button class="btn-cancel" onclick="goHomeFromFocusFail()" data-i18n="focus.home">返回首頁</button>
         <button class="btn-confirm" onclick="restartFromFocusFail()" data-i18n="focus.restart">重新開始</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Focus Timer: Background Sound Picker -->
+  <div id="modal-focus-sound" class="modal hidden">
+    <div class="modal-box focus-sound-box">
+      <h2 class="focus-sound-title" data-i18n="focus.sound">背景音效</h2>
+      <div class="focus-sound-grid" id="focus-sound-grid"></div>
+      <button class="btn-cancel" onclick="closeModal('modal-focus-sound')" data-i18n="focus.cancel">取消</button>
     </div>
   </div>
 

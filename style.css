@@ -1226,6 +1226,42 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .focus-fail-actions .btn-cancel  { flex: 1; margin-top: 0; }
 .focus-fail-actions .btn-confirm { flex: 1; padding: 10px; }
 
+/* Background sound picker */
+.focus-sound-box { max-width: 360px; }
+.focus-sound-title { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 14px; text-align: center; }
+.focus-sound-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.focus-sound-card {
+  position: relative;
+  background: var(--surface2);
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  padding: 14px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.focus-sound-card:hover  { border-color: var(--accent); transform: translateY(-1px); }
+.focus-sound-card:active { transform: scale(0.97); }
+.focus-sound-card.active { border-color: var(--accent); background: var(--surface); }
+.focus-sound-check {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 12px;
+}
+.focus-sound-icon { font-size: 26px; line-height: 1; }
+.focus-sound-name { font-size: 13px; font-weight: 700; color: var(--text); }
+.focus-sound-desc { font-size: 10px; color: var(--text2); }
+
 /* ─── Ad Overlay ─── */
 .ad-overlay {
   position: fixed;

@@ -2282,6 +2282,7 @@ function startFocusTimer(taskId) {
   renderFocusPetDisplay('focus-timer-pet-img', 'focus-timer-pet-fallback');
   renderFocusTimerDisplay();
   renderFocusAbandonButton();
+  playFocusSound(loadFocusSoundId());
   document.getElementById('screen-focus')?.classList.add('hidden');
   document.getElementById('screen-focus-timer')?.classList.remove('hidden');
   focusTimerState.intervalId = setInterval(tickFocusTimer, 1000);
@@ -2377,6 +2378,7 @@ function confirmFocusAbandon() {
   applyFocusAbandonPenalty();
   if (focusTimerState?.intervalId) clearInterval(focusTimerState.intervalId);
   focusTimerState = null;
+  stopFocusSound();
   document.getElementById('screen-focus-timer')?.classList.add('hidden');
   renderFocusPetDisplay('focus-fail-pet-img', 'focus-fail-pet-fallback');
   openModal('modal-focus-fail');
@@ -2407,6 +2409,7 @@ function stopFocusTimer() {
   cancelFocusAbandonHold();
   if (focusTimerState?.intervalId) clearInterval(focusTimerState.intervalId);
   focusTimerState = null;
+  stopFocusSound();
   document.getElementById('screen-focus-timer')?.classList.add('hidden');
   document.getElementById('screen-focus')?.classList.remove('hidden');
   renderFocusTaskGrid();
@@ -2418,6 +2421,7 @@ function completeFocusTimer() {
   const minutes = Math.round(focusTimerState.totalSeconds / 60);
   const reward  = Math.round(minutes * FOCUS_EXP_PER_MINUTE);
   focusTimerState = null;
+  stopFocusSound();
   document.getElementById('screen-focus-timer')?.classList.add('hidden');
   addExp(reward);
   trackQuestEvent('focus_complete');
@@ -2430,6 +2434,178 @@ function closeFocusCompleteModal() {
   closeModal('modal-focus-complete');
   document.getElementById('screen-focus')?.classList.remove('hidden');
   renderFocusTaskGrid();
+}
+
+// ── Background Sound (Web Audio API, synthesized — no audio files) ──
+const FOCUS_SOUNDS = [
+  { id: 'silent', name: '靜音',   nameEn: 'Silent',      desc: '關閉播放',   descEn: 'No sound',        type: 'none',   icon: '🔇' },
+  { id: 'white',  name: '白噪音', nameEn: 'White Noise', desc: '經典均衡',   descEn: 'Classic balance', type: 'noise',  icon: '⚪' },
+  { id: 'rain',   name: '雨聲',   nameEn: 'Rain',        desc: '舒緩雨聲',   descEn: 'Gentle rain',     type: 'rain',   icon: '🌧️' },
+  { id: 'wave',   name: '海浪',   nameEn: 'Ocean',       desc: '海浪起伏',   descEn: 'Ocean waves',     type: 'wave',   icon: '🌊' },
+  { id: 'forest', name: '森林',   nameEn: 'Forest',      desc: '林間氛圍',   descEn: 'Forest ambience', type: 'forest', icon: '🌲' },
+  { id: 'fire',   name: '篝火',   nameEn: 'Campfire',    desc: '火焰劈啪',   descEn: 'Crackling fire',  type: 'fire',   icon: '🔥' },
+  { id: 'stream', name: '溪水',   nameEn: 'Stream',      desc: '溪水潺潺',   descEn: 'Flowing stream',  type: 'stream', icon: '💧' },
+  { id: 'subway', name: '地鐵',   nameEn: 'Subway',      desc: '地鐵車廂',   descEn: 'Subway car',      type: 'subway', icon: '🚇' },
+];
+
+const getFocusSoundName = (sound) => t('focus.sound.' + sound.id);
+const getFocusSoundDesc = (sound) => (currentLang === 'en' && sound.descEn) ? sound.descEn : sound.desc;
+
+function loadFocusSoundId() {
+  try { return localStorage.getItem('focusSound') || 'silent'; } catch { return 'silent'; }
+}
+function saveFocusSoundId(id) { localStorage.setItem('focusSound', id); }
+
+function createFocusNoiseSource() {
+  const ctx = getAudioCtx();
+  const bufferSize = ctx.sampleRate * 2;
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+  source.loop = true;
+  return source;
+}
+
+let focusSoundNodes = null; // cleanup handle for the currently playing sound, or null
+
+function stopFocusSound() {
+  if (!focusSoundNodes) return;
+  try { focusSoundNodes.stop(); } catch {}
+  focusSoundNodes = null;
+}
+
+function playFocusSound(soundId) {
+  stopFocusSound();
+  const sound = FOCUS_SOUNDS.find(s => s.id === soundId);
+  if (!sound || sound.type === 'none') return;
+
+  const ctx = getAudioCtx();
+  const vol = getMasterVolume();
+
+  // Plain white noise — no filtering, matches the classic "tv static" sound.
+  if (sound.type === 'noise') {
+    const source = createFocusNoiseSource();
+    const gain = ctx.createGain();
+    gain.gain.value = 0.1 * vol;
+    source.connect(gain);
+    gain.connect(ctx.destination);
+    source.start();
+    focusSoundNodes = { stop() { try { source.stop(); } catch {} source.disconnect(); gain.disconnect(); } };
+    return;
+  }
+
+  // Single-filter variants: noise -> one biquad filter -> gain.
+  if (sound.type === 'rain' || sound.type === 'forest' || sound.type === 'stream') {
+    const source = createFocusNoiseSource();
+    const filter = ctx.createBiquadFilter();
+    const gain   = ctx.createGain();
+    if (sound.type === 'rain')   { filter.type = 'lowpass';  filter.frequency.value = 400;  gain.gain.value = 0.15 * vol; }
+    if (sound.type === 'forest') { filter.type = 'highpass'; filter.frequency.value = 2000; gain.gain.value = 0.08 * vol; }
+    if (sound.type === 'stream') { filter.type = 'bandpass'; filter.frequency.value = 800; filter.Q.value = 0.7; gain.gain.value = 0.12 * vol; }
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    source.start();
+    focusSoundNodes = { stop() { try { source.stop(); } catch {} source.disconnect(); filter.disconnect(); gain.disconnect(); } };
+    return;
+  }
+
+  // Periodic-swell variants: noise -> lowpass -> gain, with an LFO breathing the volume.
+  if (sound.type === 'wave' || sound.type === 'subway') {
+    const source = createFocusNoiseSource();
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = sound.type === 'wave' ? 600 : 200;
+    const baseVol = (sound.type === 'wave' ? 0.12 : 0.15) * vol;
+    const gain = ctx.createGain();
+    gain.gain.value = baseVol;
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = sound.type === 'wave' ? (1 / 4) : (1 / 6); // ~4s wave swell, ~6s rumble
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.value = baseVol * 0.6; // modulation depth, kept under baseVol so gain never goes negative
+    lfo.connect(lfoGain);
+    lfoGain.connect(gain.gain);
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    source.start();
+    lfo.start();
+    focusSoundNodes = {
+      stop() {
+        try { source.stop(); } catch {}
+        try { lfo.stop(); } catch {}
+        source.disconnect(); filter.disconnect(); gain.disconnect(); lfo.disconnect(); lfoGain.disconnect();
+      },
+    };
+    return;
+  }
+
+  // Campfire: bandpass noise wandering 200-800Hz, plus random crackle pops.
+  if (sound.type === 'fire') {
+    const source = createFocusNoiseSource();
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 500;
+    filter.Q.value = 1;
+    const gain = ctx.createGain();
+    gain.gain.value = 0.12 * vol;
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    source.start();
+
+    const wanderInterval = setInterval(() => {
+      filter.frequency.setTargetAtTime(200 + Math.random() * 600, ctx.currentTime, 0.3);
+    }, 400);
+    const crackleInterval = setInterval(() => {
+      if (Math.random() >= 0.4) return;
+      const pop = ctx.createOscillator();
+      pop.type = 'square';
+      pop.frequency.value = 800 + Math.random() * 1200;
+      const popGain = ctx.createGain();
+      popGain.gain.value = 0.15 * vol;
+      popGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+      pop.connect(popGain);
+      popGain.connect(ctx.destination);
+      pop.start();
+      pop.stop(ctx.currentTime + 0.06);
+    }, 250);
+
+    focusSoundNodes = {
+      stop() {
+        clearInterval(wanderInterval);
+        clearInterval(crackleInterval);
+        try { source.stop(); } catch {}
+        source.disconnect(); filter.disconnect(); gain.disconnect();
+      },
+    };
+  }
+}
+
+function openFocusSoundModal() {
+  renderFocusSoundGrid();
+  openModal('modal-focus-sound');
+}
+
+function renderFocusSoundGrid() {
+  const grid = document.getElementById('focus-sound-grid');
+  if (!grid) return;
+  const current = loadFocusSoundId();
+  grid.innerHTML = FOCUS_SOUNDS.map(sound => `
+    <div class="focus-sound-card${sound.id === current ? ' active' : ''}" onclick="selectFocusSound('${sound.id}')">
+      ${sound.id === current ? '<span class="focus-sound-check">✅</span>' : ''}
+      <div class="focus-sound-icon">${sound.icon}</div>
+      <div class="focus-sound-name">${getFocusSoundName(sound)}</div>
+      <div class="focus-sound-desc">${getFocusSoundDesc(sound)}</div>
+    </div>`).join('');
+}
+
+function selectFocusSound(soundId) {
+  saveFocusSoundId(soundId);
+  playFocusSound(soundId);
+  renderFocusSoundGrid();
 }
 
 function updateSlotDots(activeIdx) {
