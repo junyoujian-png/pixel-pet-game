@@ -2443,7 +2443,7 @@ const FOCUS_SOUNDS = [
   { id: 'rain',   name: '雨聲',   nameEn: 'Rain',        desc: '舒緩雨聲',   descEn: 'Gentle rain',     type: 'fire',   icon: '🌧️' },
   { id: 'wave',   name: '海浪',   nameEn: 'Ocean',       desc: '海浪起伏',   descEn: 'Ocean waves',     type: 'wave',   icon: '🌊' },
   { id: 'forest', name: '森林',   nameEn: 'Forest',      desc: '林間氛圍',   descEn: 'Forest ambience', type: 'forest', icon: '🌲' },
-  { id: 'fire',   name: '篝火',   nameEn: 'Campfire',    desc: '火焰劈啪',   descEn: 'Crackling fire',  type: 'rain',   icon: '🔥' },
+  { id: 'fire',   name: '篝火',   nameEn: 'Campfire',    desc: '火焰劈啪',   descEn: 'Crackling fire',  type: 'campfire', icon: '🔥' },
   { id: 'stream', name: '溪水',   nameEn: 'Stream',      desc: '溪水潺潺',   descEn: 'Flowing stream',  type: 'stream', icon: '💧' },
   { id: 'subway', name: '地鐵',   nameEn: 'Subway',      desc: '地鐵車廂',   descEn: 'Subway car',      type: 'subway', icon: '🚇' },
 ];
@@ -2542,7 +2542,8 @@ function playFocusSound(soundId) {
     return;
   }
 
-  // Campfire: bandpass noise wandering 200-800Hz, plus random crackle pops.
+  // Bandpass-wander + tonal pop variant (currently used by the 雨聲/Rain card —
+  // kept as-is since this task only asked to fix the 篝火/Campfire card).
   if (sound.type === 'fire') {
     const source = createFocusNoiseSource();
     const filter = ctx.createBiquadFilter();
@@ -2579,6 +2580,51 @@ function playFocusSound(soundId) {
         clearInterval(crackleInterval);
         try { source.stop(); } catch {}
         source.disconnect(); filter.disconnect(); gain.disconnect();
+      },
+    };
+    return;
+  }
+
+  // Campfire: low-frequency burning-noise bed (lowpass 150Hz) plus randomized
+  // short noise-burst "pops" with an exponential-decay envelope, highpass-
+  // filtered so they read as crisp crackles rather than low rumble.
+  if (sound.type === 'campfire') {
+    const baseSource = createFocusNoiseSource();
+    const lowpass = ctx.createBiquadFilter();
+    lowpass.type = 'lowpass';
+    lowpass.frequency.value = 150;
+    const baseGain = ctx.createGain();
+    baseGain.gain.value = 0.15 * vol;
+    baseSource.connect(lowpass);
+    lowpass.connect(baseGain);
+    baseGain.connect(ctx.destination);
+    baseSource.start();
+
+    const crackleInterval = setInterval(() => {
+      const crackleLength = Math.floor(ctx.sampleRate * 0.05);
+      const crackleBuffer = ctx.createBuffer(1, crackleLength, ctx.sampleRate);
+      const crackleData = crackleBuffer.getChannelData(0);
+      for (let i = 0; i < crackleLength; i++) {
+        crackleData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.01));
+      }
+      const crackleSource = ctx.createBufferSource();
+      crackleSource.buffer = crackleBuffer;
+      const highpass = ctx.createBiquadFilter();
+      highpass.type = 'highpass';
+      highpass.frequency.value = 1000;
+      const crackleGain = ctx.createGain();
+      crackleGain.gain.value = Math.random() * 0.3 * vol;
+      crackleSource.connect(highpass);
+      highpass.connect(crackleGain);
+      crackleGain.connect(ctx.destination);
+      crackleSource.start();
+    }, Math.random() * 500 + 200);
+
+    focusSoundNodes = {
+      stop() {
+        clearInterval(crackleInterval);
+        try { baseSource.stop(); } catch {}
+        baseSource.disconnect(); lowpass.disconnect(); baseGain.disconnect();
       },
     };
   }
