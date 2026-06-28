@@ -1221,6 +1221,10 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .focus-complete-pet-fallback { font-size: 48px; line-height: 1; }
 .focus-complete-title { font-size: 18px; font-weight: 800; color: var(--text); }
 .focus-complete-exp { font-size: 22px; font-weight: 900; color: var(--accent); margin-bottom: 6px; }
+.focus-fail-penalty { font-size: 18px; font-weight: 800; color: #f44336; margin-bottom: 6px; }
+.focus-fail-actions { display: flex; gap: 8px; width: 100%; }
+.focus-fail-actions .btn-cancel  { flex: 1; margin-top: 0; }
+.focus-fail-actions .btn-confirm { flex: 1; padding: 10px; }
 
 /* ─── Ad Overlay ─── */
 .ad-overlay {

@@ -46,6 +46,10 @@ const LANG_DATA = {
     'focus.abandon.hold': '按住確認放棄',
     'focus.abandon.penalty': '放棄專注！心情 -20',
     'focus.confirm': '確認',
+    'focus.fail': '專注失敗，再接再厲',
+    'focus.penalty': '心情 -20',
+    'focus.home': '返回首頁',
+    'focus.restart': '重新開始',
     // 寵物詳細頁面
     'pet.detail.title': '寵物詳細',
     'pet.detail.stats': '戰鬥屬性',
@@ -453,6 +457,10 @@ const LANG_DATA = {
     'focus.abandon.hold': 'Hold to Abandon',
     'focus.abandon.penalty': 'Focus abandoned! Mood -20',
     'focus.confirm': 'Confirm',
+    'focus.fail': 'Focus failed, keep trying!',
+    'focus.penalty': 'Mood -20',
+    'focus.home': 'Return Home',
+    'focus.restart': 'Try Again',
     // Pet Detail page
     'pet.detail.title': 'Pet Detail',
     'pet.detail.stats': 'Battle Stats',

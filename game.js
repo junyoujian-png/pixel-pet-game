@@ -2375,7 +2375,11 @@ function cancelFocusAbandonHold() {
 function confirmFocusAbandon() {
   cancelFocusAbandonHold();
   applyFocusAbandonPenalty();
-  stopFocusTimer();
+  if (focusTimerState?.intervalId) clearInterval(focusTimerState.intervalId);
+  focusTimerState = null;
+  document.getElementById('screen-focus-timer')?.classList.add('hidden');
+  renderFocusPetDisplay('focus-fail-pet-img', 'focus-fail-pet-fallback');
+  openModal('modal-focus-fail');
 }
 
 function applyFocusAbandonPenalty() {
@@ -2386,7 +2390,17 @@ function applyFocusAbandonPenalty() {
     savePetState(petId, ps);
     if (petId === (getDisplayPetId() || selectedPetId)) state.mood = ps.mood;
   }
-  showToast(t('focus.abandon.penalty'));
+}
+
+function goHomeFromFocusFail() {
+  closeModal('modal-focus-fail');
+  document.getElementById('screen-focus')?.classList.add('hidden');
+}
+
+function restartFromFocusFail() {
+  closeModal('modal-focus-fail');
+  document.getElementById('screen-focus')?.classList.remove('hidden');
+  renderFocusTaskGrid();
 }
 
 function stopFocusTimer() {
