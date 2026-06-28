@@ -2440,10 +2440,10 @@ function closeFocusCompleteModal() {
 const FOCUS_SOUNDS = [
   { id: 'silent', name: '靜音',   nameEn: 'Silent',      desc: '關閉播放',   descEn: 'No sound',        type: 'none',   icon: '🔇' },
   { id: 'white',  name: '白噪音', nameEn: 'White Noise', desc: '經典均衡',   descEn: 'Classic balance', type: 'noise',  icon: '⚪' },
-  { id: 'rain',   name: '雨聲',   nameEn: 'Rain',        desc: '舒緩雨聲',   descEn: 'Gentle rain',     type: 'rain',   icon: '🌧️' },
+  { id: 'rain',   name: '雨聲',   nameEn: 'Rain',        desc: '舒緩雨聲',   descEn: 'Gentle rain',     type: 'fire',   icon: '🌧️' },
   { id: 'wave',   name: '海浪',   nameEn: 'Ocean',       desc: '海浪起伏',   descEn: 'Ocean waves',     type: 'wave',   icon: '🌊' },
   { id: 'forest', name: '森林',   nameEn: 'Forest',      desc: '林間氛圍',   descEn: 'Forest ambience', type: 'forest', icon: '🌲' },
-  { id: 'fire',   name: '篝火',   nameEn: 'Campfire',    desc: '火焰劈啪',   descEn: 'Crackling fire',  type: 'fire',   icon: '🔥' },
+  { id: 'fire',   name: '篝火',   nameEn: 'Campfire',    desc: '火焰劈啪',   descEn: 'Crackling fire',  type: 'rain',   icon: '🔥' },
   { id: 'stream', name: '溪水',   nameEn: 'Stream',      desc: '溪水潺潺',   descEn: 'Flowing stream',  type: 'stream', icon: '💧' },
   { id: 'subway', name: '地鐵',   nameEn: 'Subway',      desc: '地鐵車廂',   descEn: 'Subway car',      type: 'subway', icon: '🚇' },
 ];
