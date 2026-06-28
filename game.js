@@ -2111,7 +2111,7 @@ const DEFAULT_FOCUS_TASKS = [
   { id: 'relax',    name: '放鬆',   nameEn: 'Relax',    minutes: 20 },
 ];
 const FOCUS_DURATION_OPTIONS = [5, 10, 15, 20, 25, 30, 45, 50, 60, 90];
-const FOCUS_COMPLETE_COIN_REWARD = 100;
+const FOCUS_COMPLETE_COIN_REWARD = 50;
 
 function loadFocusTasks() {
   try {

@@ -60,8 +60,8 @@ const LANG_DATA = {
     'focus.sound.stream': '溪水',
     'focus.sound.subway': '地鐵',
     'focus.complete.title': '專注完成！',
-    'focus.complete.reward': '💎 +100 像素晶石',
-    'focus.complete.toast': '專注完成！+100 💎',
+    'focus.complete.reward': '💎 +50 像素晶石',
+    'focus.complete.toast': '專注完成！+50 💎',
     // 寵物詳細頁面
     'pet.detail.title': '寵物詳細',
     'pet.detail.stats': '戰鬥屬性',
@@ -483,8 +483,8 @@ const LANG_DATA = {
     'focus.sound.stream': 'Stream',
     'focus.sound.subway': 'Subway',
     'focus.complete.title': 'Focus Complete!',
-    'focus.complete.reward': '💎 +100 Pixel Gems',
-    'focus.complete.toast': 'Focus complete! +100 💎',
+    'focus.complete.reward': '💎 +50 Pixel Gems',
+    'focus.complete.toast': 'Focus complete! +50 💎',
     // Pet Detail page
     'pet.detail.title': 'Pet Detail',
     'pet.detail.stats': 'Battle Stats',
