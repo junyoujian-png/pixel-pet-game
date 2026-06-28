@@ -2095,7 +2095,12 @@ function renderSlotPage(slotIdx) {
         <span>⚙️</span><span class="small-btn-label">${t('home.manage')}</span>
       </button>
     </div>
+    <button class="home-focus-btn" onclick="openFocusTimer()" data-i18n="home.focus">${t('home.focus')}</button>
   `;
+}
+
+function openFocusTimer() {
+  showToast(t('toast.coming_soon'));
 }
 
 function updateSlotDots(activeIdx) {

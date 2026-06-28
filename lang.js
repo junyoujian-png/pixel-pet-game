@@ -24,6 +24,8 @@ const LANG_DATA = {
     'home.info': '資訊',
     'home.collection': '圖鑑',
     'home.manage': '管理',
+    'home.focus': '專注',
+    'toast.coming_soon': '即將推出！',
     // 寵物詳細頁面
     'pet.detail.title': '寵物詳細',
     'pet.detail.stats': '戰鬥屬性',
@@ -409,6 +411,8 @@ const LANG_DATA = {
     'home.info': 'Info',
     'home.collection': 'Collection',
     'home.manage': 'Manage',
+    'home.focus': 'Focus',
+    'toast.coming_soon': 'Coming soon!',
     // Pet Detail page
     'pet.detail.title': 'Pet Detail',
     'pet.detail.stats': 'Battle Stats',
