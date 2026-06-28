@@ -1188,6 +1188,8 @@ const DAILY_QUESTS = [
   { id: 'd6', name: '出去尋寶',   desc: '收集一個寶箱',           target: 1,  reward: 30, type: 'treasure' },
   { id: 'd7', name: '兌換能量',   desc: '完成一次步數兌換',         target: 1,  reward: 20, type: 'exchange' },
   { id: 'd8', name: '免費能量石', desc: '觀看廣告獲得獎勵',         target: 3,  reward: 50, type: 'watch_ad', maxPerDay: 3 },
+  { id: 'd9',  name: '今日專注', desc: '完成一次專注計時',         target: 1,  reward: 30,  type: 'focus_complete' },
+  { id: 'd10', name: '專注達人', desc: '完成三次專注計時',         target: 3,  reward: 100, type: 'focus_complete' },
 ];
 
 const ACHIEVEMENT_QUESTS = [
@@ -1203,12 +1205,19 @@ const ACHIEVEMENT_QUESTS = [
   { id: 'a10', name: '幸運降臨', desc: '抽中第一隻 SSR 寵物', target: 1,   reward: 200,  type: 'ssr_gacha' },
   { id: 'a11', name: '小富翁',   desc: '累積花費 1000 能量石', target: 1000, reward: 100, type: 'spend_total' },
   { id: 'a12', name: '大富翁',   desc: '累積花費 5000 能量石', target: 5000, reward: 500, type: 'spend_total' },
+  { id: 'a13', name: '初次專注', desc: '第一次完成專注計時',       target: 1,   reward: 50,  type: 'focus_total' },
+  { id: 'a14', name: '專注新手', desc: '累積完成 10 次專注',       target: 10,  reward: 100, type: 'focus_total' },
+  { id: 'a15', name: '專注老手', desc: '累積完成 50 次專注',       target: 50,  reward: 300, type: 'focus_total' },
+  { id: 'a16', name: '專注大師', desc: '累積完成 100 次專注',      target: 100, reward: 800, type: 'focus_total' },
+  { id: 'a17', name: '長時專注', desc: '完成一次 45 分鐘以上的專注', target: 1, reward: 150, type: 'focus_long' },
 ];
 
 const WEEKLY_QUESTS = [
   { id: 'w1', name: '戰鬥達人', desc: '完成 5 場戰鬥',      target: 5,  reward: 150, type: 'battle_count' },
   { id: 'w2', name: '扭蛋十連', desc: '累積抽 10 次扭蛋',   target: 10, reward: 200, type: 'gacha_count' },
   { id: 'w3', name: '步數達人', desc: '連續兌換步數 7 天',   target: 7,  reward: 250, type: 'exchange_streak' },
+  { id: 'w4', name: '本週專注',   desc: '本週完成 5 次專注計時',      target: 5,   reward: 200, type: 'focus_weekly' },
+  { id: 'w5', name: '專注馬拉松', desc: '本週累積專注時間達 3 小時', target: 180, reward: 350, type: 'focus_minutes' },
 ];
 
 let activeQuestTab = 'daily';
@@ -1287,6 +1296,8 @@ function trackQuestEvent(type, value = 1) {
         wp[q.id].days.push(String(value));
         wp[q.id].progress = wp[q.id].days.length;
       }
+    } else if (type === 'focus_minutes') {
+      wp[q.id].progress = Math.min(q.target, (wp[q.id].progress || 0) + value);
     } else {
       wp[q.id].progress = Math.min(q.target, (wp[q.id].progress || 0) + 1);
     }
@@ -2414,6 +2425,7 @@ function stopFocusTimer() {
 function completeFocusTimer() {
   if (!focusTimerState) return;
   clearInterval(focusTimerState.intervalId);
+  const focusMinutes = Math.round(focusTimerState.totalSeconds / 60);
   focusTimerState = null;
   stopFocusSound();
   document.getElementById('screen-focus-timer')?.classList.add('hidden');
@@ -2421,6 +2433,10 @@ function completeFocusTimer() {
   saveState();
   renderCoins();
   trackQuestEvent('focus_complete');
+  trackQuestEvent('focus_total');
+  if (focusMinutes >= 45) trackQuestEvent('focus_long');
+  trackQuestEvent('focus_weekly');
+  trackQuestEvent('focus_minutes', focusMinutes);
   renderFocusPetDisplay('focus-complete-pet-img', 'focus-complete-pet-fallback');
   showToast(t('focus.complete.toast'));
   openModal('modal-focus-complete');
