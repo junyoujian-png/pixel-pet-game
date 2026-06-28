@@ -41,7 +41,10 @@ const LANG_DATA = {
     'focus.back': '← 返回',
     'focus.save': '儲存',
     'focus.cancel': '取消',
+    'focus.cancel.free': '取消 ({n})',
     'focus.abandon': '放棄專注',
+    'focus.abandon.hold': '按住確認放棄',
+    'focus.abandon.penalty': '放棄專注！心情 -20',
     'focus.confirm': '確認',
     // 寵物詳細頁面
     'pet.detail.title': '寵物詳細',
@@ -445,7 +448,10 @@ const LANG_DATA = {
     'focus.back': '← Back',
     'focus.save': 'Save',
     'focus.cancel': 'Cancel',
+    'focus.cancel.free': 'Cancel ({n})',
     'focus.abandon': 'Abandon Focus',
+    'focus.abandon.hold': 'Hold to Abandon',
+    'focus.abandon.penalty': 'Focus abandoned! Mood -20',
     'focus.confirm': 'Confirm',
     // Pet Detail page
     'pet.detail.title': 'Pet Detail',

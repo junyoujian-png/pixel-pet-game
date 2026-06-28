@@ -2259,6 +2259,10 @@ function renderFocusPetDisplay(imgId, fallbackId) {
   }
 }
 
+const FOCUS_FREE_CANCEL_SECONDS = 10;
+const FOCUS_ABANDON_HOLD_MS     = 2000;
+const FOCUS_ABANDON_MOOD_PENALTY = 20;
+
 function startFocusTimer(taskId) {
   const task = loadFocusTasks().find(t => t.id === taskId);
   if (!task) return;
@@ -2270,12 +2274,14 @@ function startFocusTimer(taskId) {
     remainingSeconds: totalSeconds,
     intervalId: null,
     paused: false,
+    freeCancelRemaining: FOCUS_FREE_CANCEL_SECONDS,
   };
   document.getElementById('focus-timer-task-name').textContent = focusTimerState.taskName;
   document.getElementById('btn-focus-pause').textContent = '⏸';
   document.getElementById('focus-timer-pet-img')?.classList.remove('paused');
   renderFocusPetDisplay('focus-timer-pet-img', 'focus-timer-pet-fallback');
   renderFocusTimerDisplay();
+  renderFocusAbandonButton();
   document.getElementById('screen-focus')?.classList.add('hidden');
   document.getElementById('screen-focus-timer')?.classList.remove('hidden');
   focusTimerState.intervalId = setInterval(tickFocusTimer, 1000);
@@ -2286,10 +2292,22 @@ function renderFocusTimerDisplay() {
   if (el && focusTimerState) el.textContent = formatFocusTime(focusTimerState.remainingSeconds);
 }
 
+function renderFocusAbandonButton() {
+  const btn = document.getElementById('btn-focus-abandon');
+  if (!btn || !focusTimerState) return;
+  btn.textContent = focusTimerState.freeCancelRemaining > 0
+    ? t('focus.cancel.free').replace('{n}', focusTimerState.freeCancelRemaining)
+    : t('focus.abandon.hold');
+}
+
 function tickFocusTimer() {
   if (!focusTimerState || focusTimerState.paused) return;
   focusTimerState.remainingSeconds--;
   renderFocusTimerDisplay();
+  if (focusTimerState.freeCancelRemaining > 0) {
+    focusTimerState.freeCancelRemaining--;
+    renderFocusAbandonButton();
+  }
   if (focusTimerState.remainingSeconds <= 0) completeFocusTimer();
 }
 
@@ -2300,7 +2318,79 @@ function toggleFocusPause() {
   document.getElementById('focus-timer-pet-img')?.classList.toggle('paused', focusTimerState.paused);
 }
 
+// ── Abandon button: free tap-to-cancel for the first 10s, then a 2s press-and-hold ──
+let focusAbandonHoldInterval = null;
+let focusAbandonHoldElapsed  = 0;
+
+function initFocusAbandonButton() {
+  const btn = document.getElementById('btn-focus-abandon');
+  if (!btn) return;
+  let holding = false;
+
+  const startPress = () => {
+    if (!focusTimerState || focusTimerState.freeCancelRemaining > 0) return;
+    holding = true;
+    beginFocusAbandonHold();
+  };
+  const endPress = () => {
+    if (!holding) return;
+    holding = false;
+    cancelFocusAbandonHold();
+  };
+  btn.addEventListener('mousedown', startPress);
+  btn.addEventListener('touchstart', startPress);
+  btn.addEventListener('mouseup', endPress);
+  btn.addEventListener('mouseleave', endPress);
+  btn.addEventListener('touchend', endPress);
+  btn.addEventListener('touchcancel', endPress);
+  btn.addEventListener('click', () => {
+    if (focusTimerState && focusTimerState.freeCancelRemaining > 0) stopFocusTimer();
+  });
+}
+
+function beginFocusAbandonHold() {
+  const btn = document.getElementById('btn-focus-abandon');
+  focusAbandonHoldElapsed = 0;
+  clearInterval(focusAbandonHoldInterval);
+  focusAbandonHoldInterval = setInterval(() => {
+    focusAbandonHoldElapsed += 50;
+    const pct = Math.min(100, (focusAbandonHoldElapsed / FOCUS_ABANDON_HOLD_MS) * 100);
+    if (btn) btn.style.background = `linear-gradient(to right, #1a1a2e ${pct}%, #e8e5df ${pct}%)`;
+    if (focusAbandonHoldElapsed >= FOCUS_ABANDON_HOLD_MS) {
+      clearInterval(focusAbandonHoldInterval);
+      focusAbandonHoldInterval = null;
+      confirmFocusAbandon();
+    }
+  }, 50);
+}
+
+function cancelFocusAbandonHold() {
+  clearInterval(focusAbandonHoldInterval);
+  focusAbandonHoldInterval = null;
+  focusAbandonHoldElapsed  = 0;
+  const btn = document.getElementById('btn-focus-abandon');
+  if (btn) btn.style.background = '';
+}
+
+function confirmFocusAbandon() {
+  cancelFocusAbandonHold();
+  applyFocusAbandonPenalty();
+  stopFocusTimer();
+}
+
+function applyFocusAbandonPenalty() {
+  const petId = loadSlots()[0];
+  if (petId) {
+    const ps = loadPetState(petId);
+    ps.mood = Math.max(0, ps.mood - FOCUS_ABANDON_MOOD_PENALTY);
+    savePetState(petId, ps);
+    if (petId === (getDisplayPetId() || selectedPetId)) state.mood = ps.mood;
+  }
+  showToast(t('focus.abandon.penalty'));
+}
+
 function stopFocusTimer() {
+  cancelFocusAbandonHold();
   if (focusTimerState?.intervalId) clearInterval(focusTimerState.intervalId);
   focusTimerState = null;
   document.getElementById('screen-focus-timer')?.classList.add('hidden');
@@ -3794,6 +3884,7 @@ function init() {
   initGacha();
   initQuestTab();
   initExploreCards();
+  initFocusAbandonButton();
   renderSettingsTab();
   applyLang(); // re-apply after all dynamic rendering above (lang.js's own DOMContentLoaded fires earlier)
   setInterval(decayStats, DECAY_INTERVAL);
