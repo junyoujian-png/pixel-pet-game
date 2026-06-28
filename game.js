@@ -2261,7 +2261,7 @@ function renderFocusPetDisplay(imgId, fallbackId) {
 
 const FOCUS_FREE_CANCEL_SECONDS = 10;
 const FOCUS_ABANDON_HOLD_MS     = 2000;
-const FOCUS_ABANDON_MOOD_PENALTY = 20;
+const FOCUS_ABANDON_COIN_PENALTY = 100;
 
 function startFocusTimer(taskId) {
   const task = loadFocusTasks().find(t => t.id === taskId);
@@ -2385,13 +2385,9 @@ function confirmFocusAbandon() {
 }
 
 function applyFocusAbandonPenalty() {
-  const petId = loadSlots()[0];
-  if (petId) {
-    const ps = loadPetState(petId);
-    ps.mood = Math.max(0, ps.mood - FOCUS_ABANDON_MOOD_PENALTY);
-    savePetState(petId, ps);
-    if (petId === (getDisplayPetId() || selectedPetId)) state.mood = ps.mood;
-  }
+  state.coins = Math.max(0, state.coins - FOCUS_ABANDON_COIN_PENALTY);
+  saveState();
+  renderCoins();
 }
 
 function goHomeFromFocusFail() {
