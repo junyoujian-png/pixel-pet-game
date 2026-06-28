@@ -2237,6 +2237,28 @@ function deleteFocusTaskFromOptions() {
 // ── Active Countdown ──
 let focusTimerState = null; // { taskId, taskName, totalSeconds, remainingSeconds, intervalId, paused }
 
+// Player's slot-0 pet (the "focus buddy") — shown on the timer + completion screens.
+const getFocusSlotPet = () => {
+  const petId = loadSlots()[0];
+  return petId ? PETS.find(p => p.id === petId) : null;
+};
+
+function renderFocusPetDisplay(imgId, fallbackId) {
+  const imgEl      = document.getElementById(imgId);
+  const fallbackEl = document.getElementById(fallbackId);
+  if (!imgEl || !fallbackEl) return;
+  const pet = getFocusSlotPet();
+  if (pet) {
+    imgEl.src = pet.image;
+    imgEl.alt = t(pet.nameKey);
+    imgEl.classList.remove('hidden');
+    fallbackEl.classList.add('hidden');
+  } else {
+    imgEl.classList.add('hidden');
+    fallbackEl.classList.remove('hidden');
+  }
+}
+
 function startFocusTimer(taskId) {
   const task = loadFocusTasks().find(t => t.id === taskId);
   if (!task) return;
@@ -2250,7 +2272,9 @@ function startFocusTimer(taskId) {
     paused: false,
   };
   document.getElementById('focus-timer-task-name').textContent = focusTimerState.taskName;
-  document.getElementById('btn-focus-pause').textContent = t('focus.pause');
+  document.getElementById('btn-focus-pause').textContent = '⏸';
+  document.getElementById('focus-timer-pet-img')?.classList.remove('paused');
+  renderFocusPetDisplay('focus-timer-pet-img', 'focus-timer-pet-fallback');
   renderFocusTimerDisplay();
   document.getElementById('screen-focus')?.classList.add('hidden');
   document.getElementById('screen-focus-timer')?.classList.remove('hidden');
@@ -2272,7 +2296,8 @@ function tickFocusTimer() {
 function toggleFocusPause() {
   if (!focusTimerState) return;
   focusTimerState.paused = !focusTimerState.paused;
-  document.getElementById('btn-focus-pause').textContent = t(focusTimerState.paused ? 'focus.resume' : 'focus.pause');
+  document.getElementById('btn-focus-pause').textContent = focusTimerState.paused ? '▶' : '⏸';
+  document.getElementById('focus-timer-pet-img')?.classList.toggle('paused', focusTimerState.paused);
 }
 
 function stopFocusTimer() {
@@ -2290,11 +2315,17 @@ function completeFocusTimer() {
   const reward  = Math.round(minutes * FOCUS_EXP_PER_MINUTE);
   focusTimerState = null;
   document.getElementById('screen-focus-timer')?.classList.add('hidden');
-  document.getElementById('screen-focus')?.classList.remove('hidden');
-  renderFocusTaskGrid();
   addExp(reward);
   trackQuestEvent('focus_complete');
-  showToast(`${t('focus.complete')} +${reward} EXP`);
+  renderFocusPetDisplay('focus-complete-pet-img', 'focus-complete-pet-fallback');
+  document.getElementById('focus-complete-exp').textContent = `+${reward} EXP`;
+  openModal('modal-focus-complete');
+}
+
+function closeFocusCompleteModal() {
+  closeModal('modal-focus-complete');
+  document.getElementById('screen-focus')?.classList.remove('hidden');
+  renderFocusTaskGrid();
 }
 
 function updateSlotDots(activeIdx) {

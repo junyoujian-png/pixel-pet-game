@@ -1148,32 +1148,77 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   position: fixed;
   inset: 0;
   z-index: 90;
-  background: var(--bg);
+  background: #f5f5f5;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: 20px;
   max-width: 430px;
   margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
 }
 .screen-focus-timer.hidden { display: none; }
-.focus-timer-task-name { font-size: 18px; font-weight: 700; color: var(--text); }
-.focus-timer-display { font-size: 64px; font-weight: 900; color: var(--accent); font-family: monospace; }
-.focus-timer-actions { display: flex; gap: 12px; }
-.focus-timer-btn {
-  padding: 12px 28px;
-  border-radius: 20px;
+.focus-timer-pet-frame { display: flex; align-items: center; justify-content: center; }
+.focus-timer-pet-frame .hidden { display: none; }
+.focus-timer-pet-img {
+  width: 120px;
+  height: 120px;
+  image-rendering: pixelated;
+  object-fit: contain;
+  animation: bounce 2.4s ease-in-out infinite;
+}
+.focus-timer-pet-img.paused { animation-play-state: paused; }
+.focus-timer-pet-fallback { font-size: 72px; line-height: 1; }
+.focus-timer-display {
+  font-size: 72px;
+  font-weight: 900;
+  color: #1a1a2e;
+  font-family: monospace;
+  text-align: center;
+}
+.focus-timer-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.focus-timer-task-name { font-size: 16px; font-weight: 700; color: #555; }
+.focus-timer-pause-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.focus-timer-pause-icon:hover { background: #eee; }
+.focus-abandon-btn {
+  margin-top: 8px;
+  padding: 14px 36px;
+  border-radius: 30px;
   border: none;
-  background: var(--accent);
-  color: #fff;
+  background: #d0d0d0;
+  color: #444;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
 }
-.focus-timer-btn:hover { opacity: 0.88; }
-.focus-timer-btn--danger { background: #f44336; }
+.focus-abandon-btn:hover { background: #c2c2c2; }
+
+/* Completion modal */
+.focus-complete-box { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.focus-complete-pet-frame { display: flex; align-items: center; justify-content: center; }
+.focus-complete-pet-frame .hidden { display: none; }
+.focus-complete-pet-img { width: 80px; height: 80px; image-rendering: pixelated; object-fit: contain; }
+.focus-complete-pet-fallback { font-size: 48px; line-height: 1; }
+.focus-complete-title { font-size: 18px; font-weight: 800; color: var(--text); }
+.focus-complete-exp { font-size: 22px; font-weight: 900; color: var(--accent); margin-bottom: 6px; }
 
 /* ─── Ad Overlay ─── */
 .ad-overlay {

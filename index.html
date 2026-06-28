@@ -681,11 +681,28 @@
 
   <!-- Focus Timer: Active Countdown Screen -->
   <div id="screen-focus-timer" class="screen-focus-timer hidden">
-    <div class="focus-timer-task-name" id="focus-timer-task-name"></div>
+    <div class="focus-timer-pet-frame">
+      <img id="focus-timer-pet-img" class="focus-timer-pet-img pixel-art hidden" src="" alt="">
+      <div id="focus-timer-pet-fallback" class="focus-timer-pet-fallback">⏱</div>
+    </div>
     <div class="focus-timer-display" id="focus-timer-display">00:00</div>
-    <div class="focus-timer-actions">
-      <button class="focus-timer-btn" id="btn-focus-pause" onclick="toggleFocusPause()" data-i18n="focus.pause">暫停</button>
-      <button class="focus-timer-btn focus-timer-btn--danger" onclick="stopFocusTimer()" data-i18n="focus.stop">結束</button>
+    <div class="focus-timer-meta">
+      <span class="focus-timer-task-name" id="focus-timer-task-name"></span>
+      <button class="focus-timer-pause-icon" id="btn-focus-pause" onclick="toggleFocusPause()">⏸</button>
+    </div>
+    <button class="focus-abandon-btn" onclick="stopFocusTimer()" data-i18n="focus.abandon">放棄專注</button>
+  </div>
+
+  <!-- Focus Timer: Completion Modal -->
+  <div id="modal-focus-complete" class="modal hidden">
+    <div class="modal-box focus-complete-box">
+      <div class="focus-complete-pet-frame">
+        <img id="focus-complete-pet-img" class="focus-complete-pet-img pixel-art hidden" src="" alt="">
+        <div id="focus-complete-pet-fallback" class="focus-complete-pet-fallback">⏱</div>
+      </div>
+      <div class="focus-complete-title" data-i18n="focus.complete">專注完成！</div>
+      <div class="focus-complete-exp" id="focus-complete-exp"></div>
+      <button class="btn-confirm" onclick="closeFocusCompleteModal()" data-i18n="focus.confirm">確認</button>
     </div>
   </div>
 

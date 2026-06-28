@@ -41,6 +41,8 @@ const LANG_DATA = {
     'focus.back': '← 返回',
     'focus.save': '儲存',
     'focus.cancel': '取消',
+    'focus.abandon': '放棄專注',
+    'focus.confirm': '確認',
     // 寵物詳細頁面
     'pet.detail.title': '寵物詳細',
     'pet.detail.stats': '戰鬥屬性',
@@ -443,6 +445,8 @@ const LANG_DATA = {
     'focus.back': '← Back',
     'focus.save': 'Save',
     'focus.cancel': 'Cancel',
+    'focus.abandon': 'Abandon Focus',
+    'focus.confirm': 'Confirm',
     // Pet Detail page
     'pet.detail.title': 'Pet Detail',
     'pet.detail.stats': 'Battle Stats',
