@@ -4106,6 +4106,8 @@ function renderSettingsTab() {
 
   const nameEl = document.getElementById('input-player-name');
   if (nameEl) nameEl.value = name;
+
+  renderLoginUI(currentFirebaseUser);
 }
 
 // Whether we're running inside the native Capacitor shell (iOS app) rather
@@ -4188,6 +4190,130 @@ function showRewardAd() {
   });
 }
 
+// ─── Firebase: Google Sign-In + Cloud Save ─────────────────────────────────────
+// Same no-bundler pattern as ATT/AdMob: vendor/capacitor-firebase-auth.js and
+// vendor/capacitor-firebase-firestore.js (see index.html) register
+// themselves onto Capacitor.Plugins.FirebaseAuthentication /
+// .FirebaseFirestore — no `import` needed.
+//
+// signInWithPopup() (the Firebase web SDK's usual approach) does not work
+// reliably inside Capacitor's iOS WebView — there's no popup delegate
+// configured, so the call typically just does nothing when tapped on a real
+// device. This uses @capacitor-firebase/authentication instead, which calls
+// Google's native iOS Sign-In SDK through the Capacitor bridge, and
+// @capacitor-firebase/firestore for the cloud save document itself.
+//
+// REQUIRED MANUAL SETUP — none of this can be done from this codebase:
+// 1. Register an iOS app for the "pixel-pet-game" Firebase project (bundle
+//    ID com.junyoujian.pixelpet), download GoogleService-Info.plist, and
+//    add it to ios/App/App/ in Xcode. The native Firebase SDK reads this
+//    file at launch — without it, the app will likely CRASH ON LAUNCH once
+//    these plugins are linked in, not just fail to log in.
+// 2. Add that file's REVERSED_CLIENT_ID as a URL scheme in
+//    ios/App/App/Info.plist (CFBundleURLTypes) — required for the Google
+//    Sign-In OAuth flow to be able to return to the app.
+// 3. Set Firestore Security Rules so a user can only read/write their own
+//    saves/{uid} document, e.g.:
+//      match /saves/{uid} { allow read, write: if request.auth.uid == uid; }
+//    Default/test-mode Firestore rules allow anyone to read or overwrite
+//    any save — this must be locked down before shipping.
+function getFirebaseAuth()      { return window.Capacitor?.Plugins?.FirebaseAuthentication; }
+function getFirebaseFirestore() { return window.Capacitor?.Plugins?.FirebaseFirestore; }
+
+let currentFirebaseUser = null;
+
+async function loginWithGoogle() {
+  if (!isNativeApp()) return;
+  try {
+    const result = await getFirebaseAuth().signInWithGoogle();
+    const user = result.user;
+    if (user) await loadCloudSave(user.uid); // 登入後讀取雲端存檔
+    showToast(t('settings.login.success'));
+  } catch (e) {
+    console.error('登入失敗:', e);
+    showToast(t('settings.login.fail'));
+  }
+}
+
+async function logout() {
+  if (!isNativeApp()) return;
+  try {
+    await saveCloudSave(); // 登出前先儲存到雲端
+    await getFirebaseAuth().signOut();
+    showToast(t('settings.logout.success'));
+  } catch (e) {
+    console.error('登出失敗:', e);
+  }
+}
+
+async function loadCloudSave(uid) {
+  const result = await getFirebaseFirestore().getDocument({ reference: `saves/${uid}` });
+  const data = result?.snapshot?.data;
+  if (data) {
+    // 把雲端資料寫回 localStorage
+    Object.keys(data).forEach((key) => localStorage.setItem(key, data[key]));
+    location.reload(); // 重新整理套用雲端資料
+  } else {
+    // 雲端沒有資料，把目前 localStorage 上傳
+    await saveCloudSave();
+  }
+}
+
+async function saveCloudSave() {
+  if (!isNativeApp()) return;
+  const { user } = await getFirebaseAuth().getCurrentUser();
+  if (!user) return;
+
+  const allData = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    allData[key] = localStorage.getItem(key);
+  }
+
+  await getFirebaseFirestore().setDocument({ reference: `saves/${user.uid}`, data: allData });
+}
+
+function renderLoginUI(user) {
+  const row = document.getElementById('settings-login-row');
+  if (!row) return;
+  if (user) {
+    row.innerHTML = `
+      <div class="settings-login-profile">
+        ${user.photoUrl
+          ? `<img src="${user.photoUrl}" class="settings-login-avatar" alt="">`
+          : '<div class="settings-login-avatar settings-login-avatar--fallback">👤</div>'}
+        <span class="settings-login-name">${user.displayName || ''}</span>
+      </div>
+      <button class="settings-action-btn" onclick="logout()">${t('settings.logout')}</button>`;
+  } else {
+    row.innerHTML = `<button class="settings-login-btn" onclick="loginWithGoogle()">🔵 ${t('settings.login')}</button>`;
+  }
+}
+
+async function initFirebaseAuthListener() {
+  if (!isNativeApp()) { renderLoginUI(null); return; }
+  try {
+    await getFirebaseAuth().addListener('authStateChange', (change) => {
+      currentFirebaseUser = change.user;
+      renderLoginUI(change.user);
+    });
+    const { user } = await getFirebaseAuth().getCurrentUser();
+    currentFirebaseUser = user;
+    renderLoginUI(user);
+  } catch (e) {
+    console.error('Firebase auth listener failed:', e);
+    renderLoginUI(null);
+  }
+}
+
+// Auto-save every 60 seconds while signed in — the simpler of the two
+// suggested approaches. Threading saveCloudSave() into every individual
+// level-up/purchase/gacha call site across the codebase would be a much
+// larger, more invasive change for marginal benefit over a steady interval.
+setInterval(() => {
+  if (isNativeApp() && currentFirebaseUser) saveCloudSave();
+}, 60000);
+
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 function init() {
   // Registered first so a later render/init failure can never prevent the
@@ -4196,6 +4322,7 @@ function init() {
   initSfxClickDelegation();
   requestATT();
   initAdMob();
+  initFirebaseAuthListener();
 
   checkDailyPPReset();
   initStepHistory();

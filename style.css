@@ -3558,6 +3558,43 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   color: #fff;
 }
 
+/* Google sign-in row */
+.settings-login-row { flex-wrap: wrap; }
+.settings-login-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #4285f4;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity .15s, transform .1s;
+}
+.settings-login-btn:hover  { opacity: .9; }
+.settings-login-btn:active { transform: scale(.98); }
+.settings-login-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.settings-login-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.settings-login-avatar--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface2);
+  font-size: 18px;
+}
+.settings-login-name { font-size: 14px; font-weight: 700; color: var(--text); }
+
 /* Clear-confirm modal */
 .settings-clear-confirm-box { max-width: 320px; text-align: center; padding: 28px 24px 22px; }
 .settings-clear-confirm-title { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 8px; }

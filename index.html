@@ -294,6 +294,7 @@
         <!-- 3. Account / Data -->
         <div class="card settings-section">
           <h3 class="settings-section-title" data-i18n="settings.account.section">帳號 / 資料</h3>
+          <div class="settings-row settings-login-row" id="settings-login-row"></div>
           <div class="settings-row settings-row--vertical">
             <span class="settings-row__label">👤 <span data-i18n="settings.player.name">玩家名稱</span></span>
             <input type="text" id="input-player-name" class="settings-text-input"
@@ -751,6 +752,20 @@
   <script src="vendor/capacitor.js"></script>
   <script src="vendor/capacitor-att.js"></script>
   <script src="vendor/capacitor-admob.js"></script>
+  <script>
+    // capacitor-firebase-auth.js / capacitor-firebase-firestore.js are built
+    // assuming a bundler supplies the Firebase JS SDK's own exports as extra
+    // globals (for their browser-only web fallback class). This project has
+    // no bundler and only ever calls these plugins on the native iOS bridge
+    // (gated by isNativeApp() in game.js), so the web fallback is never
+    // actually invoked — these stubs just need to exist so the scripts don't
+    // throw a ReferenceError while loading.
+    var firebaseAuthExports = {};
+    var app = {};
+    var firebaseFirestoreExports = {};
+  </script>
+  <script src="vendor/capacitor-firebase-auth.js"></script>
+  <script src="vendor/capacitor-firebase-firestore.js"></script>
   <script src="lang.js"></script>
   <script src="game.js"></script>
 </body>
