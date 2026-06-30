@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "sync:www": "node scripts/sync-www.js",
-    "ios:sync": "npm run sync:www && npx cap sync ios"
+    "ios:sync": "npm run sync:www && npx cap sync ios",
+    "icon:generate": "node scripts/generate-app-icon.js"
   },
   "repository": {
     "type": "git",
@@ -25,5 +26,8 @@
     "@capacitor/core": "^8.4.1",
     "@capacitor/ios": "^8.4.1",
     "@capgo/capacitor-app-tracking-transparency": "^8.1.13"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.2"
   }
 }
