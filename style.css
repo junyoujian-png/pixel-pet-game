@@ -3558,14 +3558,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   color: #fff;
 }
 
-/* Google sign-in row */
-.settings-login-row { flex-wrap: wrap; }
+/* Sign-in row (Google + Apple) */
+.settings-login-row { flex-wrap: wrap; gap: 8px; }
 .settings-login-btn {
   width: 100%;
   padding: 10px;
   border-radius: 10px;
   border: 1px solid var(--border);
-  background: #4285f4;
   color: #fff;
   font-size: 14px;
   font-weight: 700;
@@ -3575,6 +3574,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 .settings-login-btn:hover  { opacity: .9; }
 .settings-login-btn:active { transform: scale(.98); }
+.settings-login-btn--google { background: #4285f4; }
+.settings-login-btn--apple  { background: #000; border-color: #000; }
 .settings-login-profile {
   display: flex;
   align-items: center;

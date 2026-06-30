@@ -4235,6 +4235,24 @@ async function loginWithGoogle() {
   }
 }
 
+// Same FirebaseAuthentication plugin already used for Google — it has its
+// own signInWithApple() that calls Apple's native ASAuthorizationAppleIDProvider
+// through the Capacitor bridge, so no separate apple-sign-in package or
+// manual OAuthProvider/credential exchange is needed (unlike the raw
+// Firebase web SDK flow this was originally sketched against).
+async function loginWithApple() {
+  if (!isNativeApp()) return;
+  try {
+    const result = await getFirebaseAuth().signInWithApple();
+    const user = result.user;
+    if (user) await loadCloudSave(user.uid); // 登入後讀取雲端存檔
+    showToast(t('settings.login.success'));
+  } catch (e) {
+    console.error('Apple 登入失敗:', e);
+    showToast(t('settings.login.fail'));
+  }
+}
+
 async function logout() {
   if (!isNativeApp()) return;
   try {
@@ -4286,7 +4304,9 @@ function renderLoginUI(user) {
       </div>
       <button class="settings-action-btn" onclick="logout()">${t('settings.logout')}</button>`;
   } else {
-    row.innerHTML = `<button class="settings-login-btn" onclick="loginWithGoogle()">🔵 ${t('settings.login')}</button>`;
+    row.innerHTML = `
+      <button class="settings-login-btn settings-login-btn--google" onclick="loginWithGoogle()">🔵 ${t('settings.login')}</button>
+      <button class="settings-login-btn settings-login-btn--apple" onclick="loginWithApple()">⚫ ${t('settings.login.apple')}</button>`;
   }
 }
 
