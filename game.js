@@ -4030,48 +4030,6 @@ function toggleGameSetting(key, checked) {
 }
 
 // ─── Settings: Account / Data ──────────────────────────────────────────────
-function loadPlayerName() { return localStorage.getItem('playerName') || ''; }
-function savePlayerNameInput(name) { localStorage.setItem('playerName', name); }
-
-function exportSaveData() {
-  const data = {};
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    data[key] = localStorage.getItem(key);
-  }
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = `pixelpet-save-${getDateStr(new Date())}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  showToast('💾 存檔已匯出');
-}
-
-function importSaveData(file) {
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target.result);
-      Object.keys(data).forEach(key => localStorage.setItem(key, data[key]));
-      showToast('✅ 存檔已匯入，重新整理中...');
-      setTimeout(() => location.reload(), 800);
-    } catch {
-      showToast('❌ 存檔檔案格式錯誤');
-    }
-  };
-  reader.readAsText(file);
-}
-
-function doClearSaveData() {
-  localStorage.clear();
-  closeModal('modal-clear-confirm');
-  location.reload();
-}
 
 // ─── Settings: Render ──────────────────────────────────────────────────────
 function renderLangPicker() {
@@ -4085,7 +4043,6 @@ function renderLangPicker() {
 function renderSettingsTab() {
   const sound = loadSoundSettings();
   const game  = loadGameSettings();
-  const name  = loadPlayerName();
 
   const sfxEl    = document.getElementById('toggle-sfx');
   const musicEl  = document.getElementById('toggle-music');
@@ -4103,9 +4060,6 @@ function renderSettingsTab() {
   const questEl  = document.getElementById('toggle-quest-alert');
   if (hungerEl) hungerEl.checked = game.hungerAlert;
   if (questEl)  questEl.checked  = game.questAlert;
-
-  const nameEl = document.getElementById('input-player-name');
-  if (nameEl) nameEl.value = name;
 
   renderLoginUI(currentFirebaseUser);
 }
@@ -4302,11 +4256,37 @@ function renderLoginUI(user) {
           : '<div class="settings-login-avatar settings-login-avatar--fallback">👤</div>'}
         <span class="settings-login-name">${user.displayName || ''}</span>
       </div>
-      <button class="settings-action-btn" onclick="logout()">${t('settings.logout')}</button>`;
+      <div class="settings-login-actions">
+        <button class="settings-action-btn" onclick="logout()">${t('settings.logout')}</button>
+        <button class="settings-action-btn settings-action-btn--danger" onclick="openModal('modal-delete-account')">${t('settings.delete_account')}</button>
+      </div>`;
   } else {
     row.innerHTML = `
       <button class="settings-login-btn settings-login-btn--google" onclick="loginWithGoogle()">🔵 ${t('settings.login')}</button>
       <button class="settings-login-btn settings-login-btn--apple" onclick="loginWithApple()">⚫ ${t('settings.login.apple')}</button>`;
+  }
+}
+
+// Per the explicit deletion order requested: wipe the cloud save first, then
+// the Firebase account itself — if the Firestore delete throws, we haven't
+// touched the account yet, so nothing is left in a half-deleted state.
+async function deleteAccount() {
+  if (!isNativeApp()) return;
+  try {
+    const { user } = await getFirebaseAuth().getCurrentUser();
+    if (!user) return;
+
+    await getFirebaseFirestore().deleteDocument({ reference: `saves/${user.uid}` });
+    await getFirebaseAuth().deleteUser();
+
+    localStorage.clear();
+    closeModal('modal-delete-account');
+    showToast(t('settings.account.deleted'));
+    setTimeout(() => location.reload(), 800);
+  } catch (e) {
+    console.error('刪除帳號失敗:', e);
+    closeModal('modal-delete-account');
+    showToast(t('settings.delete_account.fail'));
   }
 }
 

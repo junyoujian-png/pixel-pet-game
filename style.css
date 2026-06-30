@@ -3595,11 +3595,12 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   font-size: 18px;
 }
 .settings-login-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.settings-login-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
 /* Clear-confirm modal */
 .settings-clear-confirm-box { max-width: 320px; text-align: center; padding: 28px 24px 22px; }
 .settings-clear-confirm-title { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
-.settings-clear-confirm-body  { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
+.settings-clear-confirm-body  { font-size: 13px; color: var(--text2); margin-bottom: 20px; white-space: pre-line; }
 .settings-clear-confirm-actions { display: flex; gap: 10px; justify-content: center; }
 .btn-confirm-danger {
   padding: 9px 26px;
