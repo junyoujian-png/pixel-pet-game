@@ -1529,8 +1529,10 @@ function confirmPurchase() {
 }
 
 // ─── Ad System ────────────────────────────────────────────────────────────────
-// TODO: 替換成真實廣告 SDK（如 AdMob、Unity Ads）
-// 目前使用模擬倒數計時代替
+// AdMob is now wired up for the native app (see showRewardAd() below).
+// This 5-second mock countdown is the intentional browser-only fallback for
+// when there's no native AdMob SDK to call — see watchAdForReward()/
+// watchAdForGacha(), which branch on isNativeApp() to pick one or the other.
 
 function loadAdWatchCount() {
   try {
@@ -1559,7 +1561,7 @@ function saveAdGachaUsed(o) { localStorage.setItem('adGachaUsed', JSON.stringify
 let adTimerInterval = null;
 
 function showAdModal(onComplete) {
-  // TODO: 替換成真實廣告 SDK（如 AdMob、Unity Ads）
+  // Browser-only fallback (no native AdMob SDK here) — see the comment above.
   const overlay   = document.getElementById('modal-ad');
   const countdown = document.getElementById('ad-countdown');
   const bar       = document.getElementById('ad-progress-bar');
@@ -1595,12 +1597,15 @@ function showAdModal(onComplete) {
   }, 1000);
 }
 
-function watchAdForReward() {
+// On a real device, watch an actual AdMob rewarded video. In a plain
+// browser (no native AdMob SDK available), fall back to the original
+// 5-second mock countdown so the feature can still be tested/demoed there.
+async function watchAdForReward() {
   const adState  = loadAdWatchCount();
   const MAX      = 3;
   if (adState.count >= MAX) { showToast(t('ad.limit')); return; }
 
-  showAdModal(() => {
+  const grantReward = () => {
     const updated  = loadAdWatchCount();
     const newCount = (updated.count || 0) + 1;
     console.log('ad watch count updated to:', newCount);
@@ -1611,14 +1616,21 @@ function watchAdForReward() {
     if (document.getElementById('tab-quest')?.classList.contains('active')) {
       renderQuestList();
     }
-  });
+  };
+
+  if (isNativeApp()) {
+    const watched = await showRewardAd();
+    if (watched) grantReward();
+  } else {
+    showAdModal(grantReward);
+  }
 }
 
-function watchAdForGacha() {
+async function watchAdForGacha() {
   const state = loadAdGachaUsed();
   if (state.used) { showToast('今日廣告扭蛋已使用！'); return; }
 
-  showAdModal(() => {
+  const grantReward = () => {
     const updated = loadAdGachaUsed();
     updated.used = true;
     saveAdGachaUsed(updated);
@@ -1633,7 +1645,14 @@ function watchAdForGacha() {
       machine?.classList.remove('gacha-spin');
       showGachaResult(doGachaRolls(1));
     }, 1200);
-  });
+  };
+
+  if (isNativeApp()) {
+    const watched = await showRewardAd();
+    if (watched) grantReward();
+  } else {
+    showAdModal(grantReward);
+  }
 }
 
 // ─── Bank (Step Exchange) ─────────────────────────────────────────────────────
@@ -4089,19 +4108,84 @@ function renderSettingsTab() {
   if (nameEl) nameEl.value = name;
 }
 
+// Whether we're running inside the native Capacitor shell (iOS app) rather
+// than a plain browser tab. Native-only plugins (ATT, AdMob) should only
+// ever be called when this is true.
+const isNativeApp = () => !!(window.Capacitor && window.Capacitor.isNativePlatform());
+
 // ─── App Tracking Transparency ────────────────────────────────────────────────
 // No bundler in this project, so the plugin is loaded as a plain global via
 // vendor/capacitor.js + vendor/capacitor-att.js (see index.html) instead of
 // `import` — registerPlugin() in those scripts exposes it on Capacitor.Plugins.
 // isNativePlatform() is false in a regular browser, so this is a no-op there.
 async function requestATT() {
-  if (!window.Capacitor?.isNativePlatform?.()) return;
+  if (!isNativeApp()) return;
   try {
     const { status } = await Capacitor.Plugins.AppTrackingTransparency.requestPermission();
     console.log('ATT status:', status);
   } catch (e) {
     console.error('ATT request failed:', e);
   }
+}
+
+// ─── AdMob ────────────────────────────────────────────────────────────────────
+// Same no-bundler pattern as ATT: vendor/capacitor-admob.js (see index.html)
+// registers itself onto Capacitor.Plugins.AdMob, no `import` needed.
+//
+// TODO: 正式上架後，把 TEST_REWARD_AD_ID 換成真實的 AdMob 廣告單元 ID
+// TODO: 正式上架後，把 Info.plist 的 GADApplicationIdentifier 換成正式 App ID
+const TEST_REWARD_AD_ID = 'ca-app-pub-3940256099942544/1712485313';
+
+async function initAdMob() {
+  if (!isNativeApp()) return; // AdMob's native SDK isn't available in a plain browser
+  try {
+    await Capacitor.Plugins.AdMob.initialize({
+      testingDevices: [],
+      initializeForTesting: true,
+      // Note: this plugin version's initialize() has no
+      // requestTrackingAuthorization option (that's a separate
+      // AdMob.requestTrackingAuthorization() method here) — ATT is already
+      // requested once via requestATT() above, so it's intentionally not
+      // duplicated through AdMob's own method too.
+    });
+  } catch (e) {
+    console.error('AdMob init failed:', e);
+  }
+}
+
+// Shows a real rewarded video ad and resolves true only if the user actually
+// earned the reward (the plugin's own docs warn that the ad being dismissed
+// is NOT the same as the reward being granted — closing early after skipping
+// must not pay out), false if it was dismissed early, failed to show, or
+// failed to load.
+function showRewardAd() {
+  return new Promise((resolve) => {
+    const AdMob = window.Capacitor?.Plugins?.AdMob;
+    if (!AdMob) { resolve(false); return; }
+
+    let rewarded = false;
+    const handles = [];
+    const cleanup = () => handles.forEach((h) => h?.remove());
+
+    AdMob.addListener('onRewardedVideoAdReward', () => { rewarded = true; })
+      .then((h) => handles.push(h));
+    AdMob.addListener('onRewardedVideoAdDismissed', () => {
+      cleanup();
+      resolve(rewarded);
+    }).then((h) => handles.push(h));
+    AdMob.addListener('onRewardedVideoAdFailedToShow', () => {
+      cleanup();
+      resolve(false);
+    }).then((h) => handles.push(h));
+
+    AdMob.prepareRewardVideoAd({ adId: TEST_REWARD_AD_ID })
+      .then(() => AdMob.showRewardVideoAd())
+      .catch((e) => {
+        console.error('Reward ad failed:', e);
+        cleanup();
+        resolve(false);
+      });
+  });
 }
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
@@ -4111,6 +4195,7 @@ function init() {
   unlockAudioOnFirstInteraction();
   initSfxClickDelegation();
   requestATT();
+  initAdMob();
 
   checkDailyPPReset();
   initStepHistory();
