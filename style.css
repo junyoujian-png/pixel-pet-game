@@ -3616,3 +3616,68 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 .btn-confirm-danger:hover  { opacity: .88; }
 .btn-confirm-danger:active { transform: scale(.96); }
+
+/* ─── Onboarding (login + language, shown once before first launch) ─── */
+.screen-onboarding {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: linear-gradient(160deg, var(--accent), var(--accent2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.screen-onboarding.hidden { display: none; }
+.onboarding-content {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  text-align: center;
+}
+.onboarding-logo { font-size: 64px; line-height: 1; }
+.onboarding-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.5;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.onboarding-login-btns {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.onboarding-skip {
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.onboarding-skip:hover { color: #fff; }
+.onboarding-lang-grid {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.onboarding-lang-card {
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  border: none;
+  background: #fff;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform .1s;
+}
+.onboarding-lang-card:hover  { transform: translateY(-2px); }
+.onboarding-lang-card:active { transform: scale(.97); }

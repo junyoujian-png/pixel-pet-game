@@ -38,6 +38,28 @@
   </style>
 </head>
 <body>
+  <!-- Onboarding: Login Screen (shown before a language is chosen, so text
+       here is hardcoded bilingual rather than going through t()) -->
+  <div id="screen-onboarding-login" class="screen-onboarding hidden">
+    <div class="onboarding-content">
+      <div class="onboarding-logo">🐾</div>
+      <h1 class="onboarding-title">歡迎來到 Pixel Pet<br>Welcome to Pixel Pet</h1>
+      <div class="onboarding-login-btns">
+        <button class="settings-login-btn settings-login-btn--google" onclick="onboardingLoginWithGoogle()">🔵 使用 Google 登入 / Sign in with Google</button>
+        <button class="settings-login-btn settings-login-btn--apple" onclick="onboardingLoginWithApple()">⚫ 使用 Apple 登入 / Sign in with Apple</button>
+      </div>
+      <a class="onboarding-skip" onclick="skipLogin()">先不登入，稍後再說 / Skip for now</a>
+    </div>
+  </div>
+
+  <!-- Onboarding: Language Screen -->
+  <div id="screen-onboarding-language" class="screen-onboarding hidden">
+    <div class="onboarding-content">
+      <h1 class="onboarding-title">選擇語言 / Choose Language</h1>
+      <div class="onboarding-lang-grid" id="onboarding-lang-grid"></div>
+    </div>
+  </div>
+
   <!-- Pet Select Screen -->
   <div id="screen-select" class="screen-select hidden">
     <div class="select-header">

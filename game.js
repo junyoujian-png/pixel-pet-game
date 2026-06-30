@@ -4177,15 +4177,17 @@ function getFirebaseFirestore() { return window.Capacitor?.Plugins?.FirebaseFire
 let currentFirebaseUser = null;
 
 async function loginWithGoogle() {
-  if (!isNativeApp()) return;
+  if (!isNativeApp()) return false;
   try {
     const result = await getFirebaseAuth().signInWithGoogle();
     const user = result.user;
     if (user) await loadCloudSave(user.uid); // 登入後讀取雲端存檔
     showToast(t('settings.login.success'));
+    return true;
   } catch (e) {
     console.error('登入失敗:', e);
     showToast(t('settings.login.fail'));
+    return false;
   }
 }
 
@@ -4195,15 +4197,17 @@ async function loginWithGoogle() {
 // manual OAuthProvider/credential exchange is needed (unlike the raw
 // Firebase web SDK flow this was originally sketched against).
 async function loginWithApple() {
-  if (!isNativeApp()) return;
+  if (!isNativeApp()) return false;
   try {
     const result = await getFirebaseAuth().signInWithApple();
     const user = result.user;
     if (user) await loadCloudSave(user.uid); // 登入後讀取雲端存檔
     showToast(t('settings.login.success'));
+    return true;
   } catch (e) {
     console.error('Apple 登入失敗:', e);
     showToast(t('settings.login.fail'));
+    return false;
   }
 }
 
@@ -4314,6 +4318,66 @@ setInterval(() => {
   if (isNativeApp() && currentFirebaseUser) saveCloudSave();
 }, 60000);
 
+// ─── Onboarding (first-launch login + language flow) ───────────────────────────
+// Gates the existing init() boot sequence behind a one-time login/language
+// flow. "initGame()" in the original spec is this project's existing init()
+// — not renamed, just called from here once onboarding is done or skipped.
+function showOnboarding() {
+  if (localStorage.getItem('hasOnboarded')) {
+    init(); // 直接進入遊戲
+  } else {
+    showLoginScreen();
+  }
+}
+
+function showLoginScreen() {
+  document.getElementById('screen-onboarding-login')?.classList.remove('hidden');
+}
+
+function hideLoginScreen() {
+  document.getElementById('screen-onboarding-login')?.classList.add('hidden');
+}
+
+async function onboardingLoginWithGoogle() {
+  const success = await loginWithGoogle();
+  if (success) onLoginSuccess();
+}
+
+async function onboardingLoginWithApple() {
+  const success = await loginWithApple();
+  if (success) onLoginSuccess();
+}
+
+function skipLogin() {
+  hideLoginScreen();
+  showLanguageScreen();
+}
+
+function onLoginSuccess() {
+  hideLoginScreen();
+  showLanguageScreen();
+}
+
+function showLanguageScreen() {
+  renderOnboardingLanguageGrid();
+  document.getElementById('screen-onboarding-language')?.classList.remove('hidden');
+}
+
+function renderOnboardingLanguageGrid() {
+  const grid = document.getElementById('onboarding-lang-grid');
+  if (!grid) return;
+  grid.innerHTML = Object.entries(LANGUAGES).map(([code, label]) =>
+    `<button class="onboarding-lang-card" onclick="selectLanguage('${code}')">${label}</button>`
+  ).join('');
+}
+
+function selectLanguage(lang) {
+  setLang(lang);
+  localStorage.setItem('hasOnboarded', 'true');
+  document.getElementById('screen-onboarding-language')?.classList.add('hidden');
+  init(); // 進入遊戲
+}
+
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 function init() {
   // Registered first so a later render/init failure can never prevent the
@@ -4350,4 +4414,4 @@ function init() {
   setInterval(decayStats, DECAY_INTERVAL);
 }
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', showOnboarding);
