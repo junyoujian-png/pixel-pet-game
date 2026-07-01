@@ -45,10 +45,10 @@
       <div class="onboarding-logo">🐾</div>
       <h1 class="onboarding-title">歡迎來到 Pixel Pet<br>Welcome to Pixel Pet</h1>
       <div class="onboarding-login-btns">
-        <button class="settings-login-btn settings-login-btn--google" onclick="onboardingLoginWithGoogle()">🔵 使用 Google 登入 / Sign in with Google</button>
-        <button class="settings-login-btn settings-login-btn--apple" onclick="onboardingLoginWithApple()">⚫ 使用 Apple 登入 / Sign in with Apple</button>
+        <button class="settings-login-btn settings-login-btn--google" onclick="try{onboardingLoginWithGoogle()}catch(e){alert('Google btn error: '+e)}">🔵 使用 Google 登入 / Sign in with Google</button>
+        <button class="settings-login-btn settings-login-btn--apple" onclick="try{onboardingLoginWithApple()}catch(e){alert('Apple btn error: '+e)}">⚫ 使用 Apple 登入 / Sign in with Apple</button>
       </div>
-      <a class="onboarding-skip" onclick="skipLogin()">先不登入，稍後再說 / Skip for now</a>
+      <a class="onboarding-skip" onclick="try{skipLogin()}catch(e){alert('Skip error: '+e)}">先不登入，稍後再說 / Skip for now</a>
     </div>
   </div>
 
@@ -770,6 +770,11 @@
   </script>
   <script src="vendor/capacitor-firebase-auth.js"></script>
   <script src="vendor/capacitor-firebase-firestore.js"></script>
+  <script>
+    window.onerror = function(msg, src, line, col, err) {
+      alert('[JS Error] ' + msg + '\n' + src + ':' + line);
+    };
+  </script>
   <script src="lang.js"></script>
   <script src="game.js"></script>
 </body>

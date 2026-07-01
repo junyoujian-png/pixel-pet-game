@@ -4390,10 +4390,6 @@ function selectLanguage(lang) {
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 function init() {
-  window.onerror = (msg, src, line, col, err) => {
-    console.error('Global error:', msg, src, line, err);
-    alert('Error: ' + msg);
-  };
   // Registered first so a later render/init failure can never prevent the
   // audio-unlock listener from being attached (BGM would otherwise never play).
   unlockAudioOnFirstInteraction();
