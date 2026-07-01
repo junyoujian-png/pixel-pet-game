@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>377657317274-6u87c1lf0gko21p1b1a7tk07qg5amiol.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.377657317274-6u87c1lf0gko21p1b1a7tk07qg5amiol</string>
+	<key>API_KEY</key>
+	<string>AIzaSyD5clT6ZmfJxtgJOJaek0oOnF5S5DBu2Tg</string>
+	<key>GCM_SENDER_ID</key>
+	<string>377657317274</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.junyoujian.pixelpet</string>
+	<key>PROJECT_ID</key>
+	<string>pixel-pet-game</string>
+	<key>STORAGE_BUCKET</key>
+	<string>pixel-pet-game.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:377657317274:ios:6cb90f9a68517b96a50c23</string>
+</dict>
+</plist>
