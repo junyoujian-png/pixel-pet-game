@@ -25,6 +25,8 @@ const LANG_DATA = {
     'home.collection': '圖鑑',
     'home.manage': '管理',
     'home.focus': '專注',
+    'home.slot.empty': '空的巢位',
+    'home.slot.add': '＋ 加入寵物',
     'toast.coming_soon': '即將推出！',
     // 專注計時器
     'focus.title': '專注',
@@ -470,6 +472,8 @@ const LANG_DATA = {
     'home.collection': 'Collection',
     'home.manage': 'Manage',
     'home.focus': 'Focus',
+    'home.slot.empty': 'Empty Slot',
+    'home.slot.add': '＋ Add Pet',
     'toast.coming_soon': 'Coming soon!',
     // Focus Timer
     'focus.title': 'Focus',

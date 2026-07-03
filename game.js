@@ -2039,8 +2039,8 @@ function renderSlotPage(slotIdx) {
     page.innerHTML = `
       <div class="slot-empty-box">
         <div class="slot-empty-icon">🐾</div>
-        <div class="slot-empty-text">空的巢位</div>
-        <button class="slot-add-btn" onclick="openPetPickForSlot(${slotIdx})">＋ 加入寵物</button>
+        <div class="slot-empty-text">${t('home.slot.empty')}</div>
+        <button class="slot-add-btn" onclick="openPetPickForSlot(${slotIdx})">${t('home.slot.add')}</button>
       </div>`;
     return;
   }
