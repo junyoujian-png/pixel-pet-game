@@ -46,13 +46,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 /* ─── Top Bar ─── */
 .top-bar {
-  height: var(--top-h);
+  min-height: var(--top-h);
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 12px;
+  padding: env(safe-area-inset-top, 0px) 12px 0;
   position: sticky;
   top: 0;
   z-index: 10;
