@@ -3487,7 +3487,7 @@ function initExploreCards() {
   document.getElementById('btn-explore-boss-back')?.addEventListener('click', hideBossPage);
   document.getElementById('btn-world-back')?.addEventListener('click',   hideWorldPage);
   document.getElementById('btn-world-locate')?.addEventListener('click', () => {
-    if (worldPlayerLat !== null && worldMap) worldMap.setView([worldPlayerLat, worldPlayerLng], 16);
+    if (worldPlayerLat !== null && worldMap) worldMap.setCenterAnimated(new mapkit.Coordinate(worldPlayerLat, worldPlayerLng));
   });
   document.getElementById('btn-world-manual')?.addEventListener('click', () => {
     document.getElementById('world-manual-location')?.classList.remove('hidden');
@@ -3516,7 +3516,7 @@ let worldPlayerMarker   = null;
 let worldPlayerLat      = null;
 let worldPlayerLng      = null;
 let worldWatchId        = null;
-let worldChestMarkers   = [];   // [{ marker, chest }]
+let worldChestMarkers   = [];   // [{ annotation, chest }]
 
 const WORLD_GLOW_DIST   = 50;   // metres — show glow + allow collect
 const WORLD_MIN_DIST    = 100;  // metres — min spawn distance from player
@@ -3575,22 +3575,42 @@ function generateWorldChests(lat, lng) {
   return data;
 }
 
-function createPlayerIcon() {
-  return L.divIcon({
-    className: '',
-    html: '<div class="world-player-dot"></div>',
-    iconSize: [20, 20],
-    iconAnchor: [10, 10],
+function initMapKitIfNeeded() {
+  if (window.mapkitInitialized) return;
+  mapkit.init({
+    authorizationCallback: function(done) {
+      const token = isNativeApp() ? MAPKIT_TOKENS.app : MAPKIT_TOKENS.web;
+      done(token);
+    }
   });
+  window.mapkitInitialized = true;
 }
 
-function createChestIcon(glowing) {
-  return L.divIcon({
-    className: '',
-    html: `<div class="world-chest-icon${glowing ? ' world-chest-icon--glow' : ''}">🎁</div>`,
-    iconSize: [36, 36],
-    iconAnchor: [18, 18],
-  });
+function createPlayerAnnotation(lat, lng) {
+  const factory = () => {
+    const el = document.createElement('div');
+    el.className = 'world-player-dot';
+    return el;
+  };
+  return new mapkit.Annotation(
+    new mapkit.Coordinate(lat, lng),
+    factory,
+    { data: { type: 'player' } }
+  );
+}
+
+function createChestAnnotation(lat, lng, chestData) {
+  const factory = () => {
+    const el = document.createElement('div');
+    el.className = 'world-chest-icon';
+    el.textContent = '🎁';
+    return el;
+  };
+  return new mapkit.Annotation(
+    new mapkit.Coordinate(lat, lng),
+    factory,
+    { data: { type: 'chest', chest: chestData } }
+  );
 }
 
 function updateWorldHUD() {
@@ -3602,14 +3622,12 @@ function updateWorldHUD() {
 }
 
 function placeWorldChestMarkers(data) {
-  // Clear existing
-  worldChestMarkers.forEach(cm => { try { worldMap.removeLayer(cm.marker); } catch {} });
+  worldChestMarkers.forEach(cm => { try { worldMap.removeAnnotation(cm.annotation); } catch {} });
   worldChestMarkers = [];
   data.chests.filter(c => !c.collected).forEach(chest => {
-    const marker = L.marker([chest.lat, chest.lng], { icon: createChestIcon(false) }).addTo(worldMap);
-    const cm = { marker, chest };
-    marker.on('click', () => tryCollectChest(cm));
-    worldChestMarkers.push(cm);
+    const annotation = createChestAnnotation(chest.lat, chest.lng, chest);
+    worldMap.addAnnotation(annotation);
+    worldChestMarkers.push({ annotation, chest });
   });
   updateWorldHUD();
 }
@@ -3623,7 +3641,7 @@ function tryCollectChest(cm) {
 
 function collectWorldChest(cm) {
   cm.chest.collected = true;
-  try { worldMap.removeLayer(cm.marker); } catch {}
+  try { worldMap.removeAnnotation(cm.annotation); } catch {}
   worldChestMarkers = worldChestMarkers.filter(x => x !== cm);
 
   const reward = 50 + Math.floor(Math.random() * 51);
@@ -3634,7 +3652,6 @@ function collectWorldChest(cm) {
   showToast(`💎 +${reward} ${t('toast.treasure')}`);
   updateWorldHUD();
 
-  // Persist collected state
   const raw = localStorage.getItem('worldChests');
   if (raw) {
     const data = JSON.parse(raw);
@@ -3663,19 +3680,19 @@ function updateWorldPlayerPos(lat, lng) {
   worldPlayerLat = lat;
   worldPlayerLng = lng;
   if (!worldPlayerMarker) {
-    worldPlayerMarker = L.marker([lat, lng], {
-      icon: createPlayerIcon(), zIndexOffset: 1000,
-    }).addTo(worldMap);
-    worldMap.setView([lat, lng], 16);
+    worldPlayerMarker = createPlayerAnnotation(lat, lng);
+    worldMap.addAnnotation(worldPlayerMarker);
+    worldMap.setCenterAnimated(new mapkit.Coordinate(lat, lng));
   } else {
-    worldPlayerMarker.setLatLng([lat, lng]);
+    worldPlayerMarker.coordinate = new mapkit.Coordinate(lat, lng);
   }
-  // Update chest glow state
   worldChestMarkers.forEach(cm => {
     if (cm.chest.collected) return;
-    const dist   = worldDist(lat, lng, cm.chest.lat, cm.chest.lng);
+    const dist    = worldDist(lat, lng, cm.chest.lat, cm.chest.lng);
     const glowing = dist <= WORLD_GLOW_DIST;
-    cm.marker.setIcon(createChestIcon(glowing));
+    if (cm.annotation.element) {
+      cm.annotation.element.classList.toggle('world-chest-icon--glow', glowing);
+    }
   });
 }
 
@@ -3684,7 +3701,6 @@ function onWorldGPSPosition(pos) {
   const lng = pos.coords.longitude;
   document.getElementById('world-gps-denied')?.classList.add('hidden');
   updateWorldPlayerPos(lat, lng);
-  // Generate chests if first time or all respawned
   const existing = loadWorldChests();
   if (!existing) {
     placeWorldChestMarkers(generateWorldChests(lat, lng));
@@ -3716,15 +3732,29 @@ function showWorldPage() {
   document.getElementById('explore-world-sub').style.display  = 'flex';
   updateWorldHUD();
   if (!worldMap) {
-    worldMap = L.map('world-map', { zoomControl: false, attributionControl: false });
-    L.control.zoom({ position: 'bottomright' }).addTo(worldMap);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(worldMap);
-    worldMap.setView([25.0330, 121.5654], 14);
-    // Load cached chests if any (non-GPS preview)
+    initMapKitIfNeeded();
+    const center = new mapkit.Coordinate(25.0330, 121.5654);
+    worldMap = new mapkit.Map('world-map', {
+      center: center,
+      region: new mapkit.CoordinateRegion(
+        center,
+        new mapkit.CoordinateSpan(0.02, 0.02)
+      ),
+      showsZoomControl: true,
+      showsCompass: mapkit.FeatureVisibility.Hidden,
+      showsScale: mapkit.FeatureVisibility.Hidden,
+      showsMapTypeControl: false,
+      isRotationEnabled: false,
+    });
+    worldMap.addEventListener('select', (event) => {
+      const ann = event.annotation;
+      if (!ann) return;
+      const cm = worldChestMarkers.find(cm => cm.annotation === ann);
+      if (cm) tryCollectChest(cm);
+    });
     const existing = loadWorldChests();
     if (existing) placeWorldChestMarkers(existing);
   }
-  setTimeout(() => worldMap.invalidateSize(), 150);
   startWorldGPS();
   applyLang();
 }
