@@ -913,7 +913,11 @@ const t = (key) => {
 const setLang = (lang) => {
   currentLang = lang;
   localStorage.setItem('language', lang);
-  applyLang(); // 不再 location.reload()，直接套用
+  applyLang();
+  // Re-render JS-generated content that doesn't use data-i18n attributes.
+  // Guards prevent errors when lang.js is loaded before game.js finishes.
+  if (typeof renderAll === 'function') renderAll();
+  if (typeof renderSettingsTab === 'function') renderSettingsTab();
 };
 
 // ─── DOM Binding: data-i18n / data-i18n-placeholder / data-lang ────────────
