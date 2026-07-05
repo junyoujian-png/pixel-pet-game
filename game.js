@@ -1674,20 +1674,72 @@ function getMockStepsForDate(iso) {
   return Math.floor(200 + (((seed * 1664525 + 1013904223) >>> 0) / 4294967296) * 15800);
 }
 
-function initStepHistory() {
+let healthKitAuthorized = false;
+
+async function requestHealthKitPermission() {
+  if (!isNativeApp()) return false;
+  try {
+    const Health = window.Capacitor.Plugins.Health;
+    await Health.requestAuthorization({ read: ['steps'], write: [] });
+    healthKitAuthorized = true;
+    return true;
+  } catch (e) {
+    console.error('[HealthKit] 授權失敗:', e);
+    healthKitAuthorized = false;
+    return false;
+  }
+}
+
+async function getRealStepsForDate(dateObj) {
+  if (!isNativeApp() || !healthKitAuthorized) return null;
+  try {
+    const Health = window.Capacitor.Plugins.Health;
+    const start = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate(), 0, 0, 0, 0);
+    const end   = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate() + 1, 0, 0, 0, 0);
+    const result = await Health.queryAggregated({
+      dataType: 'steps',
+      startDate: start.toISOString(),
+      endDate: end.toISOString(),
+      bucket: 'day',
+      aggregation: 'sum',
+    });
+    const sample = (result.samples || [])[0];
+    return sample ? Math.round(sample.value) : 0;
+  } catch (e) {
+    console.error('[HealthKit] 讀取步數失敗:', e);
+    return null;
+  }
+}
+
+async function initStepHistory() {
+  if (isNativeApp() && !healthKitAuthorized) {
+    await requestHealthKitPermission();
+  }
+
   let history = loadStepHistory();
   const today = getDateStr(new Date());
 
-  // Only add today's entry if it doesn't already exist
-  if (!history.find(e => e.date === today)) {
-    history.push({ date: today, steps: getMockStepsForDate(today) });
+  // Always refresh today's entry with real steps (or mock fallback)
+  const realSteps = await getRealStepsForDate(new Date());
+  const steps = realSteps !== null ? realSteps : getMockStepsForDate(today);
+
+  const idx = history.findIndex(e => e.date === today);
+  if (idx >= 0) {
+    history[idx].steps = steps;
+  } else {
+    history.push({ date: today, steps });
   }
 
   // Keep max 7 entries (newest first), drop oldest beyond 7
   history.sort((a, b) => b.date.localeCompare(a.date));
   if (history.length > 7) history = history.slice(0, 7);
-
   saveStepHistory(history);
+
+  if (isNativeApp() && !healthKitAuthorized) {
+    showToast('請允許存取健康資料以取得真實步數');
+  }
+
+  renderBankPanel();
 }
 
 function renderBankPanel() {
