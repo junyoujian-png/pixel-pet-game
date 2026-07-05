@@ -15,7 +15,8 @@ let package = Package(
         .package(name: "CapacitorCommunityAdmob", path: "..\..\..\node_modules\@capacitor-community\admob"),
         .package(name: "CapacitorFirebaseAuthentication", path: "..\..\..\node_modules\@capacitor-firebase\authentication"),
         .package(name: "CapacitorFirebaseFirestore", path: "..\..\..\node_modules\@capacitor-firebase\firestore"),
-        .package(name: "CapgoCapacitorAppTrackingTransparency", path: "..\..\..\node_modules\@capgo\capacitor-app-tracking-transparency")
+        .package(name: "CapgoCapacitorAppTrackingTransparency", path: "..\..\..\node_modules\@capgo\capacitor-app-tracking-transparency"),
+        .package(name: "CapgoCapacitorHealth", path: "..\..\..\node_modules\@capgo\capacitor-health")
     ],
     targets: [
         .target(
@@ -26,7 +27,8 @@ let package = Package(
                 .product(name: "CapacitorCommunityAdmob", package: "CapacitorCommunityAdmob"),
                 .product(name: "CapacitorFirebaseAuthentication", package: "CapacitorFirebaseAuthentication"),
                 .product(name: "CapacitorFirebaseFirestore", package: "CapacitorFirebaseFirestore"),
-                .product(name: "CapgoCapacitorAppTrackingTransparency", package: "CapgoCapacitorAppTrackingTransparency")
+                .product(name: "CapgoCapacitorAppTrackingTransparency", package: "CapgoCapacitorAppTrackingTransparency"),
+                .product(name: "CapgoCapacitorHealth", package: "CapgoCapacitorHealth")
             ]
         )
     ]
