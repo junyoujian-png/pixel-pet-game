@@ -137,11 +137,7 @@ const LANG_DATA = {
     // 探索
     'explore.title': '探索',
     'explore.subtitle': '選擇探索模式',
-    'explore.world': '探索世界',
     'explore.boss': 'BOSS 挑戰',
-    'explore.mystery': '神秘商店',
-    'explore.go': '出去玩',
-    'explore.go.desc': '在真實地圖上收集寶箱',
     'explore.boss.desc': '挑戰強大 BOSS 獲得稀有獎勵',
     // BOSS
     'boss.title': 'BOSS 挑戰',
@@ -420,14 +416,12 @@ const LANG_DATA = {
     'toast.drink_success': '飲料使用成功！',
     'toast.gacha_result': '抽獎結果',
     'toast.ticket_used': '使用挑戰卷！',
-    'toast.treasure': '獲得能量石！',
     // 任務內容（每日 / 成就 / 週常）
     'quest.d1.name': '餵食寵物',     'quest.d1.desc': '使用一次食物',
     'quest.d2.name': '給寵物喝飲料', 'quest.d2.desc': '使用一次飲料',
     'quest.d3.name': '挑戰 BOSS',   'quest.d3.desc': '完成一場 BOSS 戰鬥',
     'quest.d4.name': '心情滿滿',    'quest.d4.desc': '任一寵物心情達到 80 以上',
     'quest.d5.name': '扭蛋一抽',    'quest.d5.desc': '抽一次扭蛋',
-    'quest.d6.name': '出去尋寶',    'quest.d6.desc': '收集一個寶箱',
     'quest.d7.name': '兌換能量',    'quest.d7.desc': '完成一次步數兌換',
     'quest.d8.name': '免費能量石',  'quest.d8.desc': '觀看廣告獲得獎勵',
     'quest.d9.name': '今日專注',  'quest.d9.desc': '完成一次專注計時',
@@ -584,11 +578,7 @@ const LANG_DATA = {
     // Explore
     'explore.title': 'Explore',
     'explore.subtitle': 'Choose Explore Mode',
-    'explore.world': 'Explore World',
     'explore.boss': 'BOSS Battle',
-    'explore.mystery': 'Mystery Shop',
-    'explore.go': 'Go Outside',
-    'explore.go.desc': 'Collect treasure boxes on real map',
     'explore.boss.desc': 'Challenge powerful BOSSes for rare rewards',
     // BOSS
     'boss.title': 'BOSS Battle',
@@ -867,14 +857,12 @@ const LANG_DATA = {
     'toast.drink_success': 'Drink used!',
     'toast.gacha_result': 'Gacha Result',
     'toast.ticket_used': 'Ticket used!',
-    'toast.treasure': 'Gems obtained!',
     // Quest content (daily / achievement / weekly)
     'quest.d1.name': 'Feed Pet',         'quest.d1.desc': 'Use food once',
     'quest.d2.name': 'Give Pet a Drink', 'quest.d2.desc': 'Use a drink once',
     'quest.d3.name': 'Challenge BOSS',   'quest.d3.desc': 'Complete one BOSS battle',
     'quest.d4.name': 'Mood Boost',       'quest.d4.desc': "Any pet's mood reaches 80+",
     'quest.d5.name': 'One Gacha Pull',   'quest.d5.desc': 'Pull the gacha once',
-    'quest.d6.name': 'Treasure Hunt',    'quest.d6.desc': 'Collect one treasure chest',
     'quest.d7.name': 'Exchange Energy',  'quest.d7.desc': 'Complete one step exchange',
     'quest.d8.name': 'Free Gems',        'quest.d8.desc': 'Watch an ad for a reward',
     'quest.d9.name': 'Daily Focus',      'quest.d9.desc': 'Complete one focus session',
