@@ -29,13 +29,24 @@ workflows:
           xcode-project use-profiles
       - name: Build iOS
         script: |
-          xcode-project build-ipa \
-            --project "$XCODE_PROJECT" \
-            --scheme "$XCODE_SCHEME" \
-            --verbose
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -archivePath build/ios/xcarchive/App.xcarchive \
+            -configuration Release \
+            archive \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            DEVELOPMENT_TEAM=QY5RLG24T3 \
+            'CODE_SIGN_IDENTITY=Apple Distribution' \
+            CODE_SIGN_STYLE=Manual \
+            2>&1 | tee /tmp/xcodebuild_output.log
+          mkdir -p artifacts
+          cp /tmp/xcodebuild_output.log artifacts/ || true
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
+      - /tmp/xcodebuild_output.log
+      - artifacts/xcodebuild_output.log
       - $HOME/Library/Developer/Xcode/DerivedData/**/Logs/Build/*.xcactivitylog
     publishing:
       app_store_connect:
