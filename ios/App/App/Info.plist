@@ -49,6 +49,8 @@
 	<true/>
 	<key>NSHealthShareUsageDescription</key>
 	<string>Pixel Pet 需要存取你的步數資料，用來兌換能量石獎勵</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Pixel Pet 不會寫入或修改你的健康資料，此權限為健康套件框架要求</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>我們使用追蹤資料來提供個人化廣告體驗</string>
 	<!-- TODO: 正式上架後，把下面的 GADApplicationIdentifier 換成正式 App ID（目前是 Google 官方測試 App ID） -->
