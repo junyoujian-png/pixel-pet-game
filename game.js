@@ -1462,7 +1462,7 @@ function claimQuestReward(tab, questId) {
 const IAP_PACKAGES = [
   { id: 'pack1', amount: 100,  bonus: 0,    price: 30,   label: '新手包', labelKey: 'iap.pack.starter' },
   { id: 'pack2', amount: 350,  bonus: 20,   price: 100,  label: '超值包', labelKey: 'iap.pack.value' },
-  { id: 'pack3', amount: 800,  bonus: 80,   price: 220,  label: '熱門包', labelKey: 'iap.pack.popular' },
+  { id: 'pack3', amount: 900,  bonus: 90,   price: 220,  label: '熱門包', labelKey: 'iap.pack.popular' },
   { id: 'pack4', amount: 1800, bonus: 250,  price: 480,  label: '豪華包', labelKey: 'iap.pack.deluxe', popular: true },
   { id: 'pack5', amount: 4000, bonus: 700,  price: 980,  label: '至尊包', labelKey: 'iap.pack.supreme' },
   { id: 'pack6', amount: 9000, bonus: 2000, price: 1980, label: '王者包', labelKey: 'iap.pack.royal' },
