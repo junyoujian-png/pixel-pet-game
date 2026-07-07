@@ -453,7 +453,7 @@ function renderSelectScreen() {
       </div>
     `;
     card.addEventListener('click', () => {
-      if (locked) { showToast('前往扭蛋機解鎖！'); return; }
+      if (locked) { showToast(t('toast.petLocked')); return; }
       selectPet(pet.id);
     });
     grid.appendChild(card);
@@ -645,7 +645,7 @@ function selectPet(id) {
 
   hideSelectScreen();
   renderAll();
-  showToast(`選擇了 ${currentPet().name}！`);
+  showToast(t('toast.petSelected').replace('{name}', t(currentPet().nameKey)));
 }
 
 // ─── EXP / Level ─────────────────────────────────────────────────────────────
@@ -747,11 +747,11 @@ function useItem(id) {
   if (id === 'candy') {
     state.mood = Math.min(100, state.mood + 10);
     saveState(); renderSlotPage(currentSlotIdx);
-    showToast('使用愛心糖！+10心情 😄');
+    showToast(t('toast.useCandy'));
   } else if (id === 'xpboost') {
     saveState();
     addExp(20);
-    showToast('使用成長藥！+20 EXP ⭐');
+    showToast(t('toast.useXpboost'));
   }
 }
 
@@ -763,7 +763,7 @@ function buyFood(id) {
   const inv = loadInventory();
   inv[id] = (inv[id] || 0) + 1;
   saveInventory(inv);
-  showToast(`購買成功：${t(food.nameKey)} ×1`);
+  showToast(t('toast.buySuccess').replace('{name}', t(food.nameKey)));
   renderFoodShop();
 }
 
@@ -899,7 +899,7 @@ function buyDrink(id) {
   const inv = loadInventory();
   inv[id] = (inv[id] || 0) + 1;
   saveInventory(inv);
-  showToast(`購買成功：${t(drink.nameKey)} ×1`);
+  showToast(t('toast.buySuccess').replace('{name}', t(drink.nameKey)));
   renderDrinkShop();
 }
 
@@ -1038,11 +1038,11 @@ function useItemFromPickModal(id) {
     state.mood = Math.min(100, state.mood + 10);
     saveState(); renderSlotPage(currentSlotIdx);
     checkMoodQuest();
-    showToast('使用愛心糖！+10心情 😄');
+    showToast(t('toast.useCandy'));
   } else if (id === 'xpboost') {
     saveState();
     addExp(20);
-    showToast('使用成長藥！+20 EXP ⭐');
+    showToast(t('toast.useXpboost'));
   }
   closeModal('modal-item-pick');
 }
@@ -1104,7 +1104,7 @@ function addPetFromPickModal(petId) {
     slotIdx = slots.indexOf(null);
   }
   pendingAddSlotIdx = null;
-  if (slotIdx === -1) { showToast('所有巢位已滿！'); return; }
+  if (slotIdx === -1) { showToast(t('toast.slotsFull')); return; }
   slots[slotIdx] = petId;
   saveSlots(slots);
   renderAll();
@@ -1627,7 +1627,7 @@ async function watchAdForReward() {
 
 async function watchAdForGacha() {
   const state = loadAdGachaUsed();
-  if (state.used) { showToast('今日廣告扭蛋已使用！'); return; }
+  if (state.used) { showToast(t('toast.adGachaUsed')); return; }
 
   const grantReward = () => {
     const updated = loadAdGachaUsed();
@@ -1736,7 +1736,7 @@ async function initStepHistory() {
   saveStepHistory(history);
 
   if (isNativeApp() && !healthKitAuthorized) {
-    showToast('請允許存取健康資料以取得真實步數');
+    showToast(t('toast.healthKitDenied'));
   }
 
   renderBankPanel();
@@ -1797,11 +1797,11 @@ function renderBankExchange() {
 
 function doBankExchange() {
   const history = loadStepHistory();
-  if (!history.length) { showToast('沒有步數資料可兌換！'); return; }
+  if (!history.length) { showToast(t('bank.noSteps')); return; }
 
   const rate  = getDailyRate();
   const total = history.reduce((sum, e) => sum + Math.floor(e.steps / rate), 0);
-  if (total <= 0) { showToast('步數不足以兌換任何能量石！'); return; }
+  if (total <= 0) { showToast(t('bank.notEnoughSteps')); return; }
 
   saveStepHistory([]);                        // clear all history
   addCoins(total, '步數兌換');
@@ -2023,9 +2023,9 @@ function buyShopItem(id) {
   if (!spendCoins(def.price, `購買${t(def.nameKey)}`)) { showToast(t('toast.no_coins')); return; }
   addItem(id);
   if (id === 'boss_ticket') {
-    showToast(`🎫 ${t(def.nameKey)} 已加入背包！`);
+    showToast(t('toast.ticketAdded').replace('{name}', t(def.nameKey)));
   } else {
-    showToast(`購買成功：${t(def.nameKey)} ×1`);
+    showToast(t('toast.buySuccess').replace('{name}', t(def.nameKey)));
   }
   renderItemShop();
 }
@@ -3141,7 +3141,7 @@ let bSt = null;
 function startBattle(boss, isFirstTime) {
   const slotPets = getSlotPets();
   if (slotPets.length === 0) {
-    showToast('巢位裡沒有寵物！請先在主頁加入寵物');
+    showToast(t('battle.noSlotPets'));
     return;
   }
 
@@ -3343,13 +3343,13 @@ function renderBattleHand() {
 
 function battleUseCard(handIdx) {
   if (!bSt || bSt.ended || !bSt.playerTurn) return;
-  if (bSt.ap <= 0) { showToast('行動值不足！'); return; }
+  if (bSt.ap <= 0) { showToast(t('battle.noAP')); return; }
 
   const card = bSt.hand[handIdx];
   if (!card) return;
 
   const attacker = bSt.pets[card.petIdx];
-  if (!attacker || attacker.hp <= 0) { showToast('該寵物已倒下！'); return; }
+  if (!attacker || attacker.hp <= 0) { showToast(t('battle.petFainted')); return; }
 
   const attackerElement   = getPetElement(attacker.pet.id);
   const defenderElement   = getPetElement(bSt.boss.id);
@@ -3807,7 +3807,7 @@ function toggleGameSetting(key, checked) {
     s[key] = true;
     saveGameSettings(s);
   } else if (Notification.permission === 'denied') {
-    showToast('請在瀏覽器設定開啟通知權限');
+    showToast(t('toast.notificationDenied'));
     s[key] = false;
     saveGameSettings(s);
     renderSettingsTab();
@@ -3817,7 +3817,7 @@ function toggleGameSetting(key, checked) {
       if (perm === 'granted') {
         updated[key] = true;
       } else {
-        showToast('請在瀏覽器設定開啟通知權限');
+        showToast(t('toast.notificationDenied'));
         updated[key] = false;
       }
       saveGameSettings(updated);
