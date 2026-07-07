@@ -76,6 +76,7 @@ const LANG_DATA = {
     'pet.action.cancel': '取消',
     // 背包
     'select.title': '選擇你的寵物',
+    'pokedex.title': '📖 寵物圖鑑',
     'bag.food.title': '🍖 食物背包',
     'bag.drink.title': '🥤 飲料背包',
     'bag.food': '食物',
@@ -543,6 +544,7 @@ const LANG_DATA = {
     'pet.action.cancel': 'Cancel',
     // Bag
     'select.title': 'Choose Your Pet',
+    'pokedex.title': '📖 Pet Dex',
     'bag.food.title': '🍖 Food Bag',
     'bag.drink.title': '🥤 Drink Bag',
     'bag.food': 'Food',
