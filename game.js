@@ -3974,7 +3974,7 @@ function getFirebaseFirestore() { return window.Capacitor?.Plugins?.FirebaseFire
 let currentFirebaseUser = null;
 
 async function loginWithGoogle() {
-  if (!isNativeApp()) { alert('非原生環境，跳過登入'); return false; }
+  if (!isNativeApp()) return false;
   console.log('開始呼叫登入 API (Google)');
   try {
     const result = await getFirebaseAuth().signInWithGoogle();
@@ -3985,7 +3985,6 @@ async function loginWithGoogle() {
     return true;
   } catch (e) {
     console.error('登入失敗 (Google):', e);
-    alert('登入錯誤: ' + JSON.stringify(e));
     showToast(t('settings.login.fail'));
     return false;
   }
@@ -3997,7 +3996,7 @@ async function loginWithGoogle() {
 // manual OAuthProvider/credential exchange is needed (unlike the raw
 // Firebase web SDK flow this was originally sketched against).
 async function loginWithApple() {
-  if (!isNativeApp()) { alert('非原生環境，跳過登入'); return false; }
+  if (!isNativeApp()) return false;
   console.log('開始呼叫登入 API (Apple)');
   try {
     const result = await getFirebaseAuth().signInWithApple();
@@ -4008,7 +4007,6 @@ async function loginWithApple() {
     return true;
   } catch (e) {
     console.error('Apple 登入失敗:', e);
-    alert('登入錯誤: ' + JSON.stringify(e));
     showToast(t('settings.login.fail'));
     return false;
   }
@@ -4143,14 +4141,12 @@ function hideLoginScreen() {
 
 async function onboardingLoginWithGoogle() {
   console.log('登入按鈕被點擊 (Google)');
-  alert('登入函式已觸發 (Google)');
   const success = await loginWithGoogle();
   if (success) onLoginSuccess();
 }
 
 async function onboardingLoginWithApple() {
   console.log('登入按鈕被點擊 (Apple)');
-  alert('登入函式已觸發 (Apple)');
   const success = await loginWithApple();
   if (success) onLoginSuccess();
 }
