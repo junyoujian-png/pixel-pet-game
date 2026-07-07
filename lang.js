@@ -318,6 +318,11 @@ const LANG_DATA = {
     'iap.pack.deluxe': '豪華包',
     'iap.pack.supreme': '至尊包',
     'iap.pack.royal': '王者包',
+    'iap.confirm.title': '確定購買 {name}？',
+    'iap.confirm.note': '⚠️ 之後串接真實金流，目前為測試模式',
+    'iap.success': '儲值成功！+{amount} 💎',
+    'common.cancel': '取消',
+    'common.confirm': '確認',
     // 任務
     'quest.daily': '每日',
     'quest.achievement': '成就',
@@ -759,6 +764,11 @@ const LANG_DATA = {
     'iap.pack.deluxe': 'Deluxe Pack',
     'iap.pack.supreme': 'Supreme Pack',
     'iap.pack.royal': 'Royal Pack',
+    'iap.confirm.title': 'Confirm purchase of {name}?',
+    'iap.confirm.note': '⚠️ Real payment coming soon - currently in test mode',
+    'iap.success': 'Top-up successful! +{amount} 💎',
+    'common.cancel': 'Cancel',
+    'common.confirm': 'Confirm',
     // Quest
     'quest.daily': 'Daily',
     'quest.achievement': 'Achievement',

@@ -1504,7 +1504,7 @@ function showPurchaseConfirm(packageId) {
   if (!pkg) return;
   pendingPurchaseId = packageId;
   const total = pkg.amount + pkg.bonus;
-  document.getElementById('iap-confirm-pkg-name').textContent = t(pkg.labelKey);
+  document.getElementById('iap-confirm-title').textContent = t('iap.confirm.title').replace('{name}', t(pkg.labelKey));
   document.getElementById('iap-confirm-amount').textContent   = `💎 ${total.toLocaleString()}`;
   document.getElementById('iap-confirm-price').textContent    = `NT$ ${pkg.price}`;
   openModal('modal-iap-confirm');
@@ -1523,7 +1523,7 @@ function confirmPurchase() {
 
   addCoins(total, `儲值 ${pkg.label}`);
   closeModal('modal-iap-confirm');
-  showToast(`儲值成功！+${total.toLocaleString()} 💎`);
+  showToast(t('iap.success').replace('{amount}', total.toLocaleString()));
   pendingPurchaseId = null;
 }
 

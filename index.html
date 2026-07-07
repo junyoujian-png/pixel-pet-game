@@ -578,15 +578,13 @@
   <!-- IAP Confirm Modal -->
   <div id="modal-iap-confirm" class="modal hidden">
     <div class="modal-box iap-confirm-box">
-      <div class="iap-confirm-title">確定購買 <span id="iap-confirm-pkg-name"></span>？</div>
+      <div class="iap-confirm-title" id="iap-confirm-title"></div>
       <div class="iap-confirm-amount" id="iap-confirm-amount"></div>
       <div class="iap-confirm-price" id="iap-confirm-price"></div>
-      <div class="iap-confirm-note">
-        ⚠️ 之後串接真實金流，目前為測試模式
-      </div>
+      <div class="iap-confirm-note" data-i18n="iap.confirm.note">⚠️ 之後串接真實金流，目前為測試模式</div>
       <div class="iap-confirm-actions">
-        <button class="btn-cancel" onclick="closeModal('modal-iap-confirm')">取消</button>
-        <button class="btn-confirm" onclick="confirmPurchase()">確認</button>
+        <button class="btn-cancel" onclick="closeModal('modal-iap-confirm')" data-i18n="common.cancel">取消</button>
+        <button class="btn-confirm" onclick="confirmPurchase()" data-i18n="common.confirm">確認</button>
       </div>
     </div>
   </div>
