@@ -3247,7 +3247,7 @@ function renderBattleUI() {
   const endBtn = document.getElementById('btn-end-turn');
   if (endBtn) endBtn.disabled = !bSt.playerTurn || bSt.ended;
   const statusEl = document.getElementById('battle-status-label');
-  if (statusEl) statusEl.textContent = bSt.playerTurn ? '玩家回合' : 'BOSS 回合';
+  if (statusEl) statusEl.textContent = bSt.playerTurn ? t('battle.playerTurn') : t('battle.bossTurn');
 }
 
 function renderBattlePets() {
@@ -3390,7 +3390,7 @@ function endPlayerTurn() {
   const endBtn = document.getElementById('btn-end-turn');
   if (endBtn) endBtn.disabled = true;
   const statusEl = document.getElementById('battle-status-label');
-  if (statusEl) statusEl.textContent = 'BOSS 回合';
+  if (statusEl) statusEl.textContent = t('battle.bossTurn');
   setTimeout(bossTurnAnimate, 500);
 }
 

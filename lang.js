@@ -75,6 +75,9 @@ const LANG_DATA = {
     'pet.action.remove': '移回寵物背包',
     'pet.action.cancel': '取消',
     // 背包
+    'select.title': '選擇你的寵物',
+    'bag.food.title': '🍖 食物背包',
+    'bag.drink.title': '🥤 飲料背包',
     'bag.food': '食物',
     'bag.drink': '飲料',
     'bag.item': '道具',
@@ -115,6 +118,7 @@ const LANG_DATA = {
     // 廣告
     'ad.watch': '觀看廣告',
     'ad.watching': '廣告播放中...',
+    'ad.hint': '請觀看完整廣告以獲取獎勵',
     'ad.reward': '廣告獎勵',
     'ad.limit': '今日已達上限',
     'ad.free_gacha': '看廣告抽一次',
@@ -287,6 +291,8 @@ const LANG_DATA = {
     'battle.noSlotPets': '巢位裡沒有寵物！請先在主頁加入寵物',
     'battle.noAP': '行動值不足！',
     'battle.petFainted': '該寵物已倒下！',
+    'battle.playerTurn': '玩家回合',
+    'battle.bossTurn': 'BOSS 回合',
     // 屬性名稱
     'element.水': '水',
     'element.火': '火',
@@ -536,6 +542,9 @@ const LANG_DATA = {
     'pet.action.remove': 'Return to Bag',
     'pet.action.cancel': 'Cancel',
     // Bag
+    'select.title': 'Choose Your Pet',
+    'bag.food.title': '🍖 Food Bag',
+    'bag.drink.title': '🥤 Drink Bag',
     'bag.food': 'Food',
     'bag.drink': 'Drinks',
     'bag.item': 'Items',
@@ -576,6 +585,7 @@ const LANG_DATA = {
     // Ads
     'ad.watch': 'Watch Ad',
     'ad.watching': 'Ad playing...',
+    'ad.hint': 'Watch the full ad to receive your reward',
     'ad.reward': 'Ad Reward',
     'ad.limit': 'Daily limit reached',
     'ad.free_gacha': 'Watch Ad for Free Draw',
@@ -748,6 +758,8 @@ const LANG_DATA = {
     'battle.noSlotPets': 'No pets in slots! Add pets on the home screen first',
     'battle.noAP': 'Not enough AP!',
     'battle.petFainted': 'That pet has fainted!',
+    'battle.playerTurn': 'Your Turn',
+    'battle.bossTurn': 'BOSS Turn',
     // Element names
     'element.水': 'Water',
     'element.火': 'Fire',

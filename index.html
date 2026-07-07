@@ -57,7 +57,7 @@
   <!-- Pet Select Screen -->
   <div id="screen-select" class="screen-select hidden">
     <div class="select-header">
-      <h1 class="select-title">選擇你的寵物</h1>
+      <h1 class="select-title" data-i18n="select.title">選擇你的寵物</h1>
     </div>
     <div id="select-grid" class="select-grid"></div>
   </div>
@@ -405,18 +405,18 @@
   <!-- Food Bag Modal -->
   <div id="modal-feed" class="modal hidden">
     <div class="modal-box modal-pick-box">
-      <h2 class="modal-pick-title">🍖 食物背包</h2>
+      <h2 class="modal-pick-title" data-i18n="bag.food.title">🍖 食物背包</h2>
       <div id="feed-pick-list" class="modal-pick-list"></div>
-      <button class="btn-cancel" onclick="closeModal('modal-feed')">取消</button>
+      <button class="btn-cancel" onclick="closeModal('modal-feed')" data-i18n="common.cancel">取消</button>
     </div>
   </div>
 
   <!-- Drink Bag Modal -->
   <div id="modal-drink" class="modal hidden">
     <div class="modal-box modal-pick-box">
-      <h2 class="modal-pick-title">🥤 飲料背包</h2>
+      <h2 class="modal-pick-title" data-i18n="bag.drink.title">🥤 飲料背包</h2>
       <div id="drink-pick-list" class="modal-pick-list"></div>
-      <button class="btn-cancel" onclick="closeModal('modal-drink')">取消</button>
+      <button class="btn-cancel" onclick="closeModal('modal-drink')" data-i18n="common.cancel">取消</button>
     </div>
   </div>
 
@@ -513,7 +513,7 @@
         </div>
         <div class="battle-center-actions">
           <button class="battle-end-turn-btn" id="btn-end-turn" onclick="endPlayerTurn()" data-i18n="battle.end_turn">結束回合</button>
-          <div class="battle-status-label" id="battle-status-label">玩家回合</div>
+          <div class="battle-status-label" id="battle-status-label"></div>
         </div>
       </div>
 
@@ -536,7 +536,7 @@
   <div id="modal-wheel" class="modal hidden">
     <div class="modal-box modal-wheel-box">
       <h2 class="wheel-title">🎡 <span data-i18n="wheel.title">命運轉盤</span></h2>
-      <p id="wheel-boss-name" class="wheel-subtitle">恭喜打敗！</p>
+      <p id="wheel-boss-name" class="wheel-subtitle"></p>
 
       <div class="wheel-area">
         <div class="wheel-pointer">▼</div>
@@ -694,7 +694,7 @@
         <div class="ad-progress-bar" id="ad-progress-bar"></div>
       </div>
       <div class="ad-countdown" id="ad-countdown">5</div>
-      <div class="ad-hint">請觀看完整廣告以獲取獎勵</div>
+      <div class="ad-hint" data-i18n="ad.hint">請觀看完整廣告以獲取獎勵</div>
     </div>
   </div>
 
