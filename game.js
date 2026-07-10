@@ -2420,10 +2420,19 @@ function initFocusAbandonButton() {
     cancelFocusAbandonHold();
   };
   btn.addEventListener('mousedown', startPress);
-  btn.addEventListener('touchstart', startPress);
+  btn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    startPress();
+  }, { passive: false });
   btn.addEventListener('mouseup', endPress);
   btn.addEventListener('mouseleave', endPress);
-  btn.addEventListener('touchend', endPress);
+  btn.addEventListener('touchend', (e) => {
+    if (focusTimerState && focusTimerState.freeCancelRemaining > 0) {
+      stopFocusTimer();
+      return;
+    }
+    endPress();
+  });
   btn.addEventListener('touchcancel', endPress);
   btn.addEventListener('click', () => {
     if (focusTimerState && focusTimerState.freeCancelRemaining > 0) stopFocusTimer();
