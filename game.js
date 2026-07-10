@@ -2363,6 +2363,7 @@ function startFocusTimer(taskId) {
   renderFocusPetDisplay('focus-timer-pet-img', 'focus-timer-pet-fallback');
   renderFocusTimerDisplay();
   renderFocusAbandonButton();
+  stopBGM();
   playFocusSound(loadFocusSoundId());
   document.getElementById('screen-focus')?.classList.add('hidden');
   document.getElementById('screen-focus-timer')?.classList.remove('hidden');
@@ -2469,6 +2470,7 @@ function confirmFocusAbandon() {
   if (focusTimerState?.intervalId) clearInterval(focusTimerState.intervalId);
   focusTimerState = null;
   stopFocusSound();
+  startBGM();
   document.getElementById('screen-focus-timer')?.classList.add('hidden');
   renderFocusPetDisplay('focus-fail-pet-img', 'focus-fail-pet-fallback');
   openModal('modal-focus-fail');
@@ -2496,6 +2498,7 @@ function stopFocusTimer() {
   if (focusTimerState?.intervalId) clearInterval(focusTimerState.intervalId);
   focusTimerState = null;
   stopFocusSound();
+  startBGM();
   document.getElementById('screen-focus-timer')?.classList.add('hidden');
   document.getElementById('screen-focus')?.classList.remove('hidden');
   renderFocusTaskGrid();
@@ -2507,6 +2510,7 @@ function completeFocusTimer() {
   const focusMinutes = Math.round(focusTimerState.totalSeconds / 60);
   focusTimerState = null;
   stopFocusSound();
+  startBGM();
   document.getElementById('screen-focus-timer')?.classList.add('hidden');
   state.coins += FOCUS_COMPLETE_COIN_REWARD;
   saveState();
