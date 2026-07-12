@@ -331,6 +331,7 @@ const LANG_DATA = {
     'iap.confirm.title': '確定購買 {name}？',
     'iap.confirm.note': '⚠️ 之後串接真實金流，目前為測試模式',
     'iap.success': '儲值成功！+{amount} 💎',
+    'iap.failed': '購買失敗，請稍後再試',
     'common.cancel': '取消',
     'common.confirm': '確認',
     // 任務
@@ -799,6 +800,7 @@ const LANG_DATA = {
     'iap.confirm.title': 'Confirm purchase of {name}?',
     'iap.confirm.note': '⚠️ Real payment coming soon - currently in test mode',
     'iap.success': 'Top-up successful! +{amount} 💎',
+    'iap.failed': 'Purchase failed, please try again',
     'common.cancel': 'Cancel',
     'common.confirm': 'Confirm',
     // Quest

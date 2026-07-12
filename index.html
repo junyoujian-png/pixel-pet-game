@@ -570,7 +570,7 @@
     </div>
     <div class="iap-body">
       <div class="iap-grid" id="iap-grid"></div>
-      <p class="iap-notice" data-i18n="iap.test.mode">⚠️ 目前為測試模式，不收取真實費用</p>
+      <p id="iap-test-notice" class="iap-notice" data-i18n="iap.test.mode">⚠️ 目前為測試模式，不收取真實費用</p>
     </div>
   </div>
 
@@ -580,7 +580,7 @@
       <div class="iap-confirm-title" id="iap-confirm-title"></div>
       <div class="iap-confirm-amount" id="iap-confirm-amount"></div>
       <div class="iap-confirm-price" id="iap-confirm-price"></div>
-      <div class="iap-confirm-note" data-i18n="iap.confirm.note">⚠️ 之後串接真實金流，目前為測試模式</div>
+      <div id="iap-confirm-note" class="iap-confirm-note" data-i18n="iap.confirm.note">⚠️ 之後串接真實金流，目前為測試模式</div>
       <div class="iap-confirm-actions">
         <button class="btn-cancel" onclick="closeModal('modal-iap-confirm')" data-i18n="common.cancel">取消</button>
         <button class="btn-confirm" onclick="confirmPurchase()" data-i18n="common.confirm">確認</button>

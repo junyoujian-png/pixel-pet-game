@@ -1460,19 +1460,67 @@ function claimQuestReward(tab, questId) {
 // 目前為模擬付款，直接發放晶石
 
 const IAP_PACKAGES = [
-  { id: 'pack1', amount: 100,  bonus: 0,    price: 30,   label: '新手包', labelKey: 'iap.pack.starter' },
-  { id: 'pack2', amount: 350,  bonus: 20,   price: 100,  label: '超值包', labelKey: 'iap.pack.value' },
-  { id: 'pack3', amount: 900,  bonus: 90,   price: 250,  label: '熱門包', labelKey: 'iap.pack.popular' },
-  { id: 'pack4', amount: 1800, bonus: 250,  price: 480,  label: '豪華包', labelKey: 'iap.pack.deluxe', popular: true },
-  { id: 'pack5', amount: 4000, bonus: 700,  price: 980,  label: '至尊包', labelKey: 'iap.pack.supreme' },
-  { id: 'pack6', amount: 9000, bonus: 2000, price: 1980, label: '王者包', labelKey: 'iap.pack.royal' },
+  { id: 'pack1', amount: 100,  bonus: 0,    price: 30,   label: '新手包', labelKey: 'iap.pack.starter',  productId: 'com.junyoujian.pixelpet.pack1' },
+  { id: 'pack2', amount: 350,  bonus: 20,   price: 100,  label: '超值包', labelKey: 'iap.pack.value',    productId: 'com.junyoujian.pixelpet.pack2' },
+  { id: 'pack3', amount: 900,  bonus: 90,   price: 250,  label: '熱門包', labelKey: 'iap.pack.popular',  productId: 'com.junyoujian.pixelpet.pack3' },
+  { id: 'pack4', amount: 1800, bonus: 250,  price: 480,  label: '豪華包', labelKey: 'iap.pack.deluxe',   productId: 'com.junyoujian.pixelpet.pack4', popular: true },
+  { id: 'pack5', amount: 4000, bonus: 700,  price: 980,  label: '至尊包', labelKey: 'iap.pack.supreme',  productId: 'com.junyoujian.pixelpet.pack5' },
+  { id: 'pack6', amount: 9000, bonus: 2000, price: 1980, label: '王者包', labelKey: 'iap.pack.royal',    productId: 'com.junyoujian.pixelpet.pack6' },
 ];
+
+const IAP_PRODUCT_IDS = [
+  'com.junyoujian.pixelpet.pack1',
+  'com.junyoujian.pixelpet.pack2',
+  'com.junyoujian.pixelpet.pack3',
+  'com.junyoujian.pixelpet.pack4',
+  'com.junyoujian.pixelpet.pack5',
+  'com.junyoujian.pixelpet.pack6',
+];
+
+let iapProducts = []; // 從 StoreKit 載入的真實商品資料
+
+async function initIAP() {
+  if (!isNativeApp()) return;
+  try {
+    const NativePurchases = window.Capacitor.Plugins.NativePurchases;
+    const { products } = await NativePurchases.getProducts({
+      productIdentifiers: IAP_PRODUCT_IDS,
+    });
+    iapProducts = products;
+    console.log('[IAP] 商品載入成功', products);
+  } catch (e) {
+    console.error('[IAP] 商品載入失敗', e);
+  }
+}
+
+async function purchaseIAP(productId) {
+  const NativePurchases = window.Capacitor.Plugins.NativePurchases;
+  try {
+    const result = await NativePurchases.purchaseProduct({ productIdentifier: productId });
+    console.log('[IAP] 購買成功', result);
+    return { success: true, result };
+  } catch (e) {
+    console.error('[IAP] 購買失敗或取消', e);
+    return { success: false, error: e };
+  }
+}
+
+function grantIAPPackage(pkg) {
+  const total = pkg.amount + pkg.bonus;
+  const history = loadPurchaseHistory();
+  history.push({ date: displayDate(getDateStr(new Date())), packageId: pkg.id, amount: total, label: pkg.label });
+  savePurchaseHistory(history);
+  addCoins(total);
+  showToast(t('iap.success').replace('{amount}', total.toLocaleString()));
+}
 
 function loadPurchaseHistory()  { try { return JSON.parse(localStorage.getItem('purchaseHistory') || '[]'); } catch { return []; } }
 function savePurchaseHistory(a) { localStorage.setItem('purchaseHistory', JSON.stringify(a.slice(-100))); }
 
 function openIAPStore() {
   document.getElementById('screen-iap')?.classList.remove('hidden');
+  const notice = document.getElementById('iap-test-notice');
+  if (notice) notice.style.display = isNativeApp() ? 'none' : '';
   renderIAPStore();
 }
 
@@ -1485,6 +1533,8 @@ function renderIAPStore() {
   if (!grid) return;
   grid.innerHTML = IAP_PACKAGES.map(pkg => {
     const total = pkg.amount + pkg.bonus;
+    const iapProduct = iapProducts.find(p => p.identifier === pkg.productId);
+    const priceText = iapProduct ? iapProduct.priceString : `NT$${pkg.price}`;
     return `
       <div class="iap-card${pkg.popular ? ' iap-card--popular' : ''}" onclick="showPurchaseConfirm('${pkg.id}')">
         ${pkg.popular ? `<div class="iap-card__badge">${t('iap.best')}</div>` : ''}
@@ -1492,7 +1542,7 @@ function renderIAPStore() {
         <div class="iap-card__amount">${pkg.amount.toLocaleString()}</div>
         ${pkg.bonus ? `<div class="iap-card__bonus">+${pkg.bonus.toLocaleString()} ${t('iap.bonus')}</div>` : ''}
         <div class="iap-card__label">${t(pkg.labelKey)}</div>
-        <div class="iap-card__price">NT$ ${pkg.price}</div>
+        <div class="iap-card__price">${priceText}</div>
       </div>`;
   }).join('');
 }
@@ -1504,27 +1554,48 @@ function showPurchaseConfirm(packageId) {
   if (!pkg) return;
   pendingPurchaseId = packageId;
   const total = pkg.amount + pkg.bonus;
-  document.getElementById('iap-confirm-title').textContent = t('iap.confirm.title').replace('{name}', t(pkg.labelKey));
-  document.getElementById('iap-confirm-amount').textContent   = `💎 ${total.toLocaleString()}`;
-  document.getElementById('iap-confirm-price').textContent    = `NT$ ${pkg.price}`;
+  const iapProduct = iapProducts.find(p => p.identifier === pkg.productId);
+  const priceText = iapProduct ? iapProduct.priceString : `NT$${pkg.price}`;
+  document.getElementById('iap-confirm-title').textContent  = t('iap.confirm.title').replace('{name}', t(pkg.labelKey));
+  document.getElementById('iap-confirm-amount').textContent = `💎 ${total.toLocaleString()}`;
+  document.getElementById('iap-confirm-price').textContent  = priceText;
+  const note = document.getElementById('iap-confirm-note');
+  if (note) note.style.display = isNativeApp() ? 'none' : '';
   openModal('modal-iap-confirm');
 }
 
-function confirmPurchase() {
-  // TODO: 串接真實金流（如 Stripe、街口支付、Line Pay）
-  // 目前為模擬付款，直接發放晶石
+async function confirmPurchase() {
   const pkg = IAP_PACKAGES.find(p => p.id === pendingPurchaseId);
   if (!pkg) { closeModal('modal-iap-confirm'); return; }
 
-  const total   = pkg.amount + pkg.bonus;
-  const history = loadPurchaseHistory();
-  history.push({ date: displayDate(getDateStr(new Date())), packageId: pkg.id, amount: total, label: pkg.label });
-  savePurchaseHistory(history);
+  if (!isNativeApp()) {
+    grantIAPPackage(pkg);
+    closeModal('modal-iap-confirm');
+    pendingPurchaseId = null;
+    return;
+  }
 
-  addCoins(total, `儲值 ${pkg.label}`);
+  const confirmBtn = document.querySelector('#modal-iap-confirm .btn-confirm');
+  const cancelBtn  = document.querySelector('#modal-iap-confirm .btn-cancel');
+  if (confirmBtn) confirmBtn.disabled = true;
+  if (cancelBtn)  cancelBtn.disabled  = true;
+
+  const { success, error } = await purchaseIAP(pkg.productId);
+
+  if (confirmBtn) confirmBtn.disabled = false;
+  if (cancelBtn)  cancelBtn.disabled  = false;
+
   closeModal('modal-iap-confirm');
-  showToast(t('iap.success').replace('{amount}', total.toLocaleString()));
   pendingPurchaseId = null;
+
+  if (success) {
+    grantIAPPackage(pkg);
+  } else {
+    const msg = (error?.message || '').toLowerCase();
+    if (!msg.includes('cancel')) {
+      showToast(t('iap.failed'));
+    }
+  }
 }
 
 // ─── Ad System ────────────────────────────────────────────────────────────────
@@ -4225,6 +4296,7 @@ function init() {
   initQuestTab();
   initExploreCards();
   initFocusAbandonButton();
+  initIAP();
   renderSettingsTab();
   applyLang(); // re-apply after all dynamic rendering above (lang.js's own DOMContentLoaded fires earlier)
   setInterval(decayStats, DECAY_INTERVAL);
