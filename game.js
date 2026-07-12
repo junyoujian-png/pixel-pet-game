@@ -1591,6 +1591,7 @@ async function confirmPurchase() {
   if (success) {
     grantIAPPackage(pkg);
   } else {
+    alert('[IAP Debug] ' + JSON.stringify(error, Object.getOwnPropertyNames(error)));
     const msg = (error?.message || '').toLowerCase();
     if (!msg.includes('cancel')) {
       showToast(t('iap.failed'));
