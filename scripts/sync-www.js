@@ -18,7 +18,12 @@ const PLUGIN_SNAPSHOTS = [
   ['@capgo/native-purchases/dist/plugin.js', 'vendor/capacitor-native-purchases.js'],
 ];
 for (const [src, dest] of PLUGIN_SNAPSHOTS) {
-  fs.copyFileSync(path.join(root, 'node_modules', src), path.join(root, dest));
+  const srcPath = path.join(root, 'node_modules', src);
+  if (!fs.existsSync(srcPath)) {
+    console.error(`ERROR: ${srcPath} not found. Run "npm install" to install missing packages.`);
+    process.exit(1);
+  }
+  fs.copyFileSync(srcPath, path.join(root, dest));
 }
 
 fs.rmSync(www, { recursive: true, force: true });
