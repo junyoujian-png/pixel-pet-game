@@ -1488,11 +1488,6 @@ async function initIAP() {
     });
     iapProducts = products;
     console.log('[IAP] 商品載入成功', products);
-    let debugMsg = '[IAP Products]\n';
-    iapProducts.forEach(p => {
-      debugMsg += `${p.identifier}: ${p.priceString} (price=${p.price}, currency=${p.currencyCode || p.currency || '?'})\n`;
-    });
-    alert(debugMsg);
   } catch (e) {
     console.error('[IAP] 商品載入失敗', e);
   }
