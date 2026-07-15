@@ -1461,11 +1461,11 @@ function claimQuestReward(tab, questId) {
 
 const IAP_PACKAGES = [
   { id: 'pack1', amount: 100,  bonus: 0,    price: 30,   label: '新手包', labelKey: 'iap.pack.starter',  productId: 'com.junyoujian.pixelpet.pack1' },
-  { id: 'pack2', amount: 350,  bonus: 20,   price: 100,  label: '超值包', labelKey: 'iap.pack.value',    productId: 'com.junyoujian.pixelpet.pack2' },
-  { id: 'pack3', amount: 900,  bonus: 90,   price: 250,  label: '熱門包', labelKey: 'iap.pack.popular',  productId: 'com.junyoujian.pixelpet.pack3' },
-  { id: 'pack4', amount: 1800, bonus: 250,  price: 480,  label: '豪華包', labelKey: 'iap.pack.deluxe',   productId: 'com.junyoujian.pixelpet.pack4', popular: true },
-  { id: 'pack5', amount: 4000, bonus: 700,  price: 980,  label: '至尊包', labelKey: 'iap.pack.supreme',  productId: 'com.junyoujian.pixelpet.pack5' },
-  { id: 'pack6', amount: 9000, bonus: 2000, price: 1980, label: '王者包', labelKey: 'iap.pack.royal',    productId: 'com.junyoujian.pixelpet.pack6' },
+  { id: 'pack2', amount: 350,  bonus: 20,   price: 100,  label: '超值包', labelKey: 'iap.pack.value',    productId: 'com.junyoujian.pixelpet.pack3' },
+  { id: 'pack3', amount: 900,  bonus: 90,   price: 250,  label: '熱門包', labelKey: 'iap.pack.popular',  productId: 'com.junyoujian.pixelpet.pack6' },
+  { id: 'pack4', amount: 1800, bonus: 250,  price: 480,  label: '豪華包', labelKey: 'iap.pack.deluxe',   productId: 'com.junyoujian.pixelpet.pack5', popular: true },
+  { id: 'pack5', amount: 4000, bonus: 700,  price: 980,  label: '至尊包', labelKey: 'iap.pack.supreme',  productId: 'com.junyoujian.pixelpet.pack4' },
+  { id: 'pack6', amount: 9000, bonus: 2000, price: 1980, label: '王者包', labelKey: 'iap.pack.royal',    productId: 'com.junyoujian.pixelpet.pack2' },
 ];
 
 const IAP_PRODUCT_IDS = [
