@@ -509,7 +509,7 @@ function doGachaRolls(count) {
   results.forEach(r => {
     trackQuestEvent('gacha');
     trackQuestEvent('gacha_count');
-    if (r.pet.rarity === 'SSR' && r.isNew) trackQuestEvent('ssr_gacha');
+    if (r.pet.rarity === 'SR' && r.isNew) trackQuestEvent('sr_gacha');
   });
   trackQuestEvent('pet_count', unlockedPets.length);
   return results;
@@ -1201,7 +1201,7 @@ const ACHIEVEMENT_QUESTS = [
   { id: 'a7',  name: '收藏王者', desc: '收集 51 隻寵物',     target: 51,   reward: 1000, type: 'pet_count' },
   { id: 'a8',  name: '初戰告捷', desc: '通關第一隻 BOSS',    target: 1,    reward: 100,  type: 'boss_clear' },
   { id: 'a9',  name: '無人能敵', desc: '通關全部 BOSS',      target: 16,   reward: 2000, type: 'boss_clear_all' },
-  { id: 'a10', name: '幸運降臨', desc: '抽中第一隻 SSR 寵物', target: 1,   reward: 200,  type: 'ssr_gacha' },
+  { id: 'a10', name: '幸運降臨', desc: '抽中第一隻 SR 寵物',  target: 1,   reward: 200,  type: 'sr_gacha' },
   { id: 'a11', name: '小富翁',   desc: '累積花費 1000 能量石', target: 1000, reward: 100, type: 'spend_total' },
   { id: 'a12', name: '大富翁',   desc: '累積花費 5000 能量石', target: 5000, reward: 500, type: 'spend_total' },
   { id: 'a13', name: '初次專注', desc: '第一次完成專注計時',       target: 1,   reward: 50,  type: 'focus_total' },
@@ -1916,7 +1916,10 @@ function buildGachaPanel() {
   const panel = document.getElementById('shop-gacha');
   if (!panel) return;
   panel.innerHTML = `
-    <p style="font-size:14px;color:#888;text-align:center;margin-bottom:4px">常駐寵物卡池</p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px">
+      <span style="font-size:14px;color:#888">常駐寵物卡池</span>
+      <button onclick="showGachaRates()" style="font-size:12px;color:#6b5a47;background:#e8e4de;border:1px solid #ddd5c8;border-radius:12px;padding:2px 8px;cursor:pointer;font-family:inherit">ℹ️ ${t('gacha.rates.btn')}</button>
+    </div>
     <div style="display:inline-flex;background:#e8e8e8;border-radius:20px;padding:5px 14px;font-size:13px;font-weight:600;margin-bottom:8px;cursor:pointer">${t('gacha.pool')} ▼</div>
     <div id="gacha-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px;transition:opacity 0.3s">
       ${petCellsHTML(getRandomPets(16))}
@@ -1945,6 +1948,25 @@ function buildAdGachaBtn() {
       font-family:inherit;opacity:${used ? '0.5' : '1'}">
     📺 ${used ? '今日廣告扭蛋已使用' : t('ad.free_gacha') + '（每日限 1 次）'}
   </button>`;
+}
+
+function showGachaRates() {
+  const total = RARITY_RATES.reduce((s, r) => s + r.weight, 0);
+  const rows = RARITY_RATES.map(r => {
+    const pct = (r.weight / total * 100).toFixed(0);
+    return `<tr>
+      <td style="padding:8px 0;border-bottom:1px solid #eee">
+        <span class="badge badge--${r.rarity.toLowerCase()}">${r.rarity}</span>
+      </td>
+      <td style="padding:8px 0;border-bottom:1px solid #eee;text-align:right;font-weight:700">${pct}%</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('gacha-rates-rows').innerHTML = rows;
+  document.getElementById('gacha-rates-title-text').textContent = t('gacha.rates.title');
+  document.getElementById('gacha-rates-pity').textContent = t('gacha.rates.pity');
+  document.getElementById('gacha-rates-note').textContent = t('gacha.rates.note');
+  document.getElementById('gacha-rates-confirm').textContent = t('common.confirm');
+  openModal('modal-gacha-rates');
 }
 
 function doGacha(count) {
