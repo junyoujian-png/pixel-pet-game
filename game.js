@@ -4271,7 +4271,6 @@ function init() {
   // audio-unlock listener from being attached (BGM would otherwise never play).
   unlockAudioOnFirstInteraction();
   initSfxClickDelegation();
-  requestATT();
   initAdMob();
   initFirebaseAuthListener();
 
@@ -4299,6 +4298,7 @@ function init() {
   initIAP();
   renderSettingsTab();
   applyLang(); // re-apply after all dynamic rendering above (lang.js's own DOMContentLoaded fires earlier)
+  setTimeout(() => { requestATT(); }, 1500);
   setInterval(decayStats, DECAY_INTERVAL);
 }
 
