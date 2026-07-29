@@ -3991,9 +3991,7 @@ async function requestATT() {
 // Same no-bundler pattern as ATT: vendor/capacitor-admob.js (see index.html)
 // registers itself onto Capacitor.Plugins.AdMob, no `import` needed.
 //
-// TODO: 正式上架後，把 TEST_REWARD_AD_ID 換成真實的 AdMob 廣告單元 ID
-// TODO: 正式上架後，把 Info.plist 的 GADApplicationIdentifier 換成正式 App ID
-const TEST_REWARD_AD_ID = 'ca-app-pub-3940256099942544/1712485313';
+const REWARD_AD_ID = 'ca-app-pub-3424470264959904/2631600987'; // AdMob rewarded ad unit (production)
 
 async function initAdMob() {
   if (!isNativeApp()) return; // AdMob's native SDK isn't available in a plain browser
@@ -4037,7 +4035,7 @@ function showRewardAd() {
       resolve(false);
     }).then((h) => handles.push(h));
 
-    AdMob.prepareRewardVideoAd({ adId: TEST_REWARD_AD_ID })
+    AdMob.prepareRewardVideoAd({ adId: REWARD_AD_ID })
       .then(() => AdMob.showRewardVideoAd())
       .catch((e) => {
         console.error('Reward ad failed:', e);
