@@ -102,6 +102,15 @@ const DRINKS = [
   { id: 'drink_08', name: '咖啡',   nameKey: 'drink.coffee',      rarity: 'SSR', image: 'assets/drinks/drink_08.png', price: 500, effect: { water: 100, exp: 60 }, desc: '+100 水份 +60 EXP'         },
 ];
 
+function effectDesc(effect) {
+  const parts = [];
+  if (effect.water)  parts.push(`+${effect.water} ${t('stat.water')}`);
+  if (effect.hunger) parts.push(`+${effect.hunger} ${t('stat.hunger')}`);
+  if (effect.mood)   parts.push(`+${effect.mood} ${t('stat.mood')}`);
+  if (effect.exp)    parts.push(`+${effect.exp} EXP`);
+  return parts.join(' ');
+}
+
 const ITEM_DEFS = {
   candy:        { icon: '🍬', name: '愛心糖',      nameKey: 'item.heart_candy',   desc: '+10心情',             descKey: 'item.heart_candy.desc',   price: 100 },
   xpboost:      { icon: '⭐', name: '成長藥',       nameKey: 'item.growth_potion', desc: '+20 EXP',             descKey: 'item.growth_potion.desc', price: 100 },
@@ -707,6 +716,8 @@ function spendCoins(n) {
 function renderAll() {
   renderPetSlots();
   renderCoins();
+  if (!document.getElementById('modal-feed')?.classList.contains('hidden'))  renderFeedModal();
+  if (!document.getElementById('modal-drink')?.classList.contains('hidden')) renderDrinkModal();
 }
 
 
@@ -798,11 +809,11 @@ function renderFeedModal() {
             ${t(f.nameKey)}
             <span class="badge badge--${f.rarity.toLowerCase()}">${f.rarity}</span>
           </div>
-          <div class="modal-pick-desc">${f.desc}</div>
+          <div class="modal-pick-desc">${effectDesc(f.effect)}</div>
         </div>
         <div class="modal-pick-right">
           <span class="modal-pick-count">×${cnt}</span>
-          <button class="use-btn" onclick="useFoodFromModal('${id}')">使用</button>
+          <button class="use-btn" onclick="useFoodFromModal('${id}')">${t('item.use')}</button>
         </div>
       </div>`;
   }).join('');
@@ -821,7 +832,7 @@ function useFoodFromModal(id) {
   sfxFeed();
   if (e.exp) addExp(e.exp); else renderAll();
   closeModal('modal-feed');
-  showToast(`${t('toast.feed_success')} ${t(food.nameKey)}（${food.desc}）`);
+  showToast(`${t('toast.feed_success')} ${t(food.nameKey)}（${effectDesc(food.effect)}）`);
 }
 
 function renderFoodShop() {
@@ -934,11 +945,11 @@ function renderDrinkModal() {
             ${t(d.nameKey)}
             <span class="badge badge--${d.rarity.toLowerCase()}">${d.rarity}</span>
           </div>
-          <div class="modal-pick-desc">${d.desc}</div>
+          <div class="modal-pick-desc">${effectDesc(d.effect)}</div>
         </div>
         <div class="modal-pick-right">
           <span class="modal-pick-count">×${cnt}</span>
-          <button class="use-btn" onclick="useDrinkFromModal('${id}')">使用</button>
+          <button class="use-btn" onclick="useDrinkFromModal('${id}')">${t('item.use')}</button>
         </div>
       </div>`;
   }).join('');
@@ -957,7 +968,7 @@ function useDrinkFromModal(id) {
   sfxFeed();
   if (e.exp) addExp(e.exp); else renderAll();
   closeModal('modal-drink');
-  showToast(`${t('toast.drink_success')} ${t(drink.nameKey)}（${drink.desc}）`);
+  showToast(`${t('toast.drink_success')} ${t(drink.nameKey)}（${effectDesc(drink.effect)}）`);
 }
 
 // ─── Bag Select Modal ────────────────────────────────────────────────────────

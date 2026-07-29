@@ -338,6 +338,7 @@ const LANG_DATA = {
     'iap.failed': '購買失敗，請稍後再試',
     'common.cancel': '取消',
     'common.confirm': '確認',
+    'common.close': '關閉',
     // 任務
     'quest.daily': '每日',
     'quest.achievement': '成就',
@@ -811,6 +812,7 @@ const LANG_DATA = {
     'iap.failed': 'Purchase failed, please try again',
     'common.cancel': 'Cancel',
     'common.confirm': 'Confirm',
+    'common.close': 'Close',
     // Quest
     'quest.daily': 'Daily',
     'quest.achievement': 'Achievement',
