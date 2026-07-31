@@ -418,6 +418,23 @@ const RARITY_RATES = [
   { rarity: 'F',  weight: 65 },
 ];
 
+const SPECIAL_GACHA_COST_SINGLE = 300;
+const SPECIAL_GACHA_COST_TEN    = 2500;
+const SPECIAL_RARITY_RATES = [
+  { rarity: 'SSR', weight: 3  },
+  { rarity: 'SR',  weight: 7  },
+  { rarity: 'R',   weight: 30 },
+  { rarity: 'F',   weight: 60 },
+];
+const SPECIAL_POOL_IDS       = ['pet52', 'pet53', 'pet54'];
+const SPECIAL_PITY_KEY        = 'specialGachaPityCount';
+const SPECIAL_PITY_THRESHOLD  = 100;
+
+let activeGachaPool = 'standard'; // 'standard' | 'special'
+
+function getSpecialPityCount() { return parseInt(localStorage.getItem(SPECIAL_PITY_KEY) || '0', 10); }
+function setSpecialPityCount(n) { localStorage.setItem(SPECIAL_PITY_KEY, String(n)); }
+
 let unlockedPets = (() => {
   try {
     const raw = localStorage.getItem('unlockedPets');
@@ -1643,6 +1660,15 @@ function loadAdGachaUsed() {
 }
 function saveAdGachaUsed(o) { localStorage.setItem('adGachaUsed', JSON.stringify(o)); }
 
+function loadAdSpecialGachaUsed() {
+  try {
+    const raw = JSON.parse(localStorage.getItem('adSpecialGachaUsed') || '{}');
+    if (raw.date === getDateStr(new Date())) return raw;
+  } catch {}
+  return { date: getDateStr(new Date()), used: false };
+}
+function saveAdSpecialGachaUsed(o) { localStorage.setItem('adSpecialGachaUsed', JSON.stringify(o)); }
+
 let adTimerInterval = null;
 
 function showAdModal(onComplete) {
@@ -1729,6 +1755,33 @@ async function watchAdForGacha() {
     setTimeout(() => {
       machine?.classList.remove('gacha-spin');
       showGachaResult(doGachaRolls(1));
+    }, 1200);
+  };
+
+  if (isNativeApp()) {
+    const watched = await showRewardAd();
+    if (watched) grantReward();
+  } else {
+    showAdModal(grantReward);
+  }
+}
+
+async function watchAdForSpecialGacha() {
+  const state = loadAdSpecialGachaUsed();
+  if (state.used) { showToast(t('toast.adSpecialGachaUsed')); return; }
+
+  const grantReward = () => {
+    const updated = loadAdSpecialGachaUsed();
+    updated.used = true;
+    saveAdSpecialGachaUsed(updated);
+    showToast(t('ad.gacha.toast'));
+    const adBtn = document.getElementById('btn-ad-gacha');
+    if (adBtn) adBtn.outerHTML = buildAdSpecialGachaBtn();
+    const machine = document.getElementById('gacha-machine');
+    machine?.classList.add('gacha-spin');
+    setTimeout(() => {
+      machine?.classList.remove('gacha-spin');
+      showGachaResult(doSpecialGachaRolls(1));
     }, 1200);
   };
 
@@ -1930,26 +1983,44 @@ function petCellsHTML(pets) {
 function buildGachaPanel() {
   const panel = document.getElementById('shop-gacha');
   if (!panel) return;
+  const isSpecial  = activeGachaPool === 'special';
+  const pity       = getSpecialPityCount();
+  const singleCost = isSpecial ? SPECIAL_GACHA_COST_SINGLE : GACHA_COST_SINGLE;
+  const tenCost    = isSpecial ? SPECIAL_GACHA_COST_TEN    : GACHA_COST_TEN;
+  const onSingle   = isSpecial ? 'doSpecialGacha(1)'  : 'doGacha(1)';
+  const onTen      = isSpecial ? 'doSpecialGacha(10)' : 'doGacha(10)';
+  const onRates    = isSpecial ? 'showSpecialGachaRates()' : 'showGachaRates()';
+  const poolLabel  = isSpecial ? t('gacha.pool.special') : t('gacha.pool');
+
   panel.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px">
-      <span style="font-size:14px;color:#888">常駐寵物卡池</span>
-      <button onclick="showGachaRates()" style="font-size:12px;color:#6b5a47;background:#e8e4de;border:1px solid #ddd5c8;border-radius:12px;padding:2px 8px;cursor:pointer;font-family:inherit">ℹ️ ${t('gacha.rates.btn')}</button>
+      <div style="display:inline-flex;background:#e8e8e8;border-radius:20px;overflow:hidden;font-size:13px;font-weight:600">
+        <button onclick="switchGachaPool('standard')"
+          style="padding:5px 14px;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;
+            background:${!isSpecial ? '#6b5a47' : 'transparent'};color:${!isSpecial ? '#fff' : '#555'};
+            border-radius:20px 0 0 20px;transition:background 0.2s">${t('gacha.pool')}</button>
+        <button onclick="switchGachaPool('special')"
+          style="padding:5px 14px;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;
+            background:${isSpecial ? '#6b5a47' : 'transparent'};color:${isSpecial ? '#fff' : '#555'};
+            border-radius:0 20px 20px 0;transition:background 0.2s">${t('gacha.pool.special')}</button>
+      </div>
+      <button onclick="${onRates}" style="font-size:12px;color:#6b5a47;background:#e8e4de;border:1px solid #ddd5c8;border-radius:12px;padding:2px 8px;cursor:pointer;font-family:inherit">ℹ️ ${t('gacha.rates.btn')}</button>
     </div>
-    <div style="display:inline-flex;background:#e8e8e8;border-radius:20px;padding:5px 14px;font-size:13px;font-weight:600;margin-bottom:8px;cursor:pointer">${t('gacha.pool')} ▼</div>
-    <div id="gacha-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px;transition:opacity 0.3s">
-      ${petCellsHTML(getRandomPets(16))}
+    ${isSpecial ? `<div style="font-size:11px;color:#888;text-align:center;margin-bottom:2px">SSR ${t('gacha.pity.progress')}：${pity} / ${SPECIAL_PITY_THRESHOLD}</div>` : ''}
+    <div id="gacha-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px;transition:opacity 0.3s">
+      ${petCellsHTML(getGachaGridPets(16))}
     </div>
     <div style="display:flex;gap:10px;position:sticky;bottom:0;background:#f5f0eb;padding:10px 0 4px;margin-top:12px">
-      <button onclick="doGacha(1)" style="flex:1;padding:14px 8px;border-radius:30px;background:#f0ebe4;border:1px solid #ddd5c8;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px">
+      <button onclick="${onSingle}" style="flex:1;padding:14px 8px;border-radius:30px;background:#f0ebe4;border:1px solid #ddd5c8;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px">
         <span style="font-size:15px;font-weight:700">${t('gacha.single')}</span>
-        <span style="font-size:12px;color:#6b5a47">100 💎</span>
+        <span style="font-size:12px;color:#6b5a47">${singleCost} 💎</span>
       </button>
-      <button onclick="doGacha(10)" style="flex:1;padding:14px 8px;border-radius:30px;background:#f0ebe4;border:1px solid #ddd5c8;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px">
+      <button onclick="${onTen}" style="flex:1;padding:14px 8px;border-radius:30px;background:#f0ebe4;border:1px solid #ddd5c8;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px">
         <span style="font-size:15px;font-weight:700">${t('gacha.ten')}</span>
-        <span style="font-size:12px;color:#6b5a47">900 💎</span>
+        <span style="font-size:12px;color:#6b5a47">${tenCost} 💎</span>
       </button>
     </div>
-    ${buildAdGachaBtn()}`;
+    ${isSpecial ? buildAdSpecialGachaBtn() : buildAdGachaBtn()}`;
 }
 
 function buildAdGachaBtn() {
@@ -1962,6 +2033,19 @@ function buildAdGachaBtn() {
       cursor:${used ? 'default' : 'pointer'};font-size:14px;font-weight:700;
       font-family:inherit;opacity:${used ? '0.5' : '1'}">
     📺 ${used ? '今日廣告扭蛋已使用' : t('ad.free_gacha') + '（每日限 1 次）'}
+  </button>`;
+}
+
+function buildAdSpecialGachaBtn() {
+  const used = loadAdSpecialGachaUsed().used;
+  return `<button
+    id="btn-ad-gacha"
+    ${used ? '' : 'onclick="watchAdForSpecialGacha()"'}
+    style="width:100%;margin-top:4px;padding:12px 8px;border-radius:30px;
+      background:${used ? '#aaa' : '#1565c0'};border:none;color:#fff;
+      cursor:${used ? 'default' : 'pointer'};font-size:14px;font-weight:700;
+      font-family:inherit;opacity:${used ? '0.5' : '1'}">
+    📺 ${used ? t('toast.adSpecialGachaUsed') : t('ad.free_gacha') + '（每日限 1 次）'}
   </button>`;
 }
 
@@ -1984,10 +2068,103 @@ function showGachaRates() {
   openModal('modal-gacha-rates');
 }
 
+function showSpecialGachaRates() {
+  const total = SPECIAL_RARITY_RATES.reduce((s, r) => s + r.weight, 0);
+  const rows = SPECIAL_RARITY_RATES.map(r => {
+    const pct = (r.weight / total * 100).toFixed(0);
+    return `<tr>
+      <td style="padding:8px 0;border-bottom:1px solid #eee">
+        <span class="badge badge--${r.rarity.toLowerCase()}">${r.rarity}</span>
+      </td>
+      <td style="padding:8px 0;border-bottom:1px solid #eee;text-align:right;font-weight:700">${pct}%</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('gacha-rates-rows').innerHTML = rows;
+  document.getElementById('gacha-rates-title-text').textContent = t('gacha.rates.special.title');
+  document.getElementById('gacha-rates-pity').textContent = t('gacha.rates.special.pity');
+  document.getElementById('gacha-rates-note').textContent = t('gacha.rates.special.note');
+  document.getElementById('gacha-rates-confirm').textContent = t('common.confirm');
+  openModal('modal-gacha-rates');
+}
+
+function switchGachaPool(pool) {
+  activeGachaPool = pool;
+  buildGachaPanel();
+}
+
+function getGachaGridPets(count) {
+  const result = [];
+  const pool = activeGachaPool === 'special'
+    ? PETS.filter(p => !p.petVersion && (p.obtainable !== false || SPECIAL_POOL_IDS.includes(p.id)))
+    : PETS.filter(p => !p.petVersion && p.obtainable !== false);
+  for (let i = 0; i < count; i++) {
+    result.push(pool[Math.floor(Math.random() * pool.length)]);
+  }
+  return result;
+}
+
 function doGacha(count) {
   const cost = count === 1 ? GACHA_COST_SINGLE : GACHA_COST_TEN;
   if (!spendCoins(cost, '扭蛋')) { showToast(t('toast.no_coins')); return; }
   showGachaResult(doGachaRolls(count));
+}
+
+// ─── Special Pool ─────────────────────────────────────────────────────────────
+function rollSpecialPet(forcedMinRarity = null) {
+  let rarity;
+  const rates = forcedMinRarity
+    ? SPECIAL_RARITY_RATES.filter(r => RARITY_ORDER[r.rarity] >= RARITY_ORDER[forcedMinRarity])
+    : SPECIAL_RARITY_RATES;
+  const total = rates.reduce((s, r) => s + r.weight, 0);
+  let rand = Math.random() * total;
+  for (const { rarity: r, weight } of rates) {
+    rand -= weight;
+    if (rand <= 0) { rarity = r; break; }
+  }
+  rarity = rarity || (forcedMinRarity || 'F');
+  const pool = PETS.filter(p => p.rarity === rarity && !p.petVersion &&
+    (p.obtainable !== false || SPECIAL_POOL_IDS.includes(p.id)));
+  return pool[Math.floor(Math.random() * pool.length)] || PETS[0];
+}
+
+function doSpecialGachaRolls(count) {
+  sfxGacha();
+  const results = [];
+  let hasSRPlus = false;
+  let pity = getSpecialPityCount();
+
+  for (let i = 0; i < count; i++) {
+    pity++;
+    const needSSRPity  = pity >= SPECIAL_PITY_THRESHOLD;
+    const needTenPity  = count === 10 && i === count - 1 && !hasSRPlus;
+    const forcedMin    = needSSRPity ? 'SSR' : (needTenPity ? 'SR' : null);
+
+    const pet = rollSpecialPet(forcedMin);
+    if (RARITY_ORDER[pet.rarity] >= RARITY_ORDER['SSR']) pity = 0;
+    if (RARITY_ORDER[pet.rarity] >= RARITY_ORDER['SR'])  hasSRPlus = true;
+
+    const isNew = !isUnlocked(pet.id);
+    if (isNew) { unlockedPets.push(pet.id); } else { state.coins += 50; }
+    results.push({ pet, isNew, compensation: isNew ? 0 : 50 });
+  }
+
+  setSpecialPityCount(pity);
+  saveUnlockedPets();
+  saveState();
+  renderCoins();
+  results.forEach(r => {
+    trackQuestEvent('gacha');
+    trackQuestEvent('gacha_count');
+    if (r.pet.rarity === 'SR' && r.isNew) trackQuestEvent('sr_gacha');
+  });
+  trackQuestEvent('pet_count', unlockedPets.length);
+  return results;
+}
+
+function doSpecialGacha(count) {
+  const cost = count === 1 ? SPECIAL_GACHA_COST_SINGLE : SPECIAL_GACHA_COST_TEN;
+  if (!spendCoins(cost, '特殊扭蛋')) { showToast(t('toast.no_coins')); return; }
+  showGachaResult(doSpecialGachaRolls(count));
 }
 
 const showShopMain = () => {
@@ -2027,7 +2204,7 @@ const showShopSub = (type) => {
       if (!grid) { clearInterval(gachaInterval); return; }
       grid.style.opacity = '0';
       setTimeout(() => {
-        grid.innerHTML = petCellsHTML(getRandomPets(16));
+        grid.innerHTML = petCellsHTML(getGachaGridPets(16));
         grid.style.opacity = '1';
       }, 300);
     }, 2000);
@@ -2163,18 +2340,16 @@ function renderPokedex() {
   grid.innerHTML = sorted.map(pet => {
     const unlocked = isUnlocked(pet.id);
     const ps       = unlocked ? loadPetState(pet.id) : null;
-    const isUnobtainable = pet.obtainable === false && !unlocked;
     return `
       <div class="pokedex-card${unlocked ? '' : ' pokedex-card--locked'}">
         <div class="pokedex-card__img-wrap">
           ${unlocked
             ? `<img src="${pet.image}" class="pokedex-card__img" alt="${t(pet.nameKey)}"
                     onerror="this.style.opacity='.3'">`
-            : `<div class="pokedex-card__lock">${isUnobtainable ? '✨' : '🔒'}</div>`}
+            : `<div class="pokedex-card__lock">🔒</div>`}
         </div>
         <div class="pokedex-card__name">${unlocked ? t(pet.nameKey) : '???'}</div>
         <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>${getElementBadgeHtml(pet.id)}
-        ${isUnobtainable ? `<div style="font-size:10px;color:#ff9800;font-weight:700;margin-top:2px">${t('pokedex.coming_soon')}</div>` : ''}
         ${unlocked && ps ? `<div class="pokedex-card__lv">Lv.${ps.level}</div>` : ''}
       </div>`;
   }).join('');

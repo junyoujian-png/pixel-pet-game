@@ -112,6 +112,8 @@ const LANG_DATA = {
     // 扭蛋
     'gacha.title': '寵物抽獎',
     'gacha.pool': '常駐卡池',
+    'gacha.pool.special': '特殊卡池',
+    'gacha.pity.progress': '保底進度',
     'gacha.single': '單次抽獎',
     'gacha.ten': '十次抽獎',
     'gacha.ad': '看廣告抽一次',
@@ -121,6 +123,9 @@ const LANG_DATA = {
     'gacha.rates.title': '扭蛋機率',
     'gacha.rates.pity': '※ 十連保底：前 9 抽未出現 SR，第 10 抽必定 SR',
     'gacha.rates.note': '※ 單抽、十連、廣告扭蛋機率相同',
+    'gacha.rates.special.title': '特殊卡池機率',
+    'gacha.rates.special.pity': '※ 十連保底：前 9 抽未出現 SR，第 10 抽必定 SR；累積 100 抽保底 SSR（計數跨次保留）',
+    'gacha.rates.special.note': '※ 特殊卡池含限定 SSR 寵物，常駐卡池不含',
     // 廣告
     'ad.watch': '觀看廣告',
     'ad.watching': '廣告播放中...',
@@ -452,6 +457,7 @@ const LANG_DATA = {
     'toast.ticketAdded': '🎫 {name} 已加入背包！',
     'toast.slotsFull': '所有巢位已滿！',
     'toast.adGachaUsed': '今日廣告扭蛋已使用！',
+    'toast.adSpecialGachaUsed': '今日特殊卡池廣告已使用！',
     'toast.healthKitDenied': '請允許存取健康資料以取得真實步數',
     'toast.notificationDenied': '請在瀏覽器設定開啟通知權限',
     // 任務內容（每日 / 成就 / 週常）
@@ -591,6 +597,8 @@ const LANG_DATA = {
     // Gacha
     'gacha.title': 'Pet Gacha',
     'gacha.pool': 'Standard Pool',
+    'gacha.pool.special': 'Special Pool',
+    'gacha.pity.progress': 'SSR Pity',
     'gacha.single': 'Single Draw',
     'gacha.ten': '10x Draw',
     'gacha.ad': 'Watch Ad to Draw',
@@ -600,6 +608,9 @@ const LANG_DATA = {
     'gacha.rates.title': 'Gacha Rates',
     'gacha.rates.pity': '* 10x Guarantee: If no SR in first 9 pulls, the 10th is guaranteed SR',
     'gacha.rates.note': '* Rates apply equally to single, 10x, and ad gacha',
+    'gacha.rates.special.title': 'Special Pool Rates',
+    'gacha.rates.special.pity': '* 10x Guarantee: SR+ on 10th pull if none in first 9; 100 cumulative pulls guarantees SSR (counter persists)',
+    'gacha.rates.special.note': '* Includes exclusive SSR pets not available in the Standard Pool',
     // Ads
     'ad.watch': 'Watch Ad',
     'ad.watching': 'Ad playing...',
@@ -931,6 +942,7 @@ const LANG_DATA = {
     'toast.ticketAdded': '🎫 {name} added to bag!',
     'toast.slotsFull': 'All slots are full!',
     'toast.adGachaUsed': 'Daily ad gacha already used!',
+    'toast.adSpecialGachaUsed': 'Special pool ad gacha already used today!',
     'toast.healthKitDenied': 'Please allow access to health data for real step counts',
     'toast.notificationDenied': 'Please enable notification permission in browser settings',
     // Quest content (daily / achievement / weekly)
