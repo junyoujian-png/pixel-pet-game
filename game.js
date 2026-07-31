@@ -56,6 +56,10 @@ const PETS = [
   { id: 'pet49', name: '梅花鹿', nameKey: 'pet.pet49.name', rarity: 'SR', image: 'assets/pets/梅花鹿.png', skills: [{ name: '撞', nameKey: 'skill.charge', desc: '低頭用身體衝撞敵人', descKey: 'skill.charge.desc', effect: 'atk', power: 1.0, icon: '💨', maxPP: 15, currentPP: 15 }, { name: '衝撞', nameKey: 'skill.charge2', desc: '低頭用身體全力衝撞敵人', descKey: 'skill.charge2.desc', effect: 'atk', power: 1.5, icon: '💥', maxPP: 10, currentPP: 10 }, { name: '猛力頭槌', nameKey: 'skill.charge3', desc: '蓄力後以頭部猛烈撞擊', descKey: 'skill.charge3.desc', effect: 'atk', power: 2.0, icon: '🌪️', maxPP: 5, currentPP: 5 }] },
   { id: 'pet50', name: '綿羊',         nameKey: 'pet.pet50.name', rarity: 'R',  image: 'assets/pets/綿羊.png',         skills: [{ name: '撞', nameKey: 'skill.charge', desc: '低頭用身體撞敵人', descKey: 'skill.charge.desc', effect: 'atk', power: 1.0, icon: '💨', maxPP: 10, currentPP: 10 }, { name: '衝撞', nameKey: 'skill.charge2', desc: '低頭用身體全力衝撞敵人', descKey: 'skill.charge2.desc', effect: 'atk', power: 1.5, icon: '💥', maxPP: 5, currentPP: 5 }] },
   { id: 'pet51', name: '紅浣熊',       nameKey: 'pet.pet51.name', rarity: 'SR', image: 'assets/pets/紅浣熊.png', skills: [{ name: '抓', nameKey: 'skill.scratch', desc: '伸出利爪快速抓向敵人', descKey: 'skill.scratch.desc', effect: 'atk', power: 1.0, icon: '🐾', maxPP: 15, currentPP: 15 }, { name: '亂抓', nameKey: 'skill.scratch2', desc: '瘋狂揮舞爪子攻擊', descKey: 'skill.scratch2.desc', effect: 'atk', power: 1.5, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '快速亂抓', nameKey: 'skill.scratch3', desc: '瘋狂揮舞爪子快速攻擊', descKey: 'skill.scratch3.desc', effect: 'atk', power: 2.0, icon: '🌑', maxPP: 5, currentPP: 5 }] },
+  // ── SSR 圖鑑限定（obtainable: false — 不進扭蛋池，未來活動解鎖）──
+  { id: 'pet52', name: '企鵝',   nameKey: 'pet.pet52.name', rarity: 'SSR', image: 'assets/pets/pet_52.png', obtainable: false, skills: [{ name: '啄擊',   nameKey: 'skill.peck',    desc: '用尖嘴啄向敵人',   descKey: 'skill.peck.desc',    effect: 'atk', power: 1.5, icon: '🐦', maxPP: 15, currentPP: 15 }, { name: '快速啄擊', nameKey: 'skill.peck2', desc: '快速啄擊敵人',     descKey: 'skill.peck2.desc',   effect: 'atk', power: 2.0, icon: '🐦', maxPP: 10, currentPP: 10 }, { name: '連續猛啄', nameKey: 'skill.peck3', desc: '連續啄擊敵人多次', descKey: 'skill.peck3.desc',   effect: 'atk', power: 3.0, icon: '🦅', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet53', name: '北極熊', nameKey: 'pet.pet53.name', rarity: 'SSR', image: 'assets/pets/pet_53.png', obtainable: false, skills: [{ name: '咬',     nameKey: 'skill.bite',    desc: '用尖牙狠狠咬住敵人', descKey: 'skill.bite.desc',    effect: 'atk', power: 1.5, icon: '🦷', maxPP: 15, currentPP: 15 }, { name: '撕咬',   nameKey: 'skill.bite2',   desc: '憤怒地咬住敵人不放', descKey: 'skill.bite2.desc',   effect: 'atk', power: 2.0, icon: '🦷', maxPP: 10, currentPP: 10 }, { name: '強咬',   nameKey: 'skill.bite3',   desc: '以本能發動致命一咬', descKey: 'skill.bite3.desc',   effect: 'atk', power: 3.0, icon: '🦷', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet54', name: '北極狐', nameKey: 'pet.pet54.name', rarity: 'SSR', image: 'assets/pets/pet_54.png', obtainable: false, skills: [{ name: '抓',     nameKey: 'skill.scratch',  desc: '伸出利爪抓向敵人',   descKey: 'skill.scratch.desc', effect: 'atk', power: 1.5, icon: '🐾', maxPP: 15, currentPP: 15 }, { name: '亂抓',   nameKey: 'skill.scratch2', desc: '瘋狂揮舞爪子攻擊',   descKey: 'skill.scratch2.desc',effect: 'atk', power: 2.0, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '快速亂抓', nameKey: 'skill.scratch3',desc: '瘋狂揮舞爪子快速攻擊',descKey: 'skill.scratch3.desc',effect: 'atk', power: 3.0, icon: '🌑', maxPP:  5, currentPP:  5 }] },
   // ── Boss Pets（轉盤獲得，等級上限同 SSR Lv.50）──
   { id: 'boss_pet_01', name: '金剛鸚鵡', nameKey: 'pet.boss_pet_01.name', rarity: 'SSR', image: 'assets/boss/boss_01.png', petVersion: true, skills: [{ name: '啄', nameKey: 'skill.boss_peck', desc: '用鳥喙快速啄向敵人', descKey: 'skill.boss_peck.desc', effect: 'atk', power: 1.5, icon: '🐦', maxPP: 15, currentPP: 15 }, { name: '猛啄', nameKey: 'skill.boss_peck2', desc: '用鳥喙用力猛啄', descKey: 'skill.boss_peck2.desc', effect: 'atk', power: 2.0, icon: '💢', maxPP: 10, currentPP: 10 }, { name: '連續啄擊', nameKey: 'skill.boss_peck3', desc: '瘋狂連續啄擊敵人', descKey: 'skill.boss_peck3.desc', effect: 'atk', power: 2.5, icon: '⚡', maxPP: 5, currentPP: 5 }] },
   { id: 'boss_pet_02', name: '蟒蛇',     nameKey: 'pet.boss_pet_02.name', rarity: 'SSR', image: 'assets/boss/boss_02.png', petVersion: true, skills: [{ name: '咬', nameKey: 'skill.boss_bite', desc: '用利牙快速咬向敵人', descKey: 'skill.boss_bite.desc', effect: 'atk', power: 1.5, icon: '🦷', maxPP: 15, currentPP: 15 }, { name: '猛咬', nameKey: 'skill.boss_bite2', desc: '用利牙用力猛咬', descKey: 'skill.boss_bite2.desc', effect: 'atk', power: 2.0, icon: '💢', maxPP: 10, currentPP: 10 }, { name: '連續咬擊', nameKey: 'skill.boss_bite3', desc: '瘋狂連續咬擊敵人', descKey: 'skill.boss_bite3.desc', effect: 'atk', power: 2.5, icon: '⚡', maxPP: 5, currentPP: 5 }] },
@@ -491,7 +495,7 @@ function rollPet(forcedMinRarity = null) {
     }
     rarity = rarity || 'F';
   }
-  const pool = PETS.filter(p => p.rarity === rarity && !p.petVersion);
+  const pool = PETS.filter(p => p.rarity === rarity && !p.petVersion && p.obtainable !== false);
   return pool[Math.floor(Math.random() * pool.length)] || PETS[0];
 }
 
@@ -1910,7 +1914,7 @@ let gachaInterval = null;
 function getRandomPets(count) {
   const result = [];
   for (let i = 0; i < count; i++) {
-    const pool = PETS.filter(p => !p.petVersion);
+    const pool = PETS.filter(p => !p.petVersion && p.obtainable !== false);
     result.push(pool[Math.floor(Math.random() * pool.length)]);
   }
   return result;
@@ -2159,16 +2163,18 @@ function renderPokedex() {
   grid.innerHTML = sorted.map(pet => {
     const unlocked = isUnlocked(pet.id);
     const ps       = unlocked ? loadPetState(pet.id) : null;
+    const isUnobtainable = pet.obtainable === false && !unlocked;
     return `
       <div class="pokedex-card${unlocked ? '' : ' pokedex-card--locked'}">
         <div class="pokedex-card__img-wrap">
           ${unlocked
             ? `<img src="${pet.image}" class="pokedex-card__img" alt="${t(pet.nameKey)}"
                     onerror="this.style.opacity='.3'">`
-            : `<div class="pokedex-card__lock">🔒</div>`}
+            : `<div class="pokedex-card__lock">${isUnobtainable ? '✨' : '🔒'}</div>`}
         </div>
         <div class="pokedex-card__name">${unlocked ? t(pet.nameKey) : '???'}</div>
         <span class="badge badge--${pet.rarity.toLowerCase()}">${pet.rarity}</span>${getElementBadgeHtml(pet.id)}
+        ${isUnobtainable ? `<div style="font-size:10px;color:#ff9800;font-weight:700;margin-top:2px">${t('pokedex.coming_soon')}</div>` : ''}
         ${unlocked && ps ? `<div class="pokedex-card__lv">Lv.${ps.level}</div>` : ''}
       </div>`;
   }).join('');

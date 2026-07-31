@@ -77,6 +77,7 @@ const LANG_DATA = {
     // 背包
     'select.title': '選擇你的寵物',
     'pokedex.title': '📖 寵物圖鑑',
+    'pokedex.coming_soon': '敬請期待',
     'bag.food.title': '🍖 食物背包',
     'bag.drink.title': '🥤 飲料背包',
     'bag.food': '食物',
@@ -167,6 +168,7 @@ const LANG_DATA = {
     'pet.pet41.name': '小鴨', 'pet.pet42.name': '水豚', 'pet.pet43.name': '樹麻雀', 'pet.pet44.name': '紅頭山雀',
     'pet.pet45.name': '黃牛', 'pet.pet46.name': '荷斯坦牛', 'pet.pet47.name': '浣熊', 'pet.pet48.name': '山羌',
     'pet.pet49.name': '梅花鹿', 'pet.pet50.name': '綿羊', 'pet.pet51.name': '紅浣熊',
+    'pet.pet52.name': '企鵝', 'pet.pet53.name': '北極熊', 'pet.pet54.name': '北極狐',
     // BOSS寵物名稱
     'pet.boss_pet_01.name': '金剛鸚鵡', 'pet.boss_pet_02.name': '蟒蛇', 'pet.boss_pet_03.name': '鴕鳥', 'pet.boss_pet_04.name': '狼',
     'pet.boss_pet_05.name': '袋鼠', 'pet.boss_pet_06.name': '獵豹', 'pet.boss_pet_07.name': '河馬', 'pet.boss_pet_08.name': '犀牛',
@@ -187,6 +189,9 @@ const LANG_DATA = {
     'pet.pet46.element': '水',
     'pet.pet47.element': '水',
     'pet.pet51.element': '水',
+    'pet.pet52.element': '水',
+    'pet.pet53.element': '水',
+    'pet.pet54.element': '水',
     // 火屬性
     'pet.pet2.element': '火',
     'pet.pet4.element': '火',
@@ -551,6 +556,7 @@ const LANG_DATA = {
     // Bag
     'select.title': 'Choose Your Pet',
     'pokedex.title': '📖 Pet Dex',
+    'pokedex.coming_soon': 'Coming Soon',
     'bag.food.title': '🍖 Food Bag',
     'bag.drink.title': '🥤 Drink Bag',
     'bag.food': 'Food',
@@ -641,6 +647,7 @@ const LANG_DATA = {
     'pet.pet41.name': 'Duckling', 'pet.pet42.name': 'Capybara', 'pet.pet43.name': 'Tree Sparrow', 'pet.pet44.name': 'Red-headed Tit',
     'pet.pet45.name': 'Yellow Cow', 'pet.pet46.name': 'Holstein Cow', 'pet.pet47.name': 'Raccoon', 'pet.pet48.name': 'Reeves Muntjac',
     'pet.pet49.name': 'Sika Deer', 'pet.pet50.name': 'Sheep', 'pet.pet51.name': 'Red Panda',
+    'pet.pet52.name': 'Penguin', 'pet.pet53.name': 'Polar Bear', 'pet.pet54.name': 'Arctic Fox',
     // BOSS pet names
     'pet.boss_pet_01.name': 'Macaw', 'pet.boss_pet_02.name': 'Python', 'pet.boss_pet_03.name': 'Ostrich', 'pet.boss_pet_04.name': 'Wolf',
     'pet.boss_pet_05.name': 'Kangaroo', 'pet.boss_pet_06.name': 'Cheetah', 'pet.boss_pet_07.name': 'Hippo', 'pet.boss_pet_08.name': 'Rhinoceros',
@@ -661,6 +668,9 @@ const LANG_DATA = {
     'pet.pet46.element': '水',
     'pet.pet47.element': '水',
     'pet.pet51.element': '水',
+    'pet.pet52.element': '水',
+    'pet.pet53.element': '水',
+    'pet.pet54.element': '水',
     // Fire
     'pet.pet2.element': '火',
     'pet.pet4.element': '火',
