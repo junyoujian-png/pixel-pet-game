@@ -4281,6 +4281,13 @@ async function loginWithGoogle() {
     return true;
   } catch (e) {
     console.error('登入失敗 (Google):', e);
+    const msg = [
+      '[Google 登入失敗]',
+      'code: '    + (e.code    || e.errorCode    || '—'),
+      'message: ' + (e.message || e.errorMessage || '—'),
+      'detail: '  + JSON.stringify(e),
+    ].join('\n');
+    alert(msg);
     showToast(t('settings.login.fail'));
     return false;
   }
@@ -4303,6 +4310,13 @@ async function loginWithApple() {
     return true;
   } catch (e) {
     console.error('Apple 登入失敗:', e);
+    const msg = [
+      '[Apple 登入失敗]',
+      'code: '    + (e.code    || e.errorCode    || '—'),
+      'message: ' + (e.message || e.errorMessage || '—'),
+      'detail: '  + JSON.stringify(e),
+    ].join('\n');
+    alert(msg);
     showToast(t('settings.login.fail'));
     return false;
   }
