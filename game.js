@@ -57,9 +57,9 @@ const PETS = [
   { id: 'pet50', name: '綿羊',         nameKey: 'pet.pet50.name', rarity: 'R',  image: 'assets/pets/綿羊.png',         skills: [{ name: '撞', nameKey: 'skill.charge', desc: '低頭用身體撞敵人', descKey: 'skill.charge.desc', effect: 'atk', power: 1.0, icon: '💨', maxPP: 10, currentPP: 10 }, { name: '衝撞', nameKey: 'skill.charge2', desc: '低頭用身體全力衝撞敵人', descKey: 'skill.charge2.desc', effect: 'atk', power: 1.5, icon: '💥', maxPP: 5, currentPP: 5 }] },
   { id: 'pet51', name: '紅浣熊',       nameKey: 'pet.pet51.name', rarity: 'SR', image: 'assets/pets/紅浣熊.png', skills: [{ name: '抓', nameKey: 'skill.scratch', desc: '伸出利爪快速抓向敵人', descKey: 'skill.scratch.desc', effect: 'atk', power: 1.0, icon: '🐾', maxPP: 15, currentPP: 15 }, { name: '亂抓', nameKey: 'skill.scratch2', desc: '瘋狂揮舞爪子攻擊', descKey: 'skill.scratch2.desc', effect: 'atk', power: 1.5, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '快速亂抓', nameKey: 'skill.scratch3', desc: '瘋狂揮舞爪子快速攻擊', descKey: 'skill.scratch3.desc', effect: 'atk', power: 2.0, icon: '🌑', maxPP: 5, currentPP: 5 }] },
   // ── SSR 圖鑑限定（obtainable: false — 不進扭蛋池，未來活動解鎖）──
-  { id: 'pet52', name: '企鵝',   nameKey: 'pet.pet52.name', rarity: 'SSR', image: 'assets/pets/pet_52.png', obtainable: false, skills: [{ name: '啄擊',   nameKey: 'skill.peck',    desc: '用尖嘴啄向敵人',   descKey: 'skill.peck.desc',    effect: 'atk', power: 1.5, icon: '🐦', maxPP: 15, currentPP: 15 }, { name: '快速啄擊', nameKey: 'skill.peck2', desc: '快速啄擊敵人',     descKey: 'skill.peck2.desc',   effect: 'atk', power: 2.0, icon: '🐦', maxPP: 10, currentPP: 10 }, { name: '連續猛啄', nameKey: 'skill.peck3', desc: '連續啄擊敵人多次', descKey: 'skill.peck3.desc',   effect: 'atk', power: 3.0, icon: '🦅', maxPP:  5, currentPP:  5 }] },
-  { id: 'pet53', name: '北極熊', nameKey: 'pet.pet53.name', rarity: 'SSR', image: 'assets/pets/pet_53.png', obtainable: false, skills: [{ name: '咬',     nameKey: 'skill.bite',    desc: '用尖牙狠狠咬住敵人', descKey: 'skill.bite.desc',    effect: 'atk', power: 1.5, icon: '🦷', maxPP: 15, currentPP: 15 }, { name: '撕咬',   nameKey: 'skill.bite2',   desc: '憤怒地咬住敵人不放', descKey: 'skill.bite2.desc',   effect: 'atk', power: 2.0, icon: '🦷', maxPP: 10, currentPP: 10 }, { name: '強咬',   nameKey: 'skill.bite3',   desc: '以本能發動致命一咬', descKey: 'skill.bite3.desc',   effect: 'atk', power: 3.0, icon: '🦷', maxPP:  5, currentPP:  5 }] },
-  { id: 'pet54', name: '北極狐', nameKey: 'pet.pet54.name', rarity: 'SSR', image: 'assets/pets/pet_54.png', obtainable: false, skills: [{ name: '抓',     nameKey: 'skill.scratch',  desc: '伸出利爪抓向敵人',   descKey: 'skill.scratch.desc', effect: 'atk', power: 1.5, icon: '🐾', maxPP: 15, currentPP: 15 }, { name: '亂抓',   nameKey: 'skill.scratch2', desc: '瘋狂揮舞爪子攻擊',   descKey: 'skill.scratch2.desc',effect: 'atk', power: 2.0, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '快速亂抓', nameKey: 'skill.scratch3',desc: '瘋狂揮舞爪子快速攻擊',descKey: 'skill.scratch3.desc',effect: 'atk', power: 3.0, icon: '🌑', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet52', name: '企鵝',   nameKey: 'pet.pet52.name', rarity: 'SSR', image: 'assets/pets/pet_52.png', obtainable: false, skills: [{ name: '啄擊',   nameKey: 'skill.peck',    desc: '用尖嘴啄向敵人',   descKey: 'skill.peck.desc',    effect: 'atk', power: 1.5, icon: '🐦', maxPP: 15, currentPP: 15 }, { name: '快速啄擊', nameKey: 'skill.peck2', desc: '快速啄擊敵人',     descKey: 'skill.peck2.desc',   effect: 'atk', power: 2.0, icon: '🐦', maxPP: 10, currentPP: 10 }, { name: '連續猛啄', nameKey: 'skill.peck3', desc: '連續啄擊敵人多次', descKey: 'skill.peck3.desc',   effect: 'atk', power: 2.5, icon: '🦅', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet53', name: '北極熊', nameKey: 'pet.pet53.name', rarity: 'SSR', image: 'assets/pets/pet_53.png', obtainable: false, skills: [{ name: '咬',     nameKey: 'skill.bite',    desc: '用尖牙狠狠咬住敵人', descKey: 'skill.bite.desc',    effect: 'atk', power: 1.5, icon: '🦷', maxPP: 15, currentPP: 15 }, { name: '撕咬',   nameKey: 'skill.bite2',   desc: '憤怒地咬住敵人不放', descKey: 'skill.bite2.desc',   effect: 'atk', power: 2.0, icon: '🦷', maxPP: 10, currentPP: 10 }, { name: '強咬',   nameKey: 'skill.bite3',   desc: '以本能發動致命一咬', descKey: 'skill.bite3.desc',   effect: 'atk', power: 2.5, icon: '🦷', maxPP:  5, currentPP:  5 }] },
+  { id: 'pet54', name: '北極狐', nameKey: 'pet.pet54.name', rarity: 'SSR', image: 'assets/pets/pet_54.png', obtainable: false, skills: [{ name: '抓',     nameKey: 'skill.scratch',  desc: '伸出利爪抓向敵人',   descKey: 'skill.scratch.desc', effect: 'atk', power: 1.5, icon: '🐾', maxPP: 15, currentPP: 15 }, { name: '亂抓',   nameKey: 'skill.scratch2', desc: '瘋狂揮舞爪子攻擊',   descKey: 'skill.scratch2.desc',effect: 'atk', power: 2.0, icon: '🐾', maxPP: 10, currentPP: 10 }, { name: '快速亂抓', nameKey: 'skill.scratch3',desc: '瘋狂揮舞爪子快速攻擊',descKey: 'skill.scratch3.desc',effect: 'atk', power: 2.5, icon: '🌑', maxPP:  5, currentPP:  5 }] },
   // ── Boss Pets（轉盤獲得，等級上限同 SSR Lv.50）──
   { id: 'boss_pet_01', name: '金剛鸚鵡', nameKey: 'pet.boss_pet_01.name', rarity: 'SSR', image: 'assets/boss/boss_01.png', petVersion: true, skills: [{ name: '啄', nameKey: 'skill.boss_peck', desc: '用鳥喙快速啄向敵人', descKey: 'skill.boss_peck.desc', effect: 'atk', power: 1.5, icon: '🐦', maxPP: 15, currentPP: 15 }, { name: '猛啄', nameKey: 'skill.boss_peck2', desc: '用鳥喙用力猛啄', descKey: 'skill.boss_peck2.desc', effect: 'atk', power: 2.0, icon: '💢', maxPP: 10, currentPP: 10 }, { name: '連續啄擊', nameKey: 'skill.boss_peck3', desc: '瘋狂連續啄擊敵人', descKey: 'skill.boss_peck3.desc', effect: 'atk', power: 2.5, icon: '⚡', maxPP: 5, currentPP: 5 }] },
   { id: 'boss_pet_02', name: '蟒蛇',     nameKey: 'pet.boss_pet_02.name', rarity: 'SSR', image: 'assets/boss/boss_02.png', petVersion: true, skills: [{ name: '咬', nameKey: 'skill.boss_bite', desc: '用利牙快速咬向敵人', descKey: 'skill.boss_bite.desc', effect: 'atk', power: 1.5, icon: '🦷', maxPP: 15, currentPP: 15 }, { name: '猛咬', nameKey: 'skill.boss_bite2', desc: '用利牙用力猛咬', descKey: 'skill.boss_bite2.desc', effect: 'atk', power: 2.0, icon: '💢', maxPP: 10, currentPP: 10 }, { name: '連續咬擊', nameKey: 'skill.boss_bite3', desc: '瘋狂連續咬擊敵人', descKey: 'skill.boss_bite3.desc', effect: 'atk', power: 2.5, icon: '⚡', maxPP: 5, currentPP: 5 }] },
@@ -873,7 +873,7 @@ function renderFoodShop() {
             <div class="drink-shop-info">
               <span class="drink-shop-name">${t(f.nameKey)}</span>
               <span class="badge badge--${f.rarity.toLowerCase()}">${f.rarity}</span>
-              <span class="drink-shop-desc">${f.desc}</span>
+              <span class="drink-shop-desc">${effectDesc(f.effect)}</span>
             </div>
             <button class="buy-btn${coins >= f.price ? '' : ' buy-btn--disabled'}"
               onclick="buyFood('${f.id}')" ${coins >= f.price ? '' : 'disabled'}>
@@ -1120,7 +1120,7 @@ function renderPetPickModal() {
         <div class="modal-pick-right">
           <button class="use-btn${slotsFull ? ' use-btn--disabled' : ''}"
                   ${slotsFull ? 'disabled' : `onclick="addPetFromPickModal('${pet.id}')"`}>
-            ${slotsFull ? '巢位已滿' : '加入巢位'}
+            ${slotsFull ? t('pet.pick.slots_full') : t('pet.pick.add')}
           </button>
         </div>
       </div>`;
@@ -1142,7 +1142,7 @@ function addPetFromPickModal(petId) {
   renderAll();
   closeModal('modal-pet-pick');
   const pet = PETS.find(p => p.id === petId);
-  showToast(`✅ ${pet ? t(pet.nameKey) : t('bag.pet')} 加入巢位！`);
+  showToast(t('toast.petAddedToNest').replace('{name}', pet ? t(pet.nameKey) : t('bag.pet')));
 }
 
 function renderDrinkShop() {
@@ -1164,7 +1164,7 @@ function renderDrinkShop() {
             <div class="drink-shop-info">
               <span class="drink-shop-name">${t(d.nameKey)}</span>
               <span class="badge badge--${d.rarity.toLowerCase()}">${d.rarity}</span>
-              <span class="drink-shop-desc">${d.desc}</span>
+              <span class="drink-shop-desc">${effectDesc(d.effect)}</span>
             </div>
             <button class="buy-btn${coins >= d.price ? '' : ' buy-btn--disabled'}"
               onclick="buyDrink('${d.id}')" ${coins >= d.price ? '' : 'disabled'}>
@@ -2006,7 +2006,7 @@ function buildGachaPanel() {
       </div>
       <button onclick="${onRates}" style="font-size:12px;color:#6b5a47;background:#e8e4de;border:1px solid #ddd5c8;border-radius:12px;padding:2px 8px;cursor:pointer;font-family:inherit">ℹ️ ${t('gacha.rates.btn')}</button>
     </div>
-    ${isSpecial ? `<div style="font-size:11px;color:#888;text-align:center;margin-bottom:2px">SSR ${t('gacha.pity.progress')}：${pity} / ${SPECIAL_PITY_THRESHOLD}</div>` : ''}
+    ${isSpecial ? `<div style="font-size:11px;color:#888;text-align:center;margin-bottom:2px">${t('gacha.pity.progress')}：${pity} / ${SPECIAL_PITY_THRESHOLD}</div>` : ''}
     <div id="gacha-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px;transition:opacity 0.3s">
       ${petCellsHTML(getGachaGridPets(16))}
     </div>
@@ -2032,7 +2032,7 @@ function buildAdGachaBtn() {
       background:${used ? '#aaa' : '#1565c0'};border:none;color:#fff;
       cursor:${used ? 'default' : 'pointer'};font-size:14px;font-weight:700;
       font-family:inherit;opacity:${used ? '0.5' : '1'}">
-    📺 ${used ? '今日廣告扭蛋已使用' : t('ad.free_gacha') + '（每日限 1 次）'}
+    📺 ${used ? t('toast.adGachaUsed') : t('ad.free_gacha') + t('ad.daily_limit')}
   </button>`;
 }
 
@@ -2045,7 +2045,7 @@ function buildAdSpecialGachaBtn() {
       background:${used ? '#aaa' : '#1565c0'};border:none;color:#fff;
       cursor:${used ? 'default' : 'pointer'};font-size:14px;font-weight:700;
       font-family:inherit;opacity:${used ? '0.5' : '1'}">
-    📺 ${used ? t('toast.adSpecialGachaUsed') : t('ad.free_gacha') + '（每日限 1 次）'}
+    📺 ${used ? t('toast.adSpecialGachaUsed') : t('ad.free_gacha') + t('ad.daily_limit')}
   </button>`;
 }
 
